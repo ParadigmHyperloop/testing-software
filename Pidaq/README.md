@@ -1,7 +1,6 @@
-# Raspberry Pi CPU Directory Structure
+# Pidaq (Raspberry Pi Data Aquisitor) 
 
-This directory contains all of the code that will run on the raspberry pi as well as all configuration for grafana and influxdb instances that will run on the pi.
-
+This directory contains all of the code that will run on the raspberry pi. The pi will receive and parse CAN messages, and create either a JSON or protobuf message to send to the control laptop via ethernet (UDP)
 *** 
 
 ## DataLogger
