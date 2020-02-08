@@ -5,18 +5,19 @@ Contains all the code that implements a module graphical user interface that can
 *** 
 
 ## Dashboard
-``` 
+
 Contains documentation and configuration for the grafana dashboard
-```
+
 ***
 ## Examples
-```
+
 Contains examples of grafana dashboard configuration
-```
+
+
 ***
 ## Control
-```
+
 Contains the web front end for the controls. 
-```
+
 **Very Temporary** 
 ***
