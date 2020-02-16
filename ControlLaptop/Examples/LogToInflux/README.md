@@ -1,6 +1,8 @@
 # Example - Logging to Influx
 
-Example of logging to influx using python, as well as how to setup influxdb. Drawn from http://richardn.ca/2019/01/04/installing-influxdb-on-windows/
+Example of logging to influx using python, as well as how to setup influxdb and grafana. Drawn from http://richardn.ca/2019/01/04/installing-influxdb-on-windows/
+
+
 
 ## Installing nssm
 nssm is the "non-sucking service manager", it is a valuable tool for creating, configuring, and deploying services on windows. It is simply a .exe that is downloaded and then added to the PATH before it can be used from the CLI (Command line interface).
@@ -10,8 +12,10 @@ nssm is the "non-sucking service manager", it is a valuable tool for creating, c
 * Make a directory in program files called nssm and move the nssm.exe there
 * Add C:/Program Files/nssm to your path
     * start -> "Edit system environment variables" -> environment variables path -> edit -> new -> path-to-nssm
+
 * In console, enter `nssm` to ensure it is installed correctly
-___
+
+
 ## Setting Up Influxdb
 
 ### Windows
@@ -45,3 +49,19 @@ And you should see something like:
 ``` 
 {"error":"missing required parameter \"q\""}
 ```
+You can now enter the influx interactive shell by navigating to the influxdb folder containing `influx.exe` and running it (enter `influx` in console or double click the exe)
+
+---
+
+## Setting Up Grafana
+### Windows
+This pretty much describes everything you need to  know in a concise and visual form, no need to reinvent the wheel. 
+<https://devconnected.com/how-to-install-grafana-on-windows-8-10/>
+
+Note: It is not necessary to use a custom .ini, the defaults are fine for most use cases! There will be a config file for the production grafana server that we will use, however for personal dev environments the defaults are fine.
+
+After getting grafana running as a service, you can login and import the dashboard by uploading the ` dashboard.json` file in this directory.
+
+
+
+
