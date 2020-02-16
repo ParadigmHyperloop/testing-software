@@ -51,7 +51,6 @@ And you should see something like:
 ```
 You can now enter the influx interactive shell by navigating to the influxdb folder containing `influx.exe` and running it (enter `influx` in console or double click the exe)
 
----
 
 ## Setting Up Grafana
 ### Windows
