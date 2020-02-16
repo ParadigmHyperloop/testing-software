@@ -31,8 +31,8 @@ def main():
     # host, port, user, pass, database
     client = InfluxDBClient('localhost', 8086, 'root', 'root', 'example')
 
-    # client.drop_database('example')
     # Create a new database in influx
+    client.drop_database('example')
     client.create_database('example')
 
     while 1:
@@ -47,7 +47,6 @@ def main():
         # Scramble data
         telemetry[0]['fields']['Celsius'] = random.random() * 100.0 
         telemetry[0]['fields']['Fahrenheit'] = random.randint(0,100) 
-    #s telemetry[0]['time'] = datetime.now()
 
         time.sleep(1)
 
