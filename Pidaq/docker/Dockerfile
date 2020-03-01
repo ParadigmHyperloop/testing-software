@@ -29,3 +29,4 @@ COPY helloTest.sh /usr/local/bin
 RUN sed -i.bak 's/\r$//' /usr/local/bin/helloTest.sh && \
     chmod +x /usr/local/bin/helloTest.sh
 
+CMD /bin/bash
