@@ -5,7 +5,7 @@ This directory contains all of the code that will run on the raspberry pi. The p
 # Development
 We will be using docker to cross compile c++ for the raspberry pi
 
-Ensure docker is installed and running on your machine. Windows 10 Home does not have proper support for docker, however MUN offers a free upgrade to windows 10 education which is fully featured. The update is easy, unintrusive, and tasks less than 1 hour.
+Ensure docker is installed and running on your machine. Windows 10 Home does not have proper support for docker, however MUN offers a free upgrade to windows 10 education which is fully featured. The update is easy, unintrusive, and takes less than 1 hour.
 
 ## Taskrunner Setup Code for VsCode
 * Install vscode extension "Tasks" by actboy 168
