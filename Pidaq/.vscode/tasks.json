@@ -1,0 +1,34 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "echoTest",
+            "type": "shell",
+            "command": "echo 'Hello taskrunner test good.'",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "buildPiImage",
+            "type": "shell",
+            "command": "docker build -t pidaq:v1 docker/.",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "compileRunPiHelloWorld",
+            "type": "shell",
+            "command": "docker run -it -v /c/Hyperloop/testing-software/Pidaq:/home/data --entrypoint helloTest.sh  pidaq:v1",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
