@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+// Prevents naming conflicts between projects
+package example;
+
+message Telemetry {
+    float temp = 1;
+    float pressure = 2;
+    float rpm = 3;
+}
+
