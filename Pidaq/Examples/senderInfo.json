@@ -12,7 +12,13 @@
         "data": [1, 2, 3, 4, 5]
       },
       {
-        "msgId": 101,
+        "msgId": 105,
+        "isExtendedId": 0,
+        "messageFrequency": 1,
+        "data": [5, 73, 26, 5]
+      },
+      {
+        "msgId": 120,
         "isExtendedId": 0,
         "messageFrequency": 1,
         "data": [6, 7, 8, 9]
