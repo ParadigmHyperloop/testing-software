@@ -4,7 +4,6 @@ import can
 
 # Function Definitions
 
-
 def create_can_filters(raw_filters):
     """ Creates a list of can filter objects
 
@@ -25,9 +24,6 @@ def create_can_filters(raw_filters):
             "extended": extended
         })
     return can_filters
-
-
-# Main Script
 
 if __name__ == "__main__":
     json_config = open('receiverInfo.json', mode='r')

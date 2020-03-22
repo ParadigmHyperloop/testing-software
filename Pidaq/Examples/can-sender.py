@@ -5,7 +5,6 @@ import can
 
 # Function Definitions
 
-
 def create_can_messages(raw_messages):
     """ Creates a list of CAN message objects
 
@@ -25,11 +24,7 @@ def create_can_messages(raw_messages):
         can_messages.append(can_message)
     return can_messages
 
-# Main Script
-
-
 if __name__ == "__main__":
-
     with open('senderInfo.json', mode='r') as json_config:
         can_config = json.load(json_config)
         can_bus = can.Bus(bustype=can_config["canInfo"]["busType"],
