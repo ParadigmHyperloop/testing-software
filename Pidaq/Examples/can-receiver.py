@@ -1,4 +1,5 @@
 import json
+
 import can
 
 # Function Definitions
@@ -11,9 +12,7 @@ def create_can_filters(raw_filters):
     raw_filters (list): list of message filter objects as defined in the json schema
 
     Returns:
-
     can_filters (list): list of python-can filter objects
-
     """
     can_filters = []
     for raw_can_filter in raw_can_filters:
@@ -40,8 +39,9 @@ if __name__ == "__main__":
         can_filter for can_filter in can_config["canInfo"]["busFilters"]]
     can_filters = create_can_filters(raw_can_filters)
     can_bus.set_filters(filters=can_filters)
+    # The can_bus object receives message objects from the sender program
+    # Iterating over the bus continuously allows the messages on the bus to be received
     for message in can_bus:
-        message_file = open('messages.txt', mode='a+')
         print(message)
-        message_file.write(f'{message.data}\r\n')
-        message_file.close()
+        with open('messages.txt', mode='a+') as message_file:
+            message_file.write(f'{message.data}\r\n')
