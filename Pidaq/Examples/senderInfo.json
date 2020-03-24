@@ -3,7 +3,6 @@
     "serialPort": "COM5",
     "busType": "slcan",
     "bitrate": 500000,
-    "busFilters": [],
     "messageFrequency": 1,
     "messages": [
       {
