@@ -40,4 +40,4 @@ if __name__ == "__main__":
     for message in can_bus:
         print(message)
         with open('messages.txt', mode='a+') as message_file:
-            message_file.write(f'{message.data}\r\n')
+            message_file.write(f'{message}\r\n')
