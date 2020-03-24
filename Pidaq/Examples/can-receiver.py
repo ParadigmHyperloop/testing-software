@@ -35,6 +35,7 @@ if __name__ == "__main__":
         can_filter for can_filter in can_config["canInfo"]["busFilters"]]
     can_filters = create_can_filters(raw_can_filters)
     can_bus.set_filters(filters=can_filters)
+    
     # The can_bus object receives message objects from the sender program
     # Iterating over the bus continuously allows the messages on the bus to be received
     for message in can_bus:
