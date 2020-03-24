@@ -35,7 +35,7 @@ if __name__ == "__main__":
         message_frequency = can_config["canInfo"]["messageFrequency"]
         can_messages = create_can_messages(can_messages_raw)
         while True:
-            time.sleep(message_frequency)
+            time.sleep(1.0 / message_frequency)
             for can_message in can_messages:
                 try:
                     can_bus.send(can_message)
