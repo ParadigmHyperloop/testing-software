@@ -4,6 +4,7 @@
 import random
 import time
 from datetime import datetime 
+
 from influxdb import InfluxDBClient
 
 # Example data payload
@@ -24,7 +25,7 @@ def main():
                 "Celsius": 1.0,
                 "Fahrenheit": 3,
                }
-        },
+           },
         
           {
             "measurement": "pressure",
@@ -37,10 +38,9 @@ def main():
                 "millibar": 1.0,
                 "Pascal": 3.0,
                 }
-         },
-        
-        
-        {
+           },
+         
+         {
             "measurement": "Height",
             "tags": {
                 "host": "server01",
@@ -65,7 +65,6 @@ def main():
                 "samplef02": 31.0,
                 "samplef03": 12.0,
                 }
-            
          },
            
          {
@@ -80,10 +79,9 @@ def main():
                 "samplef12": 36.0,
                 "samplef13": 1.0,
                 }
-            
          },
            
-        {
+         {
             "measurement": "samplem3",
             "tags": { 
                 "host": "server01",
@@ -95,10 +93,8 @@ def main():
                 "samplef22": 12.0,
                 "samplef23": 16.0,
                 }
-            
          },
-      
-    ]
+     ]
 
     # Create client instance
     # host, port, user, pass, database
@@ -127,7 +123,6 @@ def main():
         print(f"s23: {telemetry[5]['fields']['samplef23']}")
         print()
         
-
         # Writing the payload to the DB
         client.write_points(telemetry)
 
@@ -148,7 +143,6 @@ def main():
         telemetry[5]['fields']['samplef22'] = random.randint(30,35)
         telemetry[5]['fields']['samplef23'] = random.randint(130,135)
         
-
         time.sleep(1)
 
     # Print the results of the query
