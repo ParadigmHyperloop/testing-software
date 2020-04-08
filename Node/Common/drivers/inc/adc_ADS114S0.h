@@ -3,39 +3,81 @@
 
 #include <SPI.h>
 
+enum InputMux
+{
+    MUX_SINGLE_0    = 0x0C, // Single-ended AIN0
+    MUX_SINGLE_1    = 0x1C, // Single-ended AIN1
+    MUX_SINGLE_2    = 0x2C, // Single-ended AIN2
+    MUX_SINGLE_3    = 0x3C, // Single-ended AIN3
+    MUX_SINGLE_4    = 0x4C, // Single-ended AIN4
+    MUX_SINGLE_5    = 0x5C, // Single-ended AIN5
+    MUX_SINGLE_6    = 0x6C, // Single-ended AIN6
+    MUX_SINGLE_7    = 0x7C, // Single-ended AIN7
+    MUX_SINGLE_8    = 0x8C, // Single-ended AIN8
+    MUX_SINGLE_9    = 0x9C, // Single-ended AIN9
+    MUX_SINGLE_10   = 0xAC, // Single-ended AIN10
+    MUX_SINGLE_11   = 0xBC  // Single-ended AIN11
+};
+
+enum PGAGain
+{
+    GAIN_DISABLE    = 0x00, // Default
+    GAIN_2          = 0x09,
+    GAIN_4          = 0x0A,
+    GAIN_8          = 0x0B,
+    GAIN_16         = 0x0C,
+    GAIN_32         = 0x0D,
+    GAIN_64         = 0x0E,
+    GAIN_128        = 0x0F
+};
+
+enum DataRate
+{
+    SPS_2_5     = 0x10, // 2.5 Samples Per Second
+    SPS_5       = 0x11, // 5 Samples Per Second
+    SPS_10      = 0x12, // 10 Samples Per Second
+    SPS_16_6    = 0x13, // 16.6 Samples Per Second
+    SPS_20      = 0x14, // 20 Samples Per Second (default)
+    SPS_50      = 0x15, // 50 Samples Per Second
+    SPS_60      = 0x16, // 60 Samples Per Second
+    SPS_100     = 0x17, // 100 Samples Per Second
+    SPS_200     = 0x18, // 200 Samples Per Second
+    SPS_400     = 0x19, // 400 Samples Per Second
+    SPS_800     = 0x1A, // 800 Samples Per Second
+    SPS_1000    = 0x1B, // 1000 Samples Per Second
+    SPS_2000    = 0x1C, // 2000 Samples Per Second
+    SPS_4000    = 0x1D  // 4000 Samples Per Second
+};
+
 class ADS114S0
 {
 public:
-    ADS114S0(SPIClass spi, uint8_t SS_PIN, uint8_t POWER_SEQ_PIN);
     ADS114S0(SPIClass spi, uint8_t SS_PIN);
     void init();
-    uint16_t readSingleChannel(uint8_t);
-    void readActiveChannels();
-    void enableChannel(uint8_t);
-    void disableChannel(uint8_t);
-    uint16_t *getuAdcData() { return uAdcData; };
+    void writeRegister(uint8_t, uint8_t);
+    uint8_t readRegister(uint8_t);
+    uint16_t readData();
+    void setMux(InputMux);
+    void setPGAGain(PGAGain);
+    void setDataRate(DataRate);
+    void startConversion();
+    void stopConversion();
 
 private:
     SPIClass spi;
-    SPISettings spiSettings = SPISettings(20000000, MSBFIRST, SPI_MODE0);
+    SPISettings spiSettings = SPISettings(20000000, MSBFIRST, SPI_MODE1);
     uint8_t SS_PIN;
-    uint8_t POWER_SEQ_PIN;
-    bool HAS_SEQ_PIN = false;
-    // 16-bit data words for SPI
-    const uint16_t SET_CHANNEL_REG = 0x8000;
-    const uint16_t CONFIG_PROGRAM_REG = 0x2840;
-    const uint16_t MANUAL_READ = 0x1000;
-    const uint16_t AUTO_READ_RESET = 0x2C40;
-    const uint16_t AUTO_READ_NEXT = 0x2000;
-    const uint8_t WAKEUP = 0x02;
-    const uint8_t POWERDOWN = 0x04;
-    const uint8_t RESET = 0x06;
-
-    uint16_t uAdcData[16]{};      //array of the latest data; 0 for channels not being used
-    uint16_t uActiveChannels = 0; // each bit represents a channel; 1=used, 0=unused
-    uint16_t uNumChannels = 0;    // number of channels being used;
-
-    uint16_t transfer(uint16_t uData);
+    uint8_t DRDY_PIN;
+    // Commands for interfacing with adc
+    static const uint8_t WAKEUP = 0x02;
+    static const uint8_t POWERDOWN = 0x04;
+    static const uint8_t RESET = 0x06;
+    static const uint8_t START = 0x016;
+    static const uint8_t STOP = 0x0a;
+    static const uint8_t SYOCAL = 0x16; // System offset calibration
+    static const uint8_t SYGCAL = 0x17; // System gain calibration
+    static const uint8_t SFOCAL = 0x19; // Self offset calibration
+    static const uint16_t RDATA = 0x1200;
 };
 
 #endif
