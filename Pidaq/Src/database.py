@@ -7,17 +7,24 @@ class Influx:
     """
     """
 
-    def __init__(self, database):
+    def __init__(self, database): 
         self.client = InfluxDBClient(host='localhost', port=8086)
-        self.client.create_database() #TODO figure out why environment variable is used here
+        current_databases = self.client.get_list_database()
+        if not any(current_database['name'] == database for current_database in current_databases):
+            self.client.create_database(database)
+        self.client.switch_database(database)
+
+    def switch_database(self, database):
+        self.client.switch_database(database)
          
-    def log_data(self, data):
+    def log_data(self, data, tags):
         table_row =[{
             'measurement': 'sensor_data',
             'time': datetime.datetime.now(),
-            'fields': data
+            'fields': data,
         }]
-        self.client.write_points(table_row)
+        self.client.write_points(table_row, tags=tags)
 
-    def switch_database(self, database):
+    def read_data(self, tags, measurements):
         pass
+    
