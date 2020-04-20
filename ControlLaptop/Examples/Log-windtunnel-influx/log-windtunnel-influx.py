@@ -59,9 +59,9 @@ def main():
                 "config": "1",
             },
             "fields": {
-                "samplef01": 10.0,
-                "samplef02": 31.0,
-                "samplef03": 12.0,
+                "samplef01": 10,
+                "samplef02": 31,
+                "samplef03": 12,
                 }
          },
            
@@ -74,8 +74,8 @@ def main():
             },
             "fields": {
                 "samplef11": 9.0,
-                "samplef12": 36.0,
-                "samplef13": 1.0,
+                "samplef12": 36,
+                "samplef13": 1,
                 }
          },
            
@@ -87,9 +87,9 @@ def main():
                 "config": "1",
             },
             "fields": {
-                "samplef21": 8.0,
-                "samplef22": 12.0,
-                "samplef23": 16.0,
+                "samplef21": 8,
+                "samplef22": 12,
+                "samplef23": 16,
                 }
          },
      ]
