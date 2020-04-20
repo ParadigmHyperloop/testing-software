@@ -9,7 +9,6 @@ from influxdb import InfluxDBClient
 
 # Example data payload
 # Tags contain metadata about the measurement - always a string
-# Thinking we could have something like below for each measurement
 
 def main():
         
@@ -19,8 +18,7 @@ def main():
             "tags": {
                 "host": "server01",
                 "region": "us-west"
-            },
-            #"time": f"{datetime.now()}",
+            }
             "fields": {
                 "Celsius": 1.0,
                 "Fahrenheit": 3,
