@@ -49,7 +49,7 @@ def main():
                 "Metre": 1.0,
                 "Feet": 3.0,
                 }
-        },
+           },
          
          {
             "measurement": "samplem1",
