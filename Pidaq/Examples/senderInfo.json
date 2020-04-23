@@ -1,0 +1,25 @@
+{
+  "canInfo": {
+    "serialPort": "COM5",
+    "busType": "slcan",
+    "bitrate": 500000,
+    "messageFrequency": 1,
+    "messages": [
+      {
+        "msgId": 100,
+        "isExtendedId": 0,
+        "data": [1, 2, 3, 4, 5]
+      },
+      {
+        "msgId": 105,
+        "isExtendedId": 0,
+        "data": [5, 73, 26, 5]
+      },
+      {
+        "msgId": 120,
+        "isExtendedId": 0,
+        "data": [6, 7, 8, 9]
+      }
+    ]
+  }
+}
