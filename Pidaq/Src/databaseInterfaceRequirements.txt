@@ -1,7 +1,0 @@
-Requirements
-- Create Database
-- Insert data into Database, choosing the tags to apply to the data
-- Switch between multiple databases
-- Read data from the database, by specifying tags, measurements
-- Falling under read, dump all the data (by tag, measurement etc)
-- Configure retention rate/ other params
