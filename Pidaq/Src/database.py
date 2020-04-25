@@ -6,7 +6,7 @@ from influxdb import InfluxDBClient
 
 
 class Influx:
-    """Class to interact with the influxdb
+    """Class to interact with the influx database
 
     This class enables interaction with the influx time series database through
     the use of the api. The class also enables the ability to export test
@@ -32,39 +32,49 @@ class Influx:
             self.client.create_database(database)
         self.client.switch_database(database)
 
+    def __format_data(self, data):
+        """Formats data to be able to utilize in the Influx query
+
+        Args:
+            data(list(str)): List of data to be formatted
+
+        Returns formatted_data(str): comma separated data in format
+                                     '"data1","data2","data3"...'
+        """
+        list_data = []
+        for d in data:
+            list_data.append(f'"{d}"')
+        formatted_data = ','.join(list_data)
+        return formatted_data
+
     def switch_database(self, database):
         self.client.switch_database(database)
+        self.current_database = database
 
-    def log_data(self, data, tags):
+    def log_data(self, data, measurement, tags):
         table_row = [{
-            'measurement': 'sensor_data',
+            'measurement': measurement,
             'time': datetime.datetime.now(),
             'fields': data,
         }]
         self.client.write_points(table_row, tags=tags)
 
     def read_data(self, tags=[], measurements=[]):
-        tags_formatted = []
-        measurements_formatted = []
-        for tag in tags:
-            tags_formatted.append(f'"{tag}"')
-        for measurement in measurements:
-            measurements_formatted.append(f'"{measurement}"')
-        tags_all = ','.join(tags_formatted)
-        measurements_all = ','.join(measurements_formatted)
+        formatted_tags = self.__format_data(tags)
+        formatted_measurements = self.__format_data(measurements)
         if len(measurements) == 0:
             data = self.client.query(
-                f'SELECT {tags_all}',
+                f'SELECT {formatted_tags}',
                 database=self.current_database
             )
         elif len(tags) == 0:
             data = self.client.query(
-                f'SELECT * FROM {measurements_all}',
+                f'SELECT * FROM {formatted_measurements}',
                 database=self.current_database
             )
         else:
             data = self.client.query(
-                f'SELECT {tags_all} FROM {measurements_all}',
+                f'SELECT {formatted_tags} FROM {formatted_measurements}',
                 database=self.current_database
             )
         try:
