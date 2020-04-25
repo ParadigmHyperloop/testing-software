@@ -43,7 +43,7 @@ class Influx:
         }]
         self.client.write_points(table_row, tags=tags)
 
-    def read_data(self, tags='*', measurements=None):
+    def read_data(self, tags=[], measurements=[]):
         tags_formatted = []
         measurements_formatted = []
         for tag in tags:
@@ -52,9 +52,14 @@ class Influx:
             measurements_formatted.append(f'"{measurement}"')
         tags_all = ','.join(tags_formatted)
         measurements_all = ','.join(measurements_formatted)
-        if measurements == None:
+        if len(measurements) == 0:
             data = self.client.query(
                 f'SELECT {tags_all}',
+                database=self.current_database
+            )
+        elif len(tags) == 0:
+            data = self.client.query(
+                f'SELECT * FROM {measurements_all}',
                 database=self.current_database
             )
         else:
@@ -63,7 +68,7 @@ class Influx:
                 database=self.current_database
             )
         try:
-            return (data.raw['series'][0])
+            return (data.raw['series'])
         except KeyError:
             return
 
@@ -76,12 +81,12 @@ class Influx:
             default=True
         )
 
-    def export_to_csv(self, test_name, csv_path):
+    def export_to_csv(self, test_name, tags, measurements, csv_path):
         file_name = f'{test_name}.csv'
-        data = self.read_data(tags=test_name)
-        with open(f'{csv_path}/{file_name}', 'w', newline='\n') as csvfile:
+        data = self.read_data(tags=tags, measurements=measurements)
+        with open(f'{csv_path}\\{file_name}', 'w', newline='\n') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
-            writer.writerow(data['columns'])
-            for row in data['values']:
-                writer.writerow(row)
-
+            writer.writerow(data[0]['columns'])
+            for measurement in data:
+                for row in measurement['values']:
+                    writer.writerow(row)
