@@ -52,6 +52,8 @@ class Influx:
         self.current_database = database
 
     def log_data(self, data, measurement, tags):
+        """Logs a single data point to the database
+        """
         table_row = [{
             'measurement': measurement,
             'time': datetime.datetime.now(),
@@ -60,6 +62,15 @@ class Influx:
         self.client.write_points(table_row, tags=tags)
 
     def read_data(self, tags=[], measurements=[]):
+        """Reads database for specified measurements, including specified tags and fields
+
+        Args:
+            tags (list(str)): Contains the tags and fields to be included in the query
+            measurements (list(str)): Contains the measurements to be queried
+
+        Returns:
+            (str) Raw json data
+        """
         formatted_tags = self.__format_data(tags)
         formatted_measurements = self.__format_data(measurements)
         if len(measurements) == 0:
@@ -83,6 +94,8 @@ class Influx:
             return
 
     def create_retention_policy(self, name, duration, replication):
+        """Creates a retention policy for the current database
+        """
         self.client.create_retention_policy(
             name,
             duration,
@@ -92,6 +105,14 @@ class Influx:
         )
 
     def export_to_csv(self, test_name, tags, measurements, csv_path):
+        """Exports measurements to a csv file
+
+        Args:
+            test_name (str): Name of test, becomes name of csv file
+            tags (list(str)): Tags and fields to be included in csv
+            measurements (list(str)): Measurements to be included in csv
+            csv_path(str): File path of where the csv will be written
+        """
         file_name = f'{test_name}.csv'
         data = self.read_data(tags=tags, measurements=measurements)
         with open(f'{csv_path}\\{file_name}', 'w', newline='\n') as csvfile:
