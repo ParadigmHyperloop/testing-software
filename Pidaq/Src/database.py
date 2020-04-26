@@ -31,7 +31,7 @@ class Influx:
                                 with
     """
 
-    def __init__(self, database: str):
+    def __init__(self, database: str) -> None:
         """
 
         Args:
@@ -115,7 +115,7 @@ class Influx:
             default=True
         )
 
-    def export_to_csv(self, test_name: str, tags=None, measurements=None, csv_path=None):
+    def export_to_csv(self, test_name: str, tags=None, measurements=None, csv_path=None) -> None:
         """Exports measurements to a csv file
 
         Args:
@@ -137,7 +137,7 @@ class Influx:
                     writer.writerow(row)
 
 
-def format_data(data: list):
+def format_data(data: list) -> str:
     """Formats data to be able to utilize in the Influx query
 
     Args:
