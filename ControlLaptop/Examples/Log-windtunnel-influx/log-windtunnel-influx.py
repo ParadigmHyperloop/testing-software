@@ -18,7 +18,7 @@ def main():
             "tags": {
                 "host": "server01",
                 "region": "us-west"
-            }
+            },
             "fields": {
                 "Celsius": 1.0,
                 "Fahrenheit": 3,
