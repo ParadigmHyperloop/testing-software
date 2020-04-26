@@ -42,8 +42,8 @@ class Influx:
         self.client = InfluxDBClient(host='localhost', port=8086)
         self.current_database = database
         current_databases = self.client.get_list_database()
-        if not any(self.current_database['name'] == database
-                   for self.current_database in current_databases):
+        if not any(current_database['name'] == database
+                   for current_database in current_databases):
             self.client.create_database(database)
         self.client.switch_database(database)
 
@@ -84,7 +84,7 @@ class Influx:
                 f'SELECT {formatted_tags}',
                 database=self.current_database
             )
-        elif tags is not None and measurements is None:
+        elif tags is None and measurements is not None:
             formatted_measurements = format_data(measurements)
             data = self.client.query(
                 f'SELECT * FROM {formatted_measurements}',
@@ -104,7 +104,7 @@ class Influx:
         except KeyError:
             return -1
 
-    def create_retention_policy(self, name, duration, replication):
+    def create_retention_policy(self, name: str, duration: str, replication: str) -> None:
         """Creates a retention policy for the current database"""
 
         self.client.create_retention_policy(
@@ -159,8 +159,7 @@ if __name__ == "__main__":
     DATABASE = Influx('example')
 
     # Print data from pressure measurement in formatted json
-    DATA = DATABASE.read_data(tags=['millibar', 'Pascal'], measurements=['pressure'])
-    print(DATA)
+    print(DATABASE.read_data(tags=['millibar', 'Pascal'], measurements=['pressure']))
 
     # Export example data to a csv
     CWD = os.getcwd()
@@ -176,5 +175,20 @@ if __name__ == "__main__":
         'region': 'us-east'
     }
     DATABASE.log_data(FIELDS, 'temperature', TAGS)
-    NEW_DATA = DATABASE.read_data(tags=['Celcius', 'Fahrenheit'], measurements=['temperature'])
-    print(NEW_DATA)
+    print(DATABASE.read_data(tags=['Celsius', 'Fahrenheit'], measurements=['temperature']))
+
+    # Switch to a new database, and log some data
+    DATABASE.switch_database('example1')
+    for i in range(10):
+        DATABASE.log_data(FIELDS, 'temperature', TAGS)
+
+    # Testing that a new database is not created if one of the same name already exists
+    SECOND_DATABASE = Influx('example1')
+    print(SECOND_DATABASE.read_data(measurements=['temperature']))
+
+    # Testing creating new database on construction of class instance
+    THIRD_DATABASE = Influx('example2')
+
+    # Testing creating new database using switch_database method
+    THIRD_DATABASE.switch_database('example3')
+    print(THIRD_DATABASE.client.get_list_database())
