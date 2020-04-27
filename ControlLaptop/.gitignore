@@ -1,5 +1,0 @@
-Examples/Protobuf/resources/*_pb2.py
-Examples/Protobuf/generated/*
-Examples/Protobuf/resources/__pycache__
-.vscode/settings.json
-.vscode/launch.json
