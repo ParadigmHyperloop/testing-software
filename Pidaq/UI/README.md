@@ -15,18 +15,18 @@ Contains dash control GUIs for each project, as well as grafana dashbooard .json
 Using DTS as an example, however they will all follow a similar structure
 
 DTS
-├── dts.py                      # Application entrypoint, used to launch the dash app
-├── dts_dash/                   # Python Package containing all dash layout and callbacks for the dts dash app
-    ├── __init__.py                 
-    ├── app.py                      # The dash app that gets imported by callback modules and dts.py, placed ehre to avoid circular imports
-    ├── assets/                     # Contains bootstrap css framework, and one custom .css file
+├── dts.py                      # Application entrypoint, used to launch the dash app   
+├── dts_dash/                   # Python Package containing all dash layout and callbacks for the dts dash app  
+    ├── __init__.py                   
+    ├── app.py                        # The dash app that gets imported by callback modules and dts.py  
+    ├── assets/                     # Contains bootstrap css framework, and one custom .css file  
         ├── css
         ├── js                            
-    ├── layout/                     # Subpackage containing layouts for sensor and control tab built using dash elements
+    ├── layout/                     # Subpackage containing layouts built using dash elements  
         ├── __init__.py                  
-        ├── control.py
-        ├── sensor.py
-    ├── callbacks/                  # Subpackage defining dash callbacks for the sensor and control tab
-        ├── __init__.py
-        ├── control_callbacks.py
-        ├── sensors_callbacks.py
+        ├── control.py  
+        ├── sensor.py  
+    ├── callbacks/                  # Subpackage defining dash callbacks for the sensor and control tab  
+        ├── __init__.py  
+        ├── control_callbacks.py  
+        ├── sensors_callbacks.py  
