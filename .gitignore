@@ -1,4 +1,4 @@
 .vscode/*
-.venv/*
+.venv
 !important .vscode/tasks.json
-
+__pycache__
