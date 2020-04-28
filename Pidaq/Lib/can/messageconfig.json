@@ -1,0 +1,23 @@
+{
+    "DTS": {
+        "Readings": [{
+            "Reading": "Placeholder",
+            "MsgID": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "ConversionFactor": "Placeholder"
+        }]
+    },
+    "Suspension": {
+        "Readings": [{
+            "Reading": "Placeholder",
+            "MsgID": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "ConversionFactor": "Placeholder"
+        }]
+    },
+    "WindTunnel": {
+        "Readings": [{
+            "Reading": "Placeholder",
+            "MsgID": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "ConversionFactor": "Placeholder"
+        }]
+    }
+}
