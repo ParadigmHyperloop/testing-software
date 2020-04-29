@@ -3,3 +3,4 @@ Examples/Protobuf/generated/*
 Examples/Protobuf/resources/__pycache__
 .vscode/settings.json
 .vscode/launch.json
+*.egg-info
