@@ -1,4 +1,11 @@
-"""
+"""Contains classes and methods to implement and manage the can (socketcan) bus
+
+Classes:
+    CanManager
+    SensorReading
+
+Functions:
+    parse_conversion_factor
 """
 import json
 
@@ -103,9 +110,6 @@ class SensorReading:
 
     def __init__(self, project: str, message_id: str, reading: str,
                  conversion_factor: str, conversion_factor_type: str) -> None:
-        """
-        """
-
         self.message_id = int(message_id, 16)
         self.reading = reading
         self.conversion_factor = parse_conversion_factor(
