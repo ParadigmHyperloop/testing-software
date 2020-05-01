@@ -72,7 +72,6 @@ if __name__ == "__main__":
         log_init("DTS", logger,  "%(levelname)s - %(message)s", "/mnt/c/logs", "INFO")
         logger.info(msg)
         
-        
     default_root_log(f"Called init to setup root logger with default settings...")
     logger = logging.getLogger()
     
