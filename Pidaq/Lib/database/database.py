@@ -92,13 +92,13 @@ class Influx:
             formatted_measurements = ','.join([f'"{measurement}"' for measurement in measurements])
             formatted_fields = ','.join([f'"{field}"' for field in fields]) if fields is not None else '*'
             if tags is None:
-                self.client.query(
+                data = self.client.query(
                     f'SELECT {formatted_fields} FROM {formatted_measurements}',
                     database=self.current_database
                 )
             else:
-                formatted_tags = ' AND '.join(f'{key} = {value}' for key, value in tags.items())
-                self.client.query(
+                formatted_tags = ' AND '.join(f""""{key}" = '{value}'""" for key, value in tags.items())
+                data = self.client.query(
                     f'SELECT {formatted_fields} FROM {formatted_measurements} WHERE {formatted_tags}',
                     database=self.current_database
                 )
@@ -157,50 +157,69 @@ def create_metadata_file(test_name: str, operator_name: str, commands: list, pat
     file_name = f'{test_name}_{date_time}.info'
     if path is None:
         file_path = os.getcwd()
-    with open(os.path.join(path, file_name), 'w', newline='\n') as infofile:
+    else:
+        file_path = path
+    with open(os.path.join(file_path, file_name), 'w', newline='\n') as infofile:
         infofile.write(f'Test: {test_name}\n')
         infofile.write(f'Date: {date_time}\n')
         infofile.write(f'Test operated by: {operator_name}\n')
-        infofile.write(f'List of commands:\n{'\n'.join(commands)}')
+        infofile.write('List of commands:\n{}'.format('\n'.join(commands)))
         infofile.close()
 
 
-if __name__ == "__main__": # TODO tidy up testing
+if __name__ == "__main__":
+    import random
     # Testing class functionality
 
-    DATABASE = Influx('example', 'localhost', 8086)
+    database0 = Influx('example', 'localhost', 8086) # Creating Influx instance from database that has already been created
+    database1 = Influx('example1', 'localhost', 8086) # Creating new database
 
-    # Print data from pressure measurement in formatted json
-    print(DATABASE.read_data(tags=['millibar', 'Pascal'], measurements=['pressure']))
-
-    # Export example data to a csv
-    CWD = os.getcwd()
-    DATABASE.export_to_csv('test', measurements=['pressure', 'temperature'])
-
-    # Log new data to the database, and print to console
-    FIELDS = {
-        'Celcius': 30.21,
-        'Fahrenheit': 87
+    data = {
+        'Celcius': random.random() * 40,
+        'Fahrenheit': random.randint(60, 95)
     }
-    TAGS = {
+    tags = {
         'host': 'server01',
         'region': 'us-east'
     }
-    DATABASE.log_data(FIELDS, 'temperature', TAGS)
-    print(DATABASE.read_data(fields=['Celsius', 'Fahrenheit'], measurements=['temperature']))
+    database1.log_data(data, 'temperature', tags) # Logging data to a database
 
-    # Switch to a new database, and log some data
-    DATABASE.switch_database('example1')
-    for i in range(10):
-        DATABASE.log_data(FIELDS, 'temperature', TAGS)
+    query_string = 'SELECT "samplef01","samplef02","samplef11" FROM "samplem1","samplem2" WHERE "samplef01" > 5'
+    
+    print(database0.read_data(query=query_string)) # Query using query string
+    database0.export_to_csv('test0', query=query_string)
 
-    # Testing that a new database is not created if one of the same name already exists
-    SECOND_DATABASE = Influx('example1', 'localhost', 8086)
-    print(SECOND_DATABASE.read_data(measurements=['temperature']))
+    print(database0.read_data(measurements=['temperature', 'pressure'])) # Query with only measurement
+    database0.export_to_csv('test1', measurements=['temperature', 'pressure'])
 
-    # Testing creating new database on construction of class instance
-    THIRD_DATABASE = Influx('example2', 'localhost', 8086)
+    print(database0.read_data(measurements=['samplem1', 'samplem2', 'samplem3'],
+                              tags={
+                                  'host': 'server01',
+                                  'region': 'us-west'
+                              })) # Query with measurements and tags
+    database0.export_to_csv('test2', 
+                            measurements=['samplem1', 'samplem2', 'samplem3'],
+                            tags={
+                                'host': 'server01',
+                                'region': 'us-west'
+                            })
 
-    # Testing creating new database using switch_database method
-    THIRD_DATABASE.switch_database('example3')
-    print(THIRD_DATABASE.client.get_list_database())
+    print(database0.read_data(measurements=['samplem1', 'samplem3'],
+                              fields=['samplef01', 'samplef21'])) # Query with measurements and fields
+    database0.export_to_csv('test3',
+                            measurements=['samplem1', 'samplem3'],
+                            fields=['samplef01', 'samplef21'])
+
+    print(database0.read_data(measurements=['temperature', 'pressure'],
+                              tags={
+                                  'host': 'server01',
+                                  'region': 'us-west'
+                              },
+                              fields=['Celcius', 'Fahrenheit'])) # Query with measurements, tags, and fields
+    database0.export_to_csv('test4',
+                            measurements=['temperature', 'pressure'],
+                            tags={
+                                'host': 'server01',
+                                'region': 'us-west'
+                            },
+                            fields=['Celcius', 'Fahrenheit'])
