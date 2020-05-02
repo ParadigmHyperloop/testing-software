@@ -67,38 +67,41 @@ class Influx:
         }]
         self.client.write_points(table_row, tags=tags)
 
-    def read_data(self, tags=None, measurements=None) -> str:
+    def read_data(self, query=None, tags=None, fields=None, measurements=None) -> str:
         """Reads database for specified measurements, including specified tags and fields
-
+        
+        Format of a query when not using query parameter:
+            SELECT fields FROM measurements WHERE tags.keys = tags.values
+        
         Args:
-            tags (list(str)): Contains the tags and fields to be included in the query
-            measurements (list(str)): Contains the measurements to be queried
+            query (str): if argument is passed, all other parameters are ignored, and database
+                         is queried
+            tags (dict): Contains the tag keys and values to be included in the query
+            fields (list(str)): Contains fields to be queried
+            measurements (list(str)): Contains the measurements to be queried from
 
         Returns:
             (str) Raw json data
         """
 
-        if tags is not None and measurements is None:
-            formatted_tags = format_data(tags)
-            data = self.client.query(
-                f'SELECT {formatted_tags}',
-                database=self.current_database
-            )
-        elif tags is None and measurements is not None:
-            formatted_measurements = format_data(measurements)
-            data = self.client.query(
-                f'SELECT * FROM {formatted_measurements}',
-                database=self.current_database
-            )
-        elif tags is not None and measurements is not None:
-            formatted_tags = format_data(tags)
-            formatted_measurements = format_data(measurements)
-            data = self.client.query(
-                f'SELECT {formatted_tags} FROM {formatted_measurements}',
-                database=self.current_database
-            )
+        if query is not None:
+            data = self.client.query(query, database=self.current_database)
+        elif measurements is None:
+            return -1
         else:
-            return -1 # Must specify at least a tag or a measurement
+            formatted_measurements = ','.join([f'"{measurement}"' for measurement in measurements])
+            formatted_fields = ','.join([f'"{field}"' for field in fields]) if fields is not None else '*'
+            if tags is None:
+                self.client.query(
+                    f'SELECT {formatted_fields} FROM {formatted_measurements}',
+                    database=self.current_database
+                )
+            else:
+                formatted_tags = ' AND '.join(f'{key} = {value}' for key, value in tags.items())
+                self.client.query(
+                    f'SELECT {formatted_fields} FROM {formatted_measurements} WHERE {formatted_tags}',
+                    database=self.current_database
+                )
         try:
             return data.raw['series']
         except KeyError:
@@ -136,22 +139,6 @@ class Influx:
                 for row in measurement['values']:
                     writer.writerow(row)
 
-
-def format_data(data: list) -> str:
-    """Formats data to be able to utilize in the Influx query
-
-    Args:
-        data(list(str)): List of data to be formatted
-
-    Returns formatted_data(str): comma separated data in format
-                                 '"data1","data2","data3"...'
-    """
-
-    list_data = []
-    for point in data:
-        list_data.append(f'"{point}"')
-    formatted_data = ','.join(list_data)
-    return formatted_data
 
 if __name__ == "__main__":
     # Testing class functionality
