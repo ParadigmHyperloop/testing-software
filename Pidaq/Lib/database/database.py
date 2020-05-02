@@ -118,21 +118,25 @@ class Influx:
             default=True
         )
 
-    def export_to_csv(self, test_name: str, tags=None, measurements=None, csv_path=None) -> None:
+    def export_to_csv(self, test_name: str, query=None, tags=None, fields=None, measurements=None, csv_path=None) -> None:
         """Exports measurements to a csv file
 
         Args:
             test_name (str): Name of test, becomes name of csv file
+            query (str): manually specify exact query for data to be included in csv
             tags (list(str)): Tags and fields to be included in csv
             measurements (list(str)): Measurements to be included in csv
             csv_path(str): File path of where the csv will be written
         """
 
         file_name = f'{test_name}.csv'
-        data = self.read_data(tags=tags, measurements=measurements)
+        if query is None:
+            data = self.read_data(tags=tags, fields=fields, measurements=measurements) 
+        else:
+            data = self.read_data(query=query)
         if csv_path is None:
             csv_path = os.getcwd()
-        with open(f'{csv_path}\\{file_name}', 'w', newline='\n') as csvfile:
+        with open(os.path.join(csv_path, file_name), 'w', newline='\n') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
             writer.writerow(data[0]['columns'])
             for measurement in data:
@@ -162,7 +166,7 @@ if __name__ == "__main__":
         'region': 'us-east'
     }
     DATABASE.log_data(FIELDS, 'temperature', TAGS)
-    print(DATABASE.read_data(tags=['Celsius', 'Fahrenheit'], measurements=['temperature']))
+    print(DATABASE.read_data(fields=['Celsius', 'Fahrenheit'], measurements=['temperature']))
 
     # Switch to a new database, and log some data
     DATABASE.switch_database('example1')
@@ -170,11 +174,11 @@ if __name__ == "__main__":
         DATABASE.log_data(FIELDS, 'temperature', TAGS)
 
     # Testing that a new database is not created if one of the same name already exists
-    SECOND_DATABASE = Influx('example1')
+    SECOND_DATABASE = Influx('example1', 'localhost', 8086)
     print(SECOND_DATABASE.read_data(measurements=['temperature']))
 
     # Testing creating new database on construction of class instance
-    THIRD_DATABASE = Influx('example2')
+    THIRD_DATABASE = Influx('example2', 'localhost', 8086)
 
     # Testing creating new database using switch_database method
     THIRD_DATABASE.switch_database('example3')
