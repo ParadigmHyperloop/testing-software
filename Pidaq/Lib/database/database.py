@@ -31,7 +31,7 @@ class Influx:
                                 with
     """
 
-    def __init__(self, database: str) -> None:
+    def __init__(self, database: str, host: str, port: int) -> None:
         """
 
         Args:
@@ -39,13 +39,13 @@ class Influx:
                             does not exist, it will be created.
         """
 
-        self.client = InfluxDBClient(host='localhost', port=8086)
-        self.current_database = database
+        self.client = InfluxDBClient(host=host, port=port)
         current_databases = self.client.get_list_database()
         if not any(current_database['name'] == database
                    for current_database in current_databases):
             self.client.create_database(database)
         self.client.switch_database(database)
+        self.current_database = database
 
     def switch_database(self, database: str) -> None:
         """Switches currently active database"""
@@ -156,7 +156,7 @@ def format_data(data: list) -> str:
 if __name__ == "__main__":
     # Testing class functionality
 
-    DATABASE = Influx('example')
+    DATABASE = Influx('example', 'localhost', 8086)
 
     # Print data from pressure measurement in formatted json
     print(DATABASE.read_data(tags=['millibar', 'Pascal'], measurements=['pressure']))
