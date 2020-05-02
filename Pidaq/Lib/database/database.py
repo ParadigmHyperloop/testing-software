@@ -11,7 +11,7 @@ Functions:
 """
 
 import csv
-import datetime
+from datetime import datetime
 import os
 
 from influxdb import InfluxDBClient
@@ -22,7 +22,7 @@ class Influx:
 
     This class enables interaction with the influx time series database through
     the use of the api. The class also enables the ability to export test
-    results to a csv file, for postprocessing and analysis/
+    results to a csv file, for postprocessing and analysis
 
     Attributes:
         client (InfluxDBClient): Instance of InfluxDB api to interact with the
@@ -62,7 +62,7 @@ class Influx:
 
         table_row = [{
             'measurement': measurement,
-            'time': datetime.datetime.now(),
+            'time': datetime.now(),
             'fields': data,
         }]
         self.client.write_points(table_row, tags=tags)
@@ -118,7 +118,12 @@ class Influx:
             default=True
         )
 
-    def export_to_csv(self, test_name: str, query=None, tags=None, fields=None, measurements=None, csv_path=None) -> None:
+    def export_to_csv(self, test_name: str,
+                            query=None,
+                            tags=None,
+                            fields=None,
+                            measurements=None,
+                            csv_path=None) -> None:
         """Exports measurements to a csv file
 
         Args:
@@ -128,8 +133,9 @@ class Influx:
             measurements (list(str)): Measurements to be included in csv
             csv_path(str): File path of where the csv will be written
         """
-
-        file_name = f'{test_name}.csv'
+        
+        date_time = datetime.now().strftime("%d-%m-%Y_%H:%M")
+        file_name = f'{test_name}_{date_time}.csv'
         if query is None:
             data = self.read_data(tags=tags, fields=fields, measurements=measurements) 
         else:
@@ -142,9 +148,24 @@ class Influx:
             for measurement in data:
                 for row in measurement['values']:
                     writer.writerow(row)
+        
+
+def create_metadata_file(test_name: str, operator_name: str, commands: list, path=None) -> None:
+    """Creates a file containing metadata about the current test"""
+
+    date_time = datetime.now().strftime("%d-%m-%Y_%H:%M")
+    file_name = f'{test_name}_{date_time}.info'
+    if path is None:
+        file_path = os.getcwd()
+    with open(os.path.join(path, file_name), 'w', newline='\n') as infofile:
+        infofile.write(f'Test: {test_name}\n')
+        infofile.write(f'Date: {date_time}\n')
+        infofile.write(f'Test operated by: {operator_name}\n')
+        infofile.write(f'List of commands:\n{'\n'.join(commands)}')
+        infofile.close()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # TODO tidy up testing
     # Testing class functionality
 
     DATABASE = Influx('example', 'localhost', 8086)
