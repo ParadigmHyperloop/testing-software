@@ -6,9 +6,10 @@ Classes:
             be specified, and data retention policies can be created.
 
 Functions:
-    format_data: Formats data in the correct way to pass the data into a query
-                 string in the Influx class
-"""
+    create_metadata_file: Generates a .info file with specified metadata about the
+                          test, including operator name, test name, and commands
+                          issued
+    """
 
 import csv
 from datetime import datetime
@@ -37,6 +38,8 @@ class Influx:
         Args:
             database (str): Name of database to connect to. If the database
                             does not exist, it will be created.
+            host (str): Host where the database is located
+            port (int): Port on which the database is being served
         """
 
         self.client = InfluxDBClient(host=host, port=port)
