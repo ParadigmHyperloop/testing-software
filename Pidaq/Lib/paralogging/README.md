@@ -64,6 +64,6 @@ The log_init() function takes an optional arguement for format string. This stri
 
 However, there are many more parameters available. The table below from the python docs (<https://docs.python.org/3/library/logging.html#logrecord-attributes>) contains all available parameters:
 
-![Log Formatting Options Table](log-format-table.png)
+![Log Formatting Options Table](log-format-table.PNG)
 
 
