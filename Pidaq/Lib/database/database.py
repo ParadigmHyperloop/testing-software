@@ -107,7 +107,7 @@ class Influx:
         except KeyError:
             return -1
 
-    def create_retention_policy(self, name: str, duration: str, replication: str) -> None:
+    def create_retention_policy(self, name: str, duration: str, replication: int) -> None:
         """Creates a retention policy for the current database"""
 
         self.client.create_retention_policy(
@@ -223,3 +223,12 @@ if __name__ == "__main__":
                                 'region': 'us-west'
                             },
                             fields=['Celcius', 'Fahrenheit'])
+
+    create_metadata_file('example_test', 'Daniel',
+                         ['create database',
+                          'log to database',
+                          'read data from database',
+                          'export to csv'])
+
+    database0.create_retention_policy('test_retention_policy', '1h', 1)
+
