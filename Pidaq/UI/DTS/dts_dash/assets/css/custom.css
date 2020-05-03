@@ -1,0 +1,61 @@
+.pad-top {
+    margin-top: 15px;
+}
+
+.pad-bot {
+    margin-bottom: 15px;
+}
+
+.pad-left {
+    margin-left: 15vw;
+}
+
+.pad-right {
+    margin-right: 15vw;
+}
+
+.pad-right-s {
+    margin-right: 10px;
+}
+.hov-pointer {
+    cursor: pointer;
+}
+
+.full-block {
+    height: "100%";
+    width: "100%";
+}
+
+.center-content {
+    text-align: "center";
+    justify-content: "center";
+}
+
+.custom-card {
+    height: 100%;
+}
+
+.inline-block-child {
+    display: inline-block;
+  }
+
+.small-pad-left {
+    margin-left: 15px;
+}
+
+.small-pad-right {
+    margin-left: 15px;
+}
+
+.auto-margins {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.vertical-center {
+    margin: 0;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
