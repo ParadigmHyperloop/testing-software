@@ -2,7 +2,8 @@
 
 This module contains helper functions for initializing loggers
 for the various paradigm research/testing rigs. The purpose of
-this module is to ensure log format consistency across all code """
+this module is to ensure log format consistency across all code 
+"""
 
 import logging
 import os
@@ -74,6 +75,6 @@ if __name__ == "__main__":
         
     default_root_log(f"Called init to setup root logger with default settings...")
     logger = logging.getLogger()
-    
+   
     for i in range(1,101):
         logger.info(f"Message #{i}")
