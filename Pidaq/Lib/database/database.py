@@ -72,10 +72,10 @@ class Influx:
 
     def read_data(self, query=None, tags=None, fields=None, measurements=None) -> str:
         """Reads database for specified measurements, including specified tags and fields
-        
+
         Format of a query when not using query parameter:
             SELECT fields FROM measurements WHERE tags.keys = tags.values
-        
+
         Args:
             query (str): if argument is passed, all other parameters are ignored, and database
                          is queried
@@ -122,11 +122,11 @@ class Influx:
         )
 
     def export_to_csv(self, test_name: str,
-                            query=None,
-                            tags=None,
-                            fields=None,
-                            measurements=None,
-                            csv_path=None) -> None:
+                      query=None,
+                      tags=None,
+                      fields=None,
+                      measurements=None,
+                      csv_path=None) -> None:
         """Exports measurements to a csv file
 
         Args:
@@ -136,11 +136,11 @@ class Influx:
             measurements (list(str)): Measurements to be included in csv
             csv_path(str): File path of where the csv will be written
         """
-        
+
         date_time = datetime.now().strftime("%d-%m-%Y_%H:%M")
         file_name = f'{test_name}_{date_time}.csv'
         if query is None:
-            data = self.read_data(tags=tags, fields=fields, measurements=measurements) 
+            data = self.read_data(tags=tags, fields=fields, measurements=measurements)
         else:
             data = self.read_data(query=query)
         if csv_path is None:
@@ -151,7 +151,7 @@ class Influx:
             for measurement in data:
                 for row in measurement['values']:
                     writer.writerow(row)
-        
+
 
 def create_metadata_file(test_name: str, operator_name: str, commands: list, path=None) -> None:
     """Creates a file containing metadata about the current test"""
@@ -174,7 +174,9 @@ if __name__ == "__main__":
     import random
     # Testing class functionality
 
-    database0 = Influx('example', 'localhost', 8086) # Creating Influx instance from database that has already been created
+    database0 = Influx('example', 'localhost', 8086) # Creating Influx instance from
+                                                     # database that has already been created
+
     database1 = Influx('example1', 'localhost', 8086) # Creating new database
 
     data = {
@@ -188,7 +190,7 @@ if __name__ == "__main__":
     database1.log_data(data, 'temperature', tags) # Logging data to a database
 
     query_string = 'SELECT "samplef01","samplef02","samplef11" FROM "samplem1","samplem2" WHERE "samplef01" > 5'
-    
+
     print(database0.read_data(query=query_string)) # Query using query string
     database0.export_to_csv('test0', query=query_string)
 
@@ -200,7 +202,7 @@ if __name__ == "__main__":
                                   'host': 'server01',
                                   'region': 'us-west'
                               })) # Query with measurements and tags
-    database0.export_to_csv('test2', 
+    database0.export_to_csv('test2',
                             measurements=['samplem1', 'samplem2', 'samplem3'],
                             tags={
                                 'host': 'server01',
