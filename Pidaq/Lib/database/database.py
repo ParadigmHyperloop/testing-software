@@ -11,8 +11,8 @@ Functions:
 """
 
 import csv
-from datetime import datetime
 import os
+from datetime import datetime
 
 from influxdb import InfluxDBClient
 
@@ -30,7 +30,6 @@ class Influx:
         current_database (str): Current database that the class is interacting
                                 with
     """
-
     def __init__(self, database: str, host: str, port: int) -> None:
         """
 
@@ -38,7 +37,6 @@ class Influx:
             database (str): Name of database to connect to. If the database
                             does not exist, it will be created.
         """
-
         self.client = InfluxDBClient(host=host, port=port)
         current_databases = self.client.get_list_database()
         if not any(current_database['name'] == database
@@ -49,7 +47,6 @@ class Influx:
 
     def switch_database(self, database: str) -> None:
         """Switches currently active database"""
-
         current_databases = self.client.get_list_database()
         if not any(self.current_database['name'] == database
                    for self.current_database in current_databases):
@@ -58,8 +55,13 @@ class Influx:
         self.current_database = database
 
     def log_data(self, data: dict, measurement: str, tags: dict) -> None:
-        """Logs a single data point to the database"""
-
+        """Logs a single data point to the database
+        
+        Args:
+            data (dict): key-value pair of fields and their values
+            measurement (str): measurement to log data and tags to
+            tags (dict): key-value pair of tags and their values
+        """
         table_row = [{
             'measurement': measurement,
             'time': datetime.now(),
@@ -83,11 +85,10 @@ class Influx:
         Returns:
             (str) Raw json data
         """
-
         if query is not None:
             data = self.client.query(query, database=self.current_database)
         elif measurements is None:
-            return -1
+            raise ValueError('Error, one of type or query must be specified')
         else:
             formatted_measurements = ','.join([f'"{measurement}"' for measurement in measurements])
             formatted_fields = ','.join([f'"{field}"' for field in fields]) if fields is not None else '*'
@@ -107,17 +108,6 @@ class Influx:
         except KeyError:
             return -1
 
-    def create_retention_policy(self, name: str, duration: str, replication: str) -> None:
-        """Creates a retention policy for the current database"""
-
-        self.client.create_retention_policy(
-            name,
-            duration,
-            replication,
-            database=self.current_database,
-            default=True
-        )
-
     def export_to_csv(self, test_name: str,
                             query=None,
                             tags=None,
@@ -133,7 +123,6 @@ class Influx:
             measurements (list(str)): Measurements to be included in csv
             csv_path(str): File path of where the csv will be written
         """
-        
         date_time = datetime.now().strftime("%d-%m-%Y_%H:%M")
         file_name = f'{test_name}_{date_time}.csv'
         if query is None:
@@ -142,6 +131,8 @@ class Influx:
             data = self.read_data(query=query)
         if csv_path is None:
             csv_path = os.getcwd()
+        if not os.path.exists(csv_path):
+            os.makedirs(csv_path)
         with open(os.path.join(csv_path, file_name), 'w', newline='\n') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
             writer.writerow(data[0]['columns'])
@@ -159,6 +150,8 @@ def create_metadata_file(test_name: str, operator_name: str, commands: list, pat
         file_path = os.getcwd()
     else:
         file_path = path
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
     with open(os.path.join(file_path, file_name), 'w', newline='\n') as infofile:
         infofile.write(f'Test: {test_name}\n')
         infofile.write(f'Date: {date_time}\n')
