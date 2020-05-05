@@ -152,5 +152,18 @@ if __name__ == "__main__":
     # Print SensorReading objects
     for message in bus.messages:
         print(f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
-
     
+    # Print contents of method_ids list
+    print('Message ids in use:')
+    for message_id in bus.message_ids:
+        print(message_id)
+
+    # Start receiving messages and assigning message data
+    while True:
+        current_message = bus.read_bus()
+        bus.assign_message_data(current_message)
+        for message in bus.messages:
+            print(f'Reading: {message.reading}   data: {message.data}')
+
+        # Send a control message, check the can_reciever program output for this message
+        bus.send_message(55, ['c', 'o', 'n', 't', 'r', 'o', 'l'])
