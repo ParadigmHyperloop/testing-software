@@ -91,7 +91,9 @@ class CanManager:
         if message_id in self.message_ids:
             for message in self.messages:
                 if message.message_id == bus_message.arbitration_id:
-                    message.data = bus_message.data
+                    # can.Message.data is stored in an immutable bytearray,
+                    # pass to bytes constructor to make message.data mutable
+                    message.data = bytes(bus_message.data)
 
 
 class SensorReading:
@@ -166,4 +168,4 @@ if __name__ == "__main__":
             print(f'Reading: {message.reading}   data: {message.data}')
 
         # Send a control message, check the can_reciever program output for this message
-        bus.send_message(55, ['c', 'o', 'n', 't', 'r', 'o', 'l'])
+        bus.send_message(55, bytes('control', 'utf-8'))
