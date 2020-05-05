@@ -1,26 +1,26 @@
 {
     "DTS": {
-        "Readings": [{
-            "Reading": "Placeholder",
-            "MsgID": "Placeholder (Will hold string representation of id (0x0A for example)",
-            "ConversionFactor": "Placeholder",
-            "ConversionFactorType": "Placeholder"
+        "readings": [{
+            "reading": "Placeholder",
+            "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "conversion_factor": "Placeholder",
+            "conversion_factor_type": "Placeholder"
         }]
     },
     "Suspension": {
-        "Readings": [{
-            "Reading": "Placeholder",
-            "MsgID": "Placeholder (Will hold string representation of id (0x0A for example)",
-            "ConversionFactor": "Placeholder",
-            "ConversionFactorType": "Placeholder"
+        "readings": [{
+            "reading": "Placeholder",
+            "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "conversion_factor": "Placeholder",
+            "conversion_factor_type": "Placeholder"
         }]
     },
     "WindTunnel": {
-        "Readings": [{
-            "Reading": "Placeholder",
-            "MsgID": "Placeholder (Will hold string representation of id (0x0A for example)",
-            "ConversionFactor": "Placeholder",
-            "ConversionFactorType": "Placeholder"
+        "readings": [{
+            "reading": "Placeholder",
+            "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "conversion_factor": "Placeholder",
+            "conversion_factor_type": "Placeholder"
         }]
     }
 }
