@@ -8,6 +8,7 @@ Functions:
     parse_conversion_factor
 """
 import json
+import os
 
 import can
 
@@ -34,35 +35,37 @@ class CanManager:
         assign_message_data(bus_message: can.Message)
             assigns data to the correct SensorReading object
     """
-
     def __init__(self, bus_name: str) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
         self.messages = []
         self.message_ids = []
 
-    def read_message_config(self, project: str) -> None:
+    def read_message_config(self, project: str, config_file: str, path=None) -> None:
         """Reads sensor readings configuration from messageconfig.json
 
         Constructs SensorReading objects for all expected sensor readings,
         and appends them to a list
 
         Parameters:
-            project(str): current project, must be one of dts, suspension, or windtunnel
+            project (str): current project, must be one of dts, suspension, or windtunnel
+            config_file (str): message configuration file name
+            path (str): path to configuration file, if no path specified, current working
+                        directory is assumed
         """
-
         if project.lower not in ["dts", "suspension", "windtunnel"]:
-            raise Exception(f'Error: {project} is not a valid project')
-        with open('messageconfig.json', 'r+') as config:
+            raise ValueError(f'Error: {project} is not a valid project')
+        file_path = os.getcwd() if path is None else path
+        with open(os.path.join(file_path, config_file), 'r+') as config:
             config_dict = json.load(config)
-            for reading in config_dict[project]['Readings']:
+            for reading in config_dict[project]['readings']:
                 self.messages.append(SensorReading(
                     project,
-                    reading['MsgID'],
-                    reading['Reading'],
-                    reading['ConversionFactor'],
-                    reading['ConversionFactorType']
+                    reading['message_id'],
+                    reading['reading'],
+                    reading['conversion_factor'],
+                    reading['conversion_factor_type']
                 ))
-                self.message_ids.append(int(reading['MsgID'], 16))
+                self.message_ids.append(int(reading['message_id'], 16))
 
     def send_message(self, id: int, data: list) -> None:
         if id in self.message_ids:
@@ -107,13 +110,12 @@ class SensorReading:
     Methods:
 
     """
-
     def __init__(self, project: str, message_id: str, reading: str,
                  conversion_factor: str, conversion_factor_type: str) -> None:
         self.message_id = int(message_id, 16)
         self.reading = reading
-        self.conversion_factor = parse_conversion_factor(
-            conversion_factor, conversion_factor_type)
+        self.conversion_factor = parse_conversion_factor(conversion_factor,
+                                                         conversion_factor_type)
         self.data = None
 
 
@@ -136,8 +138,19 @@ def parse_conversion_factor(conversion_factor: str, conversion_factor_type: str)
     elif conversion_factor_type.lower is 'int':
         return int(conversion_factor)
     else:
-        return -1
+        raise ValueError('Error: conversion_factor_type is invalid')
 
 
 if __name__ == "__main__":
-    pass
+    """Note: To send messages in test case, must be running linux to make use of socketcan
+
+    This test case makes use of the canSender program, see README for instructions
+    """
+    bus = CanManager('vcan0')
+    bus.read_message_config('dts', 'example_message_config.json')
+
+    # Print SensorReading objects
+    for message in bus.messages:
+        print(f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
+
+    
