@@ -14,7 +14,7 @@ def create_can_filters(raw_filters):
     can_filters (list): list of python-can filter objects
     """
     can_filters = []
-    for raw_can_filter in raw_can_filters:
+    for raw_can_filter in raw_filters:
         can_id = raw_can_filter["canId"]
         can_mask = raw_can_filter["canMask"]
         extended = raw_can_filter["extended"]
@@ -31,10 +31,10 @@ if __name__ == "__main__":
     can_bus = can.Bus(bustype=can_config["canInfo"]["busType"],
                       channel=can_config["canInfo"]["serialPort"],
                       bitrate=can_config["canInfo"]["bitrate"])
-    raw_can_filters = [
-        can_filter for can_filter in can_config["canInfo"]["busFilters"]]
-    can_filters = create_can_filters(raw_can_filters)
-    can_bus.set_filters(filters=can_filters)
+    #raw_can_filters = [
+    #    can_filter for can_filter in can_config["canInfo"]["busFilters"]]
+    # can_filters = create_can_filters(raw_can_filters)
+    # can_bus.set_filters(filters=can_filters)
     
     # The can_bus object receives message objects from the sender program
     # Iterating over the bus continuously allows the messages on the bus to be received
