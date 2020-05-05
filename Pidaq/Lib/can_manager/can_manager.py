@@ -52,12 +52,12 @@ class CanManager:
             path (str): path to configuration file, if no path specified, current working
                         directory is assumed
         """
-        if project.lower not in ["dts", "suspension", "windtunnel"]:
+        if project.lower() not in ["dts", "suspension", "windtunnel"]:
             raise ValueError(f'Error: {project} is not a valid project')
         file_path = os.getcwd() if path is None else path
         with open(os.path.join(file_path, config_file), 'r+') as config:
             config_dict = json.load(config)
-            for reading in config_dict[project]['readings']:
+            for reading in config_dict[project.lower()]['readings']:
                 self.messages.append(SensorReading(
                     project,
                     reading['message_id'],
@@ -133,9 +133,9 @@ def parse_conversion_factor(conversion_factor: str, conversion_factor_type: str)
     Returns:
         conversion_factor(int or float)
     """
-    if conversion_factor_type.lower is 'float':
+    if conversion_factor_type.lower() == 'float':
         return float(conversion_factor)
-    elif conversion_factor_type.lower is 'int':
+    elif conversion_factor_type.lower() == 'int':
         return int(conversion_factor)
     else:
         raise ValueError('Error: conversion_factor_type is invalid')
