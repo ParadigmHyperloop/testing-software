@@ -22,8 +22,9 @@ class CanManager:
 
     Attributes:
         bus (can.interfaces.socketcan.SocketcanBus)
-        messages (list(SensorReading)): list of all the messages to be expected from the 
-                                        sensor board
+        messages (dict): dict of all the messages to be expected from the 
+                         sensor board. Keys are message ids, and values are
+                         SensorReading objects
         message_ids (list(int)): list of all the message ids, hexidecimal integers
 
     Methods:
@@ -37,7 +38,7 @@ class CanManager:
     """
     def __init__(self, bus_name: str) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
-        self.messages = []
+        self.messages = {}
         self.message_ids = []
 
     def read_message_config(self, project: str, config_file: str, path=None) -> None:
@@ -58,13 +59,14 @@ class CanManager:
         with open(os.path.join(file_path, config_file), 'r+') as config:
             config_dict = json.load(config)
             for reading in config_dict[project.lower()]['readings']:
-                self.messages.append(SensorReading(
+                message_id = reading['message_id']
+                self.messages[message_id] = SensorReading(
                     project,
                     reading['message_id'],
                     reading['reading'],
                     reading['conversion_factor'],
                     reading['conversion_factor_type']
-                ))
+                )
                 self.message_ids.append(int(reading['message_id'], 16))
 
     def send_message(self, id: int, data: list) -> None:
@@ -89,11 +91,7 @@ class CanManager:
         """
         message_id = bus_message.arbitration_id
         if message_id in self.message_ids:
-            for message in self.messages:
-                if message.message_id == bus_message.arbitration_id:
-                    # can.Message.data is stored in an immutable bytearray,
-                    # pass to bytes constructor to make message.data mutable
-                    message.data = bytes(bus_message.data)
+            self.messages[message_id].data = bytes(bus_message.data)
 
 
 class SensorReading:
