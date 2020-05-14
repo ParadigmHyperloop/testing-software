@@ -4,125 +4,143 @@ import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
 
-# Modals
-start_warn_modal = dbc.Modal([
-                            dbc.ModalHeader("WARNING !!!"),
-                            dbc.ModalBody("Attempting to start test with the chosen profile:\n"
-                                           "Would you like to continue?"),
-                            dbc.ModalFooter([
-                                html.Div([
-                                    dbc.Button("Abort", 
-                                            id="abort-start",
-                                            color="danger",
-                                            className="ml-auto pad-right-s"),
-                                    dbc.Button("Start",
-                                            id="submit-start",
-                                            color="success",
-                                            className="ml-auto")
-                                ])
-                            ])
-                        ],
-                        id="start-confirm-dialog")
-
 # Main Control GUI Bootstrap Layout
 control_layout = html.Div([
-    
-    
+
 dbc.Row([
-        dbc.Col([
-          dbc.Card([
-            dbc.InputGroup(
-            [
+    dbc.Col([
+        dbc.Card([
+            dbc.CardBody(
+                html.H3("PARAMETERS",
+                    style={"text-align": "center"})
+            )
+        ])
+    ],
+    width={"size": 4, "offset": 4})
+]),
+
+
+dbc.Row([
+    dbc.Col([
+        dbc.Card([
+            dbc.InputGroup([
                 dbc.InputGroupAddon("RUNTIME", addon_type="prepend"),
                 dbc.Input(),
-            ],
-        )],
-            body=True)  
-        ],
-        width={"size": 6, "offset": 3})
-    ]),
+            ])
+        ], 
+        body=True)  
+    ], 
+    width={"size": 4, "offset": 4})
+]),
 
 dbc.Row([
-        dbc.Col([
-          dbc.Card([
-            dbc.InputGroup(
-            [
+    dbc.Col([
+        dbc.Card([
+            dbc.InputGroup([
                 dbc.InputGroupAddon("TIMESTEP", addon_type="prepend"),
                 dbc.Input(),
-            ],
-        )],
-            body=True)  
+            ])
         ],
-        width={"size": 6, "offset": 3})
-    ]),
+        body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
 
 dbc.Row([
-        dbc.Col([
-          dbc.Card([
-            dbc.InputGroup(
-            [
+    dbc.Col([
+        dbc.Card([
+            dbc.InputGroup([
                 dbc.InputGroupAddon("DISPLACEMENT STEP", addon_type="prepend"),
                 dbc.Input(),
-            ],
-        )],
-            body=True)  
+            ])
         ],
-        width={"size": 6, "offset": 3})
-    ]),
+        body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
 
 dbc.Row([
-        dbc.Col([
-          dbc.Card([
-            dbc.InputGroup(
-            [
+    dbc.Col([
+        dbc.Card([
+            dbc.InputGroup([
                 dbc.InputGroupAddon("VELOCITY STEP", addon_type="prepend"),
                 dbc.Input(),
-            ],
-        )],
-            body=True)  
+            ])
         ],
-        width={"size": 6, "offset": 3})
-    ]),
+        body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
 
 dbc.Row([
-        dbc.Col([
-          dbc.Card([
-            dbc.InputGroup(
-            [
+    dbc.Col([
+        dbc.Card([
+            dbc.InputGroup([
                 dbc.InputGroupAddon("ACCELERATION STEP", addon_type="prepend"),
                 dbc.Input(),
-            ],
-        )],
-            body=True)  
+            ])
         ],
-        width={"size": 6, "offset": 3})
-    ]),
+        body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
 
 dbc.Row([
-        dbc.Col([
-          dbc.Card([
-            dbc.InputGroup(
-            [
+    dbc.Col([
+        dbc.Card([
+            dbc.InputGroup([
                 dbc.InputGroupAddon("PROFILE NAME", addon_type="prepend"),
                 dbc.Input(),
-            ],
-        )],
-            body=True)  
+            ])
         ],
-        width={"size": 6, "offset": 3})
-    ]),
+        body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
 
 dbc.Row([
-    dbc.ButtonGroup(
-        [
-            dbc.Button("SAVE PROFILE"),
-            dbc.DropdownMenu(
-                [dbc.DropdownMenuItem("PROFILE 1"), dbc.DropdownMenuItem("PROFILE 2")],
-                label="LOAD PROFILE",
-                group=True,
-            ),
-        ]
-    )
-    ]),
+    dbc.Col([
+        dbc.Card([
+            dbc.ButtonGroup([
+                dbc.Button("SAVE PROFILE"),
+                dbc.DropdownMenu([
+                    dbc.DropdownMenuItem("PROFILE 1"), dbc.DropdownMenuItem("PROFILE 2")],
+                    label="LOAD PROFILE",
+                    group=True,)
+            ])
+        ],
+        body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
+
+dbc.Row([
+    dbc.Col([
+        dbc.Card([
+            dbc.Button("RECORD", color="success", block = True)
+        ])  
+    ],
+    width={"size": 1, "offset": 4}),
+    dbc.Col([
+        dbc.Card([
+            dbc.Button("TARE", color="warning", block = True),
+            dbc.Button("CLEAR DATA", color="warning", block = True)
+        ])  
+    ],
+    width={"size": 2, "offset": 0}),
+    dbc.Col([
+        dbc.Card([
+            dbc.Button("STOP", color="danger", block = True)
+        ])  
+    ],
+    width={"size": 1, "offset": 0})
+]),
+
+dbc.Row([
+    dbc.Col([
+        dbc.Card([dbc.Button("EMERGENCY STOP", color="danger", block = True )] , body=True)  
+    ],
+    width={"size": 4, "offset": 4})
+]),
 
 ])
