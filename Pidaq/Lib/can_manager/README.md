@@ -20,7 +20,7 @@ Configure the SensorReadings by calling `bus.read_message_config()` passing the 
 
 To send a message on the bus, use the `send_message` method. To read the bus for the latest message, use the `read_bus` method, this will return a `can.Message` object
 
-To assign message data to a SensorReading object, pass a `can.Message` object (Usually the one received from the `read_bus` method), and the method will assign the data to the correct SensorReading object, based off of the can message id.
+To assign message data to a SensorReading object, pass a `can.Message` object (Usually the one received from the `read_bus` method) to the `assign_message_data` method, and the method will assign the data to the correct SensorReading object, based off of the can message id.
 
 ## Testing
 To test the functionality of this class, unless CAN hardware is available, the user must have access to a linux install that contains socketcan, in order to use the virtual can bus (does not seem to work in WSL, not tested in a virtual machine)
