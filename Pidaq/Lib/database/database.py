@@ -92,7 +92,8 @@ class Influx:
         if query is not None:
             data = self.client.query(query, database=self.current_database)
         elif measurements is None:
-            raise ValueError('Error, one of type or query must be specified')
+            raise ValueError(
+                'Error, one of measurement or query must be specified')
         else:
             formatted_measurements = ','.join(
                 [f'"{measurement}"' for measurement in measurements])
@@ -234,5 +235,3 @@ if __name__ == "__main__":
                           'log to database',
                           'read data from database',
                           'export to csv'])
-
-    database0.create_retention_policy('test_retention_policy', '1h', 1)
