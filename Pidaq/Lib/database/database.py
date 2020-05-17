@@ -12,8 +12,8 @@ Functions:
     """
 
 import csv
-from datetime import datetime
 import os
+from datetime import datetime
 
 from influxdb import InfluxDBClient
 
@@ -41,7 +41,6 @@ class Influx:
             host (str): Host where the database is located
             port (int): Port on which the database is being served
         """
-
         self.client = InfluxDBClient(host=host, port=port)
         current_databases = self.client.get_list_database()
         if not any(current_database['name'] == database
@@ -52,7 +51,6 @@ class Influx:
 
     def switch_database(self, database: str) -> None:
         """Switches currently active database"""
-
         current_databases = self.client.get_list_database()
         if not any(self.current_database['name'] == database
                    for self.current_database in current_databases):
@@ -61,8 +59,13 @@ class Influx:
         self.current_database = database
 
     def log_data(self, data: dict, measurement: str, tags: dict) -> None:
-        """Logs a single data point to the database"""
+        """Logs a single data point to the database
 
+        Args:
+            data (dict): key-value pair of fields and their values
+            measurement (str): measurement to log data and tags to
+            tags (dict): key-value pair of tags and their values
+        """
         table_row = [{
             'measurement': measurement,
             'time': datetime.now(),
@@ -86,21 +89,23 @@ class Influx:
         Returns:
             (str) Raw json data
         """
-
         if query is not None:
             data = self.client.query(query, database=self.current_database)
         elif measurements is None:
-            return -1
+            raise ValueError('Error, one of type or query must be specified')
         else:
-            formatted_measurements = ','.join([f'"{measurement}"' for measurement in measurements])
-            formatted_fields = ','.join([f'"{field}"' for field in fields]) if fields is not None else '*'
+            formatted_measurements = ','.join(
+                [f'"{measurement}"' for measurement in measurements])
+            formatted_fields = ','.join(
+                [f'"{field}"' for field in fields]) if fields is not None else '*'
             if tags is None:
                 data = self.client.query(
                     f'SELECT {formatted_fields} FROM {formatted_measurements}',
                     database=self.current_database
                 )
             else:
-                formatted_tags = ' AND '.join(f""""{key}" = '{value}'""" for key, value in tags.items())
+                formatted_tags = ' AND '.join(
+                    f""""{key}" = '{value}'""" for key, value in tags.items())
                 data = self.client.query(
                     f'SELECT {formatted_fields} FROM {formatted_measurements} WHERE {formatted_tags}',
                     database=self.current_database
@@ -109,17 +114,6 @@ class Influx:
             return data.raw['series']
         except KeyError:
             return -1
-
-    def create_retention_policy(self, name: str, duration: str, replication: int) -> None:
-        """Creates a retention policy for the current database"""
-
-        self.client.create_retention_policy(
-            name,
-            duration,
-            replication,
-            database=self.current_database,
-            default=True
-        )
 
     def export_to_csv(self, test_name: str,
                       query=None,
@@ -136,15 +130,17 @@ class Influx:
             measurements (list(str)): Measurements to be included in csv
             csv_path(str): File path of where the csv will be written
         """
-
         date_time = datetime.now().strftime("%d-%m-%Y_%H:%M")
         file_name = f'{test_name}_{date_time}.csv'
         if query is None:
-            data = self.read_data(tags=tags, fields=fields, measurements=measurements)
+            data = self.read_data(tags=tags, fields=fields,
+                                  measurements=measurements)
         else:
             data = self.read_data(query=query)
         if csv_path is None:
             csv_path = os.getcwd()
+        if not os.path.exists(csv_path):
+            os.makedirs(csv_path)
         with open(os.path.join(csv_path, file_name), 'w', newline='\n') as csvfile:
             writer = csv.writer(csvfile, delimiter=',')
             writer.writerow(data[0]['columns'])
@@ -162,6 +158,8 @@ def create_metadata_file(test_name: str, operator_name: str, commands: list, pat
         file_path = os.getcwd()
     else:
         file_path = path
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
     with open(os.path.join(file_path, file_name), 'w', newline='\n') as infofile:
         infofile.write(f'Test: {test_name}\n')
         infofile.write(f'Date: {date_time}\n')
@@ -174,10 +172,11 @@ if __name__ == "__main__":
     import random
     # Testing class functionality
 
-    database0 = Influx('example', 'localhost', 8086) # Creating Influx instance from
-                                                     # database that has already been created
+    # Creating Influx instance from
+    database0 = Influx('example', 'localhost', 8086)
+    # database that has already been created
 
-    database1 = Influx('example1', 'localhost', 8086) # Creating new database
+    database1 = Influx('example1', 'localhost', 8086)  # Creating new database
 
     data = {
         'Celcius': random.random() * 40,
@@ -187,21 +186,22 @@ if __name__ == "__main__":
         'host': 'server01',
         'region': 'us-east'
     }
-    database1.log_data(data, 'temperature', tags) # Logging data to a database
+    database1.log_data(data, 'temperature', tags)  # Logging data to a database
 
     query_string = 'SELECT "samplef01","samplef02","samplef11" FROM "samplem1","samplem2" WHERE "samplef01" > 5'
 
-    print(database0.read_data(query=query_string)) # Query using query string
+    print(database0.read_data(query=query_string))  # Query using query string
     database0.export_to_csv('test0', query=query_string)
 
-    print(database0.read_data(measurements=['temperature', 'pressure'])) # Query with only measurement
+    # Query with only measurement
+    print(database0.read_data(measurements=['temperature', 'pressure']))
     database0.export_to_csv('test1', measurements=['temperature', 'pressure'])
 
     print(database0.read_data(measurements=['samplem1', 'samplem2', 'samplem3'],
                               tags={
                                   'host': 'server01',
                                   'region': 'us-west'
-                              })) # Query with measurements and tags
+    }))  # Query with measurements and tags
     database0.export_to_csv('test2',
                             measurements=['samplem1', 'samplem2', 'samplem3'],
                             tags={
@@ -210,7 +210,7 @@ if __name__ == "__main__":
                             })
 
     print(database0.read_data(measurements=['samplem1', 'samplem3'],
-                              fields=['samplef01', 'samplef21'])) # Query with measurements and fields
+                              fields=['samplef01', 'samplef21']))  # Query with measurements and fields
     database0.export_to_csv('test3',
                             measurements=['samplem1', 'samplem3'],
                             fields=['samplef01', 'samplef21'])
@@ -219,8 +219,8 @@ if __name__ == "__main__":
                               tags={
                                   'host': 'server01',
                                   'region': 'us-west'
-                              },
-                              fields=['Celcius', 'Fahrenheit'])) # Query with measurements, tags, and fields
+    },
+        fields=['Celcius', 'Fahrenheit']))  # Query with measurements, tags, and fields
     database0.export_to_csv('test4',
                             measurements=['temperature', 'pressure'],
                             tags={
@@ -236,4 +236,3 @@ if __name__ == "__main__":
                           'export to csv'])
 
     database0.create_retention_policy('test_retention_policy', '1h', 1)
-
