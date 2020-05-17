@@ -81,3 +81,82 @@ class DTSSimulator:
             analog_input_3,
             analog_input_4
         ]
+
+    def update_digital_input_status(self):
+        pass # This will need to read from the state
+
+    def update_motor_position_information(self):
+        pass # This will need to read from the state
+
+    def update_current_information(self):
+        phase_a_current = int(20 + random() * 5).to_bytes(2, 'big')
+        phase_b_current = int(20 + random() * 5).to_bytes(2, 'big')
+        phase_c_current = int(20 + random() * 5).to_bytes(2, 'big')
+        dc_bus_current = int(15 + random() * 6).to_bytes(2, 'big') 
+        self.current_information = [
+            phase_a_current,
+            phase_b_current,
+            phase_c_current,
+            dc_bus_current
+        ]
+
+    def update_voltage_information(self):
+        dc_bus_voltage = int(200 + random() * 7.1).to_bytes(2, 'big')
+        output_voltage = int(205 + random() * 5.5).to_bytes(2, 'big')
+        vab_vd_voltage = int(190 + random() * 9.1).to_bytes(2, 'big')
+        vbc_vq_voltage = int(180 + random() * 6.4).to_bytes(2, 'big')
+        self.voltage_information = [
+            dc_bus_voltage,
+            output_voltage,
+            vab_vd_voltage,
+            vbc_vq_voltage
+        ]
+
+    def update_flux_information(self):
+        flux_command = int(2 + random() * .64).to_bytes(2, 'big')
+        flux_feedback = int(2 + random() * .64).to_bytes(2, 'big')
+        id_feedback = int(20 + random() * 5).to_bytes(2, 'big')
+        iq_feedback = int(20 + random() * 5).to_bytes(2, 'big')
+        self.flux_information = [
+            flux_command,
+            flux_feedback,
+            id_feedback,
+            iq_feedback
+        ]
+
+    def update_internal_voltages(self):
+        one_five_voltage_ref = 150.to_bytes(2, 'big')
+        two_five_voltage_ref = 250.to_bytes(2, 'big')
+        five_voltage_ref = 500.to_bytes(2, 'big')
+        twelve_system_voltage = 1200.to_bytes(2, 'big')
+        self.internal_voltages = [
+            one_five_voltage_ref,
+            two_five_voltage_ref,
+            five_voltage_ref,
+            twelve_system_voltage
+        ]
+
+    def update_internal_states(self):
+        pass # Read from input configuration
+
+    def update_fault_codes(self):
+        pass
+
+    def update_torque_timer_information(self):
+        pass # Read from command message
+
+    def update_modulation_index(self):
+        pass
+
+    def read_configuration_message(self, message: can.Message):
+        BIT_1 = 1
+        BIT_2 = 2
+        BIT_3 = 4
+        self.torque_command = message.data[1] + message.data[0]
+        self.speed_command = message_data[3] + message.data[2]
+        self.direction_command = message.data[4]
+        self.inverter_enable = message.data[5] & BIT_1
+        self.inverter_discharge = message.data[5] & BIT_2
+        self.speed_mode_enable = message.data[5] & BIT_3 
+        self.commanded_torque_limit = message.data[7] + message.data[6]
+
