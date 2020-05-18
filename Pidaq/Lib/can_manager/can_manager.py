@@ -92,15 +92,8 @@ class CanManager:
             bus_message(can.Message)
         """
         message_id = bus_message.arbitration_id
-<<<<<<< HEAD
         if message_id in self.messages.keys():
             self.messages[message_id].data = bus_message.data
-=======
-        if message_id in self.message_ids:
-            message_id_fmt = str(hex(message_id)).upper()
-            message_id_fmt = message_id_fmt[:1] + 'x' + message_id_fmt[2:]
-            self.messages[message_id_fmt].data = bytes(bus_message.data)
->>>>>>> 058ecee... Change string formatting when searching for message id to work correctly with message dict
 
 
 class SensorReading:
