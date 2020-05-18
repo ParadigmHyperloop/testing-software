@@ -28,7 +28,6 @@
 
 .center-content {
     text-align: "center";
-    justify-content: "center";
 }
 
 .custom-card {
@@ -48,8 +47,7 @@
 }
 
 .auto-margins {
-    margin-left: auto;
-    margin-right: auto;
+   margin: auto;
 }
 
 .vertical-center {
@@ -58,4 +56,9 @@
     top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
+}
+
+.align-right {
+    position: relative;
+    float: right;
 }
