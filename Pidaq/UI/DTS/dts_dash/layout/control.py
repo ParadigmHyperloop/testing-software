@@ -3,25 +3,43 @@ import dash_bootstrap_components as dbc
 import dash_daq as daq
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table
+import pandas as pd
+
+
+# Alerts
+exceed_60s_alert = dbc.Alert("WARNING: Current test length exceeds 60s!",
+                             id="exceed-60s-alert",
+                             is_open=False,
+                             duration=5000,
+                             color="warning",
+                             dismissable=True)
+
+no_name_alert = dbc.Alert("ERROR: Please select a test profile name!",
+                             id="no-name-alert",
+                             is_open=False,
+                             duration=5000,
+                             color="warning",
+                             dismissable=True)
 
 # Buttons
 add_command_btn = dbc.Button("Add Command",
                             color="primary",
                             className="mr-1",
-                            id="add-command",
+                            id="add-command-btn",
                             style={"text-align": "center"})
 
 start_test_btn =  dbc.Button(
                             "Start",
                             color="success",
                             className="mr-1",
-                            id="test-start",
+                            id="test-start-btn",
                             style={"width": "100%"})
 
 stop_test_btn =  dbc.Button("Stop",
                             color="danger",
                             className="mr-1 pad-top",
-                            id="test-stop",
+                            id="test-stop-btn",
                             style={"width": "100%"})
 
 estop_btn =  dbc.Button("ESTOP", 
@@ -34,28 +52,38 @@ clear_last_btn =  dbc.Button("Clear Last",
                             color="primary",
                             className="mr-1",
                             style={"width": "100%"},
-                            id="clear-last")
+                            id="clear-last-btn")
 
 clear_all_btn =  dbc.Button("Clear All",
                             color="primary",
                             className="mr-1 pad-top",
                             style={"width": "100%"},
-                            id="clear-all")
+                            id="clear-all-btn")
 
 update_title_btn = dbc.Button("Update",
                               color="primary",
                               className="mr-1",
-                              id="update-title")
+                              id="update-title-btn")
 
-torque_toggle_button = dbc.Button("Torque",
-                                  color="primary",
-                                  className="mr-1",
-                                  id="torque-toggle")
+torque_toggle_btn = dbc.Button("Torque",
+                                color="primary",
+                                className="mr-1",
+                                id="torque-toggle-btn")
 
-rpm_toggle_button = dbc.Button("RPM",
-                                  color="primary",
-                                  className="mr-1",
-                                  id="rpm-toggle")
+rpm_toggle_btn = dbc.Button("RPM",
+                            color="primary",
+                            className="mr-1",
+                            id="rpm-toggle-btn")
+
+export_profile_btn = dbc.Button("Export Profile",
+                                color="primary",
+                                className="mr-1 align-right",
+                                id="export-profile-btn")
+
+load_profiles_btn = dbc.Button("Load Profile",
+                                color="primary",
+                                className="mr-1 align-right",
+                                id="load-profile-btn")
 
 # Modals
 start_warn_modal = dbc.Modal([
@@ -65,11 +93,11 @@ start_warn_modal = dbc.Modal([
                             dbc.ModalFooter([
                                 html.Div([
                                     dbc.Button("Abort", 
-                                            id="abort-start",
+                                            id="abort-start-btn",
                                             color="danger",
                                             className="ml-auto pad-right-s"),
                                     dbc.Button("Start",
-                                            id="submit-start",
+                                            id="submit-start-btn",
                                             color="success",
                                             className="ml-auto")
                                 ])
@@ -77,12 +105,29 @@ start_warn_modal = dbc.Modal([
                         ],
                         id="start-confirm-dialog")
 
+# Tables
+df = pd.DataFrame(columns=["Type", "Step Duration(ms)", "Value"])
+
+timestep_readout_table = dash_table.DataTable(
+    id="timestep-readout-tbl",
+    columns=[{"name": i, "id": i} for i in df.columns],
+    data=df.to_dict('records'),
+    editable=False,
+    style_as_list_view=True,
+    style_table={"height": 300, "overflowY": "auto"}
+)
+
 # Main Control GUI Bootstrap Layout
 control_layout = html.Div([
-    dcc.ConfirmDialog(
-    id='confirm-start',
-    message='WARNING: Are you sure that you want to continue?'),
     
+    # Modals
+    start_warn_modal,
+    
+    # Alerts
+    exceed_60s_alert,
+    no_name_alert,
+    
+    # Bootstrap Layout
     dbc.Row([
         dbc.Col([
             dbc.InputGroup([
@@ -98,35 +143,59 @@ control_layout = html.Div([
     ],
     className='pad-bot pad-top'),
     
+    
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardBody(
-                    html.H2("Current Test Title Here", 
-                            id="test_title_header",
+                dbc.CardBody([
+                    html.H3(["DTS", html.Br(), "CONTROLS"],
                             style={"text-align": "center"})
+                ])
+            ], className="custom-card")
+        ],
+        className="pad-left"),
+        
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody(
+                    html.H3("Test Title Here", 
+                            id="test-title-header",
+                            style={"text-align": "center"},
+                            className="vertical-center")
                 )
             ],
             className="custom-card")
         ],
-        width={"size": 6, "offset":3})
+        width={"size": 4,}),
+        
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H3("RPM", 
+                            id="rpm-torque-display",
+                            style={"text-align": "center"},
+                            className="vertical-center")    
+                ])
+            ],
+            className="custom-card")
+        ],
+        className="pad-right")
     ],
     className="pad-bot pad-top"),
-    
- 
-    
+
+
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("RPM / Torque", style={"text-align": "center"}),
                 dbc.CardBody([
                     dbc.ButtonGroup(
-                        [torque_toggle_button, rpm_toggle_button],
-                        style={"justify-content": "center", "text-align": "center", "margin-left": "15%", "width": "70%"},# TODO This is just gross
+                        [torque_toggle_btn, rpm_toggle_btn],
+                        style={ "text-align": "center", "margin-left": "15%", "width": "70%"},
                         className="vertical-center")
                 ])
             ],
-            className="custom-card")
+            className="custom-card center-content")
         ], 
         className="pad-left"),
         
@@ -138,10 +207,11 @@ control_layout = html.Div([
                         id="step-duration-input",
                         type="number",
                         min=0,
-                        max=10000, #TODO MAX STEP DURATION CONFIG
-                        step=10,
+                        max=10000, 
+                        step=100,
+                        value=0,
                         style={"text-align": "center", "width": "80%", "margin": "auto"},
-                        className="auto-margins vertical-center")
+                        className="vertical-center")
                 ])
             ],
             className="custom-card")
@@ -156,7 +226,7 @@ control_layout = html.Div([
                                   id="rpm-torque-value",
                                   step=100,
                                   min=0,
-                                  max=10000, # TODO MAX RPM/TORQUE VALUE
+                                  max=10000,
                                   value=0),
                         dbc.InputGroupAddon(add_command_btn,
                                             addon_type="append")
@@ -168,19 +238,25 @@ control_layout = html.Div([
         className="pad-right"),
     ]),
     
+    
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("Time-Step Readout of Test Torque/RPM Input Profile", 
-                               style={"text-align": "center"}),
+                dbc.CardHeader([
+                    "Time-Step Readout of Test Torque/RPM Input Profile",
+                    export_profile_btn
+                    ], 
+                    style={"text-align": "center"}),
+                
                 dbc.CardBody([
-                    "Body"
+                    timestep_readout_table
                 ])
             ], 
             className="pad-right pad-left")
         ])
     ],
     className="pad-top pad-bot"),
+    
     
     dbc.Row([
         dbc.Col([
@@ -193,17 +269,16 @@ control_layout = html.Div([
                        stop_test_btn
                     ])
                 ])
-            ], style={"height": "100%"})
+            ], className="custom-card")
         ],
         className="pad-left"),
         
         dbc.Col([
             dbc.Card([
-                #dbc.CardHeader("ESTOP"),
                 dbc.CardBody([
                    estop_btn
                 ])
-            ], style={"height": "100%"})
+            ], className="custom-card")
         ],
         width={"size": 5}),
         
@@ -217,15 +292,14 @@ control_layout = html.Div([
                        clear_all_btn
                     ])
                 ])
-            ], style={"height": "100%"})
+            ], className="custom-card")
         ],
         className="pad-right")
     ],
     className="pad-top pad-bot"),
     
-    # Modals
-    start_warn_modal,
-    
-    # Empty, invisible div 
-    html.Div("", id="dump"),
+    # Empty divs to store output of callbacks with no output
+    html.Div("", id="dump-abort-start"),
+    html.Div("", id="dump-export-profile"),
+    html.Div("", id="dump-start-clicked")
 ])
