@@ -22,7 +22,7 @@ class CanManager:
 
     Attributes:
         bus (can.interfaces.socketcan.SocketcanBus)
-        messages (dict): dict of all the messages to be expected from the 
+        messages (dict): dict of all the messages to be expected from the
                          sensor board. Keys are message ids, and values are
                          SensorReading objects
         message_ids (list(int)): list of all the message ids, hexidecimal integers
@@ -36,6 +36,7 @@ class CanManager:
         assign_message_data(bus_message: can.Message)
             assigns data to the correct SensorReading object
     """
+
     def __init__(self, bus_name: str) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
         self.messages = {}
@@ -91,7 +92,9 @@ class CanManager:
         """
         message_id = bus_message.arbitration_id
         if message_id in self.message_ids:
-            self.messages[message_id].data = bytes(bus_message.data)
+            message_id_fmt = str(hex(message_id)).upper()
+            message_id_fmt = message_id_fmt[:1] + 'x' + message_id_fmt[2:]
+            self.messages[message_id_fmt].data = bytes(bus_message.data)
 
 
 class SensorReading:
@@ -110,6 +113,7 @@ class SensorReading:
     Methods:
 
     """
+
     def __init__(self, project: str, message_id: str, reading: str,
                  conversion_factor: str, conversion_factor_type: str) -> None:
         self.message_id = int(message_id, 16)
@@ -150,9 +154,10 @@ if __name__ == "__main__":
     bus.read_message_config('dts', 'example_message_config.json')
 
     # Print SensorReading objects
-    for message in bus.messages:
-        print(f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
-    
+    for id, message in bus.messages.items():
+        print(
+            f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
+
     # Print contents of method_ids list
     print('Message ids in use:')
     for message_id in bus.message_ids:
@@ -162,7 +167,7 @@ if __name__ == "__main__":
     while True:
         current_message = bus.read_bus()
         bus.assign_message_data(current_message)
-        for message in bus.messages:
+        for id, message in bus.messages.items():
             print(f'Reading: {message.reading}   data: {message.data}')
 
         # Send a control message, check the can_reciever program output for this message
