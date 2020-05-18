@@ -1,5 +1,3 @@
-import time
-
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -10,16 +8,14 @@ from dash.dependencies import Input, Output, State
 from dts_dash.app import app
 from dts_dash.layout.control import control_layout
 from dts_dash.layout.sensor import sensor_layout
+from dts_dash.layout.manual import manual_layout
 from dts_dash.callbacks import control_callbacks, sensors_callbacks
 
 
 tabs = dbc.Tabs(
     [
-        # TODO - implement the control tab
         dbc.Tab(control_layout, label="Controls", tabClassName="hov-pointer"),
-        
-        # TODO - implement the sensor tab
-        dbc.Tab(sensor_layout, label="Sensors", tabClassName="hov-pointer")  
+        dbc.Tab(manual_layout, label="Manual", tabClassName="hov-pointer")
     ] 
 )
 
