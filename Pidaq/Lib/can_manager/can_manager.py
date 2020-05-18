@@ -51,7 +51,7 @@ class CanManager:
         Parameters:
             project (str): current project, must be one of dts, suspension, or windtunnel
             config_file (str): message configuration file name
-            path (str): path to configuration file, if no path specified, current working
+            path (str): path to folder containing configuration file, if no path specified, current working
                         directory is assumed
         """
         if project.lower() not in ["dts", "suspension", "windtunnel"]:
