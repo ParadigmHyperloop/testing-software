@@ -22,7 +22,7 @@ class CanManager:
 
     Attributes:
         bus (can.interfaces.socketcan.SocketcanBus)
-        messages (dict): dict of all the messages to be expected from the 
+        messages (dict): dict of all the messages to be expected from the
                          sensor board. Keys are message ids, and values are
                          SensorReading objects
         message_ids (list(int)): list of all the message ids, hexidecimal integers
@@ -92,7 +92,9 @@ class CanManager:
         """
         message_id = bus_message.arbitration_id
         if message_id in self.message_ids:
-            self.messages[message_id].data = bytes(bus_message.data)
+            message_id_fmt = str(hex(message_id)).upper()
+            message_id_fmt = message_id_fmt[:1] + 'x' + message_id_fmt[2:]
+            self.messages[message_id_fmt].data = bytes(bus_message.data)
 
 
 class SensorReading:
@@ -152,7 +154,7 @@ if __name__ == "__main__":
     bus.read_message_config('dts', 'example_message_config.json')
 
     # Print SensorReading objects
-    for message in bus.messages:
+    for id, message in bus.messages.items():
         print(
             f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
 
@@ -165,7 +167,7 @@ if __name__ == "__main__":
     while True:
         current_message = bus.read_bus()
         bus.assign_message_data(current_message)
-        for message in bus.messages:
+        for id, message in bus.messages.items():
             print(f'Reading: {message.reading}   data: {message.data}')
 
         # Send a control message, check the can_reciever program output for this message
