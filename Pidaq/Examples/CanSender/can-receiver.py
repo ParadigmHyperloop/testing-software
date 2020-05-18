@@ -4,6 +4,7 @@ import can
 
 # Function Definitions
 
+
 def create_can_filters(raw_filters):
     """ Creates a list of can filter objects
 
@@ -25,17 +26,14 @@ def create_can_filters(raw_filters):
         })
     return can_filters
 
+
 if __name__ == "__main__":
     json_config = open('receiverInfo.json', mode='r')
     can_config = json.load(json_config)
     can_bus = can.Bus(bustype=can_config["canInfo"]["busType"],
                       channel=can_config["canInfo"]["serialPort"],
                       bitrate=can_config["canInfo"]["bitrate"])
-    #raw_can_filters = [
-    #    can_filter for can_filter in can_config["canInfo"]["busFilters"]]
-    # can_filters = create_can_filters(raw_can_filters)
-    # can_bus.set_filters(filters=can_filters)
-    
+
     # The can_bus object receives message objects from the sender program
     # Iterating over the bus continuously allows the messages on the bus to be received
     for message in can_bus:
