@@ -92,8 +92,6 @@ def uploadCsv(filePath, parentName):
     else:
         logging.warning('error in uploading the csv file')
         
-
-        
 def checkExistingSubFolder(folderName, parentFolder):
     """ Queries the drive for the folder with
         the given name and parent folder
@@ -125,4 +123,3 @@ def getFolderId(fName, parentFolder):
     if len(response.get('files',[])) == 1:
         for data in response.get('files', []):
             return data.get('id')
-    
