@@ -27,7 +27,7 @@ try:
 except:
     logging.error('Parents dictionary .json file not found')
     exit()
-# change this for the ID of the default folder 
+# Change this for the ID of the default folder 
 DefaultID = '1VDOOjuOeyNRJgdKmmRTJC1HVjq91F4Q8'
 
 def uploadCsv(filePath, parentName):
@@ -41,23 +41,23 @@ def uploadCsv(filePath, parentName):
     The parent folder is supposedly going to be fixed for a
     long period of time.
     """
-    # searches for the parent name in the dictionary
+    # Searches for the parent name in the dictionary
     for key in parentDictionary.keys():
         if key.lower() == parentName.lower():
             parentKey = key
     try:
         parentFolderID = parentDictionary[parentKey]
     except KeyError:
-        # uploads to a default folder if the folder name does
-        # not exist in the dictionary
+        # Uploads to a default folder if the folder name does
+        # Not exist in the dictionary
         parentFolderID = DefaultID
         logging.error('Folder name not found \nuploading to "Default"')
     
-    #Today's date in YYYY-MM-DD format is stored in the variable "date"
+    # Today's date in YYYY-MM-DD format is stored in the variable "date"
     date = datetime.today().strftime('%Y-%m-%d')
     
     # If the folder does not exist, should be the case
-    # when running for the first time on a given day
+    # When running for the first time on a given day
     if checkExistingSubFolder(date, parentFolderID) == 0:
         folder_metadata = {
             'name' : date,
@@ -69,21 +69,21 @@ def uploadCsv(filePath, parentName):
                                       fields = 'id').execute()
         # Returns the date folder's ID
         folderId = getFolderId(date, parentFolderID)
-    # executes if the folder already exists  
+    # Executes if the folder already exists  
     elif checkExistingSubFolder(date, parentFolderID) == 1:
         logging.warning("found folder for today's date")
         folderId = getFolderId(date, parentFolderID)
-    # executes if more than one folder exists
+    # Executes if more than one folder exists
     else:
         logging.warning('unexpected count of folders named with a given date')
         return
     
-    # extracts the .csv file name from the path
+    # Extracts the .csv file name from the path
     fileName=os.path.basename(filePath)
     metadata = {'name': fileName,
                 'parents' : [folderId]
                 }
-    # uploads the .csv file
+    # Uploads the .csv file
     response = DRIVE.files().create(body=metadata,
                                media_body=filePath).execute()
     
@@ -93,21 +93,19 @@ def uploadCsv(filePath, parentName):
         logging.warning('error in uploading the csv file')
         
 def checkExistingSubFolder(folderName, parentFolder):
-    """ Queries the drive for the folder with
-        the given name and parent folder
+    """ Queries the drive for the folder with the given name and parent folder
     """
     query = " name = '" + folderName + "' and parents = \"" + parentFolder +'"'
     response = DRIVE.files().list(q = query).execute()
 
     # Returns 0 if no folder exists with today's date
-    # in the specified parent folder
+    # In the specified parent folder
     if len(response.get('files',[])) == 0: 
         logging.warning("creating a new folder...")
         return 0
     # Returns 1 if the folder with today's date
-    # exists in the specified parent folder
-    elif len(response.get('files',[])) == 1: 
-        for data in response.get('files', []):
+    # Exists in the specified parent folder
+    elif len(response.get('files',[])) == 1:
             return 1
     else:
         logging.warning("More than one file found")
@@ -116,7 +114,7 @@ def getFolderId(fName, parentFolder):
     """ Performs the query to return the ID of the folder
         with the given name
     """
-    # searches in the drive using the parameters passed
+    # Searches in the drive using the parameters passed
     query = " name = '" + fName + "' and parents = \"" + parentFolder +'"'
     response = DRIVE.files().list(q = query).execute()
     # Gets the folder ID if it exists
