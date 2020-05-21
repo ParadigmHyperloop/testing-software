@@ -1,9 +1,9 @@
+from __future__ import print_function
+
 import logging
 import os
 import json
-from __future__ import print_function
 from datetime import datetime
-
 from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
@@ -22,11 +22,11 @@ DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
 # Searches for the Json file containing folder names and IDS
 # These IDs are to be stored manually.
 try:
-    with open('dictionary.json') as json_file:    
+    with open('drive_options.json') as json_file:    
         parentDictionary = json.load(json_file)
-except:
+except FileNotFoundError:
     logging.error('Parents dictionary .json file not found')
-    exit()
+    raise SystemExit
 # Change this for the ID of the default folder 
 DefaultID = '1VDOOjuOeyNRJgdKmmRTJC1HVjq91F4Q8'
 
@@ -47,7 +47,7 @@ def uploadCsv(filePath, parentName):
             parentKey = key
     try:
         parentFolderID = parentDictionary[parentKey]
-    except KeyError:
+    except NameError:
         # Uploads to a default folder if the folder name does
         # Not exist in the dictionary
         parentFolderID = DefaultID
@@ -115,5 +115,4 @@ def getFolderId(fName, parentFolder):
     query = f" name = '{fName}' and parents = '{parentFolder}'"
     response = DRIVE.files().list(q = query).execute()
     # Gets the folder ID of the first and only entry if it exists
-    if len(response.get('files',[])) == 1:
-        return response.get('files', [])[0].get('id')
+    return response.get('files', [])[0].get('id')
