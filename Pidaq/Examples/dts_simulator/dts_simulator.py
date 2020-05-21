@@ -101,7 +101,18 @@ class DTSSimulator:
         pass  # This will need to read from the state
 
     def update_motor_position_information(self):
-        pass  # This will need to read from the state
+        motor_angle = None
+        # TODO Research conversion from torque to RPM for motor
+        motor_speed = (
+            self.speed_command if self.speed_mode_enable else self.torque_command).to_bytes(2, 'big')
+        electrical_output_frequency = None
+        delta_filter_resolved = None
+        self.motor_position_information = [
+            motor_angle,
+            motor_speed,
+            electrical_output_frequency,
+            delta_filter_resolved
+        ]
 
     def update_current_information(self):
         phase_a_current = int(20 + random() * 5).to_bytes(2, 'big')
