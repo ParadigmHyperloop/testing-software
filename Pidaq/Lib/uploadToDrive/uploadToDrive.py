@@ -79,10 +79,8 @@ def uploadCsv(filePath, parentName):
         return
     
     # Extracts the .csv file name from the path
-    fileName=os.path.basename(filePath)
-    metadata = {'name': fileName,
-                'parents' : [folderId]
-                }
+    filename=os.path.basename(filePath)
+    metadata = {'name': filename, 'parents' : [folderId] }
     # Uploads the .csv file
     response = DRIVE.files().create(body=metadata,
                                media_body=filePath).execute()
@@ -95,7 +93,7 @@ def uploadCsv(filePath, parentName):
 def checkExistingSubFolder(folderName, parentFolder):
     """ Queries the drive for the folder with the given name and parent folder
     """
-    query = " name = '" + folderName + "' and parents = \"" + parentFolder +'"'
+    query = f" name = '{folderName}' and parents = '{parentFolder}'"
     response = DRIVE.files().list(q = query).execute()
 
     # Returns 0 if no folder exists with today's date
@@ -111,11 +109,10 @@ def checkExistingSubFolder(folderName, parentFolder):
         logging.warning("More than one file found")
 
 def getFolderId(fName, parentFolder):
-    """ Performs the query to return the ID of the folder
-        with the given name
+    """ Performs the query to return the ID of the folder with the given name
     """
     # Searches in the drive using the parameters passed
-    query = " name = '" + fName + "' and parents = \"" + parentFolder +'"'
+    query = f" name = '{fName}' and parents = '{parentFolder}'"
     response = DRIVE.files().list(q = query).execute()
     # Gets the folder ID if it exists
     if len(response.get('files',[])) == 1:
