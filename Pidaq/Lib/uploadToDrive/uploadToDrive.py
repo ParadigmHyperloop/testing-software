@@ -1,8 +1,8 @@
-from __future__ import print_function
-import os
 import logging
-from datetime import datetime
+import os
 import json
+from __future__ import print_function
+from datetime import datetime
 
 from googleapiclient.discovery import build
 from httplib2 import Http
@@ -114,7 +114,6 @@ def getFolderId(fName, parentFolder):
     # Searches in the drive using the parameters passed
     query = f" name = '{fName}' and parents = '{parentFolder}'"
     response = DRIVE.files().list(q = query).execute()
-    # Gets the folder ID if it exists
+    # Gets the folder ID of the first and only entry if it exists
     if len(response.get('files',[])) == 1:
-        for data in response.get('files', []):
-            return data.get('id')
+        return response.get('files', [])[0].get('id')
