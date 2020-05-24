@@ -28,5 +28,11 @@ class DTSManager:
         self.bus.send_message(192, command_list)
 
     def convert_temperatures(self) -> None:
-        module_a_temperature = int.from_bytes(self.bus.messages['0x0A0'].data[1] +
+        self.module_a_temperature = int.from_bytes(self.bus.messages['0x0A0'].data[1] +
                                               self.bus.messages['0x0A0'].data[0], byteorder='big')
+        self.module_b_temperature = int.from_bytes(self.bus.messages['0x0A0'].data[3] +
+                                              self.bus.messages['0x0A0'].data[2], byteorder='big')
+        self.module_c_temperature = int.from_bytes(self.bus.messages['0x0A0'].data[5] +
+                                              self.bus.messages['0x0A0'].data[4], byteorder='big')
+        self.gate_driver_board_temperature = int.from_bytes(self.bus.messages['0x0A0'].data[7] +
+                                              self.bus.messages['0x0A0'].data[7], byteorder='big')              
