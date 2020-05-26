@@ -53,12 +53,8 @@ class DTSSimulator:
         module_c_temperature = int(205 + random() * 3.7).to_bytes(2, 'big')
         gate_driver_board_temperature = int(
             190 + random() * 6.2).to_bytes(2, 'big')
-        self.temperature1.data = [
-            module_a_temperature,
-            module_b_temperature,
-            module_c_temperature,
-            gate_driver_board_temperature
-        ]
+        self.temperature1.data = module_a_temperature + module_b_temperature + \
+            module_c_temperature + gate_driver_board_temperature
 
     def update_temperature2(self):
         control_board_temperature = int(
@@ -66,24 +62,17 @@ class DTSSimulator:
         rtd_1_temperature = int(230 + random() * 6.3).to_bytes(2, 'big')
         rtd_2_temperature = int(225 + random() * 3.4).to_bytes(2, 'big')
         rtd_3_temperature = int(220 + random() * 2.3).to_bytes(2, 'big')
-        self.temperature2.data = [
-            control_board_temperature,
-            rtd_1_temperature,
-            rtd_2_temperature,
-            rtd_3_temperature
-        ]
+        self.temperature2.data = control_board_temperature + \
+            rtd_1_temperature + rtd_2_temperature + rtd_3_temperature
 
     def update_temperature3(self):
         rtd_4_temperature = int(203 + random() * 2.1).to_bytes(2, 'big')
         rtd_5_temperature = int(256 + random() * 3.9).to_bytes(2, 'big')
         motor_temperature = int(232 + random() * 4.2).to_bytes(2, 'big')
-        torque_shudder = None  # TODO once set torque value gets stored
-        self.temperature3.data = [
-            rtd_4_temperature,
-            rtd_5_temperature,
-            motor_temperature,
-            torque_shudder
-        ]
+        # TODO once set torque value gets stored
+        torque_shudder = int(0).to_bytes(2, 'big')
+        self.temperature3.data = rtd_4_temperature + \
+            rtd_5_temperature + motor_temperature + torque_shudder
 
     def update_analog_input_values(self):
         analog_input_1 = int(120 + random() * 10.4).to_bytes(2, 'big')
@@ -191,8 +180,8 @@ class DTSSimulator:
         self.bus.send(self.temperature1)
         self.bus.send(self.temperature2)
         self.bus.send(self.temperature3)
-        self.bus.send(self.internal_voltages)
-        self.bus.send(self.fault_codes)
+        # self.bus.send(self.internal_voltages)
+        # self.bus.send(self.fault_codes)
 
     def send_information_messages_100hz(self):
         time.sleep(1 / 100)
@@ -205,3 +194,29 @@ class DTSSimulator:
         self.bus.send(self.internal_states)
         self.bus.send(self.torque_timer_info)
         self.bus.send(self.modulation_index_flux_weakening)
+
+
+if __name__ == "__main__":
+    sim = DTSSimulator('vcan0')
+    simulator_configured = False
+    while simulator_configured == False:
+        message = sim.bus.recv()
+        if message.arbitration_id == 192:
+            sim.read_configuration_message(message)
+            simulator_configured = True
+
+    while True:
+        sim.update_temperature1()
+        sim.update_temperature2()
+        sim.update_temperature3()
+        # sim.update_analog_input_voltages()
+        sim.update_digital_input_status()
+        sim.update_motor_position_information()
+        sim.update_current_information()
+        sim.update_voltage_information()
+        sim.update_flux_information()
+        sim.update_internal_voltages()
+        sim.update_internal_states()
+        sim.update_torque_timer_information()
+        sim.update_modulation_index()
+        sim.send_information_messages_10hz()

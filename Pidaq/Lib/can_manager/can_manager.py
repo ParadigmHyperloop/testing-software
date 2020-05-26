@@ -36,6 +36,7 @@ class CanManager:
         assign_message_data(bus_message: can.Message)
             assigns data to the correct SensorReading object
     """
+
     def __init__(self, bus_name: str) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
         self.messages = {}
@@ -67,7 +68,7 @@ class CanManager:
                     reading['conversion_factor'],
                     reading['conversion_factor_type']
                 )
-                self.message_ids.append(int(reading['message_id'], 16))
+                self.message_ids.append(reading['message_id'])
 
     def send_message(self, id: int, data: list) -> None:
         if id in self.message_ids:
@@ -89,7 +90,7 @@ class CanManager:
         Parameters:
             bus_message(can.Message)
         """
-        message_id = bus_message.arbitration_id
+        message_id = hex(bus_message.arbitration_id)
         if message_id in self.message_ids:
             self.messages[message_id].data = bytes(bus_message.data)
 
@@ -110,6 +111,7 @@ class SensorReading:
     Methods:
 
     """
+
     def __init__(self, project: str, message_id: str, reading: str,
                  conversion_factor: str, conversion_factor_type: str) -> None:
         self.message_id = int(message_id, 16)
@@ -151,8 +153,9 @@ if __name__ == "__main__":
 
     # Print SensorReading objects
     for message in bus.messages:
-        print(f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
-    
+        print(
+            f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
+
     # Print contents of method_ids list
     print('Message ids in use:')
     for message_id in bus.message_ids:
