@@ -1,0 +1,110 @@
+{
+    "dts": {
+        "readings": [
+            {
+                "reading": "temperatures1",
+                "message_id": "0xa0",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "temperatures2",
+                "message_id": "0xa1",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "temperatures3",
+                "message_id": "0xa2",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "analogInputVoltages",
+                "message_id": "0xa3",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "digitalInputStatus",
+                "message_id": "0xa4",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "motorPositionInformation",
+                "message_id": "0xa5",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "currentInformation",
+                "message_id": "0xa6",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "voltageInformation",
+                "message_id": "0xa7",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "fluxInformation",
+                "message_id": "0xa8",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "internalVoltages",
+                "message_id": "0xa9",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "internalStates",
+                "message_id": "0xaa",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "faultCodes",
+                "message_id": "0xab",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "torque&timerInformation",
+                "message_id": "0xac",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "modulationIndex&fluxWeakeningOutput",
+                "message_id": "0xad",
+                "conversion_factor": "0",
+                "conversion_factor_type": "int"
+            }
+        ]
+    },
+    "suspension": {
+        "readings": [
+            {
+                "reading": "Placeholder",
+                "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+                "conversion_factor": "Placeholder",
+                "conversion_factor_type": "Placeholder"
+            }
+        ]
+    },
+    "windtunnel": {
+        "readings": [
+            {
+                "reading": "Placeholder",
+                "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+                "conversion_factor": "Placeholder",
+                "conversion_factor_type": "Placeholder"
+            }
+        ]
+    }
+}
