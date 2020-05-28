@@ -15,6 +15,14 @@ class DTSManager:
         self.rtd_3_temperature = None
         self.rtd_4_temperature = None
         self.rtd_5_temperature = None
+        self.analog_input_1 = None
+        self.analog_input_2 = None
+        self.analog_input_3 = None
+        self.analog_input_4 = None
+        self.one_five_voltage_ref = None
+        self.two_five_voltage_ref = None
+        self.five_voltage_ref = None
+        self.twelve_system_voltage = None
 
     def configure_motor(self, configuration: dict) -> None:
         # Extract commands from dict
@@ -59,6 +67,26 @@ class DTSManager:
             self.rtd_5_temperature = int.from_bytes(
                 self.bus.messages['0xa2'].data[4:2:-1], byteorder='big') / 10
 
+    def convert_low_voltages(self) -> None:
+        if self.bus.messages['0xa3'].data:
+            self.analog_input_1 = int.from_bytes(
+                self.bus.messages['0xa3'].data[0:2], byteorder='little') / 100
+            self.analog_input_2 = int.from_bytes(
+                self.bus.messages['0xa3'].data[2:4], byteorder='little') / 100
+            self.analog_input_3 = int.from_bytes(
+                self.bus.messages['0xa3'].data[4:6], byteorder='little') / 100
+            self.analog_input_4 = int.from_bytes(
+                self.bus.messages['0xa3'].data[6:], byteorder='little') / 100
+        if self.bus.messages['0xa9'].data:
+            self.one_five_voltage_ref = int.from_bytes(
+                self.bus.messages['0xa9'].data[0:2], byteorder='little') / 100
+            self.two_five_voltage_ref = int.from_bytes(
+                self.bus.messages['0xa9'].data[2:4], byteorder='little') / 100
+            self.five_voltage_ref = int.from_bytes(
+                self.bus.messages['0xa9'].data[4:6], byteorder='little') / 100
+            self.twelve_system_voltage = int.from_bytes(
+                self.bus.messages['0xa9'].data[6:], byteorder='little') / 100
+
     def convert_torques(self) -> None:
         pass
 
@@ -83,6 +111,8 @@ if __name__ == "__main__":
         dts.send_motor_command()
         current_message = dts.bus.read_bus()
         dts.bus.assign_message_data(current_message)
-        dts.convert_temperatures()
-        print(dts.module_a_temperature)
-        print(dts.module_b_temperature)
+        dts.convert_low_voltages()
+        print(dts.one_five_voltage_ref)
+        print(dts.two_five_voltage_ref)
+        print(dts.five_voltage_ref)
+        print(dts.twelve_system_voltage)

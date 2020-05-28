@@ -79,12 +79,8 @@ class DTSSimulator:
         analog_input_2 = int(200 + random() * 7.1).to_bytes(2, 'big')
         analog_input_3 = int(178 + random() * 2.3).to_bytes(2, 'big')
         analog_input_4 = int(153 + random() * 6.6).to_bytes(2, 'big')
-        self.analog_input_voltages.data = [
-            analog_input_1,
-            analog_input_2,
-            analog_input_3,
-            analog_input_4
-        ]
+        self.analog_input_voltages.data = analog_input_1 + \
+            analog_input_2 + analog_input_3 + analog_input_4
 
     def update_digital_input_status(self):
         pass  # This will need to read from the state
@@ -140,16 +136,12 @@ class DTSSimulator:
         ]
 
     def update_internal_voltages(self):
-        one_five_voltage_ref = int(150).to_bytes(2, 'big')
-        two_five_voltage_ref = int(250).to_bytes(2, 'big')
-        five_voltage_ref = int(500).to_bytes(2, 'big')
-        twelve_system_voltage = int(1200).to_bytes(2, 'big')
-        self.internal_voltages = [
-            one_five_voltage_ref,
-            two_five_voltage_ref,
-            five_voltage_ref,
-            twelve_system_voltage
-        ]
+        one_five_voltage_ref = int(150).to_bytes(2, 'little')
+        two_five_voltage_ref = int(250).to_bytes(2, 'little')
+        five_voltage_ref = int(500).to_bytes(2, 'little')
+        twelve_system_voltage = int(1200).to_bytes(2, 'little')
+        self.internal_voltages.data = one_five_voltage_ref + \
+            two_five_voltage_ref + five_voltage_ref + twelve_system_voltage
 
     def update_internal_states(self):
         pass  # Read from input configuration
@@ -180,20 +172,20 @@ class DTSSimulator:
         self.bus.send(self.temperature1)
         self.bus.send(self.temperature2)
         self.bus.send(self.temperature3)
-        # self.bus.send(self.internal_voltages)
+        self.bus.send(self.internal_voltages)
         # self.bus.send(self.fault_codes)
 
     def send_information_messages_100hz(self):
         time.sleep(1 / 100)
         self.bus.send(self.analog_input_voltages)
-        self.bus.send(self.digital_input_status)
-        self.bus.send(self.motor_position_information)
-        self.bus.send(self.current_information)
-        self.bus.send(self.voltage_information)
-        self.bus.send(self.flux_information)
-        self.bus.send(self.internal_states)
-        self.bus.send(self.torque_timer_info)
-        self.bus.send(self.modulation_index_flux_weakening)
+        # self.bus.send(self.digital_input_status)
+        # self.bus.send(self.motor_position_information)
+        # self.bus.send(self.current_information)
+        # self.bus.send(self.voltage_information)
+        # self.bus.send(self.flux_information)
+        # self.bus.send(self.internal_states)
+        # self.bus.send(self.torque_timer_info)
+        # self.bus.send(self.modulation_index_flux_weakening)
 
 
 if __name__ == "__main__":
@@ -220,3 +212,4 @@ if __name__ == "__main__":
         sim.update_torque_timer_information()
         sim.update_modulation_index()
         sim.send_information_messages_10hz()
+        sim.send_information_messages_100hz()
