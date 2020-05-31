@@ -26,17 +26,18 @@ class DTSManager:
 
     def configure_motor(self, configuration: dict) -> None:
         # Extract commands from dict
-        self.torque_command = int(configuration['torque']).to_bytes(2, 'big')
-        self.speed_command = int(configuration['speed']).to_bytes(2, 'big')
+        self.torque_command = int(
+            configuration['torque']).to_bytes(2, 'little')
+        self.speed_command = int(configuration['speed']).to_bytes(2, 'little')
         self.direction_command = int(
-            configuration['direction']).to_bytes(1, 'big')
+            configuration['direction']).to_bytes(1, 'little')
         self.inverter_enable = int(configuration['inverterEnable'])
         self.inverter_discharge = int(configuration['inverterDischarge'])
         self.speed_mode_enable = int(configuration['speedModeEnable'])
         self.mode = ((int(self.speed_mode_enable) << 2) +
-                     (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'big')
+                     (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
         self.commanded_torque_limit = int(
-            configuration['commandedTorqueLimit']).to_bytes(2, 'big')
+            configuration['commandedTorqueLimit']).to_bytes(2, 'little')
 
     def send_motor_command(self) -> None:
         command_list = self.torque_command + self.speed_command + \
@@ -44,28 +45,30 @@ class DTSManager:
         self.bus.send_message(192, command_list)
 
     def convert_temperatures(self) -> None:
-        if self.bus.messages['0xa0'].data and self.bus.messages['0xa1'].data and self.bus.messages['0xa2'].data:
+        if self.bus.messages['0xa0'].data:
             print(self.bus.messages['0xa0'].data[1])
             self.module_a_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[2:0:-1], byteorder='big') / 10
+                self.bus.messages['0xa0'].data[0:2], byteorder='little') / 10
             self.module_b_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[4:2:-1], byteorder='big') / 10
+                self.bus.messages['0xa0'].data[2:4], byteorder='little') / 10
             self.module_c_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[6:4:-1], byteorder='big') / 10
+                self.bus.messages['0xa0'].data[4:6], byteorder='little') / 10
             self.gate_driver_board_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[:6:-1], byteorder='big') / 10
+                self.bus.messages['0xa0'].data[6:], byteorder='little') / 10
+        if self.bus.messages['0xa1'].data:
             self.control_board_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[2:0:-1], byteorder='big') / 10
+                self.bus.messages['0xa1'].data[0:2], byteorder='little') / 10
             self.rtd_1_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[4:2:-1], byteorder='big') / 10
+                self.bus.messages['0xa1'].data[2:4], byteorder='little') / 10
             self.rtd_2_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[6:4:-1], byteorder='big') / 10
+                self.bus.messages['0xa1'].data[4:6], byteorder='little') / 10
             self.rtd_3_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[:6:-1], byteorder='big') / 10
+                self.bus.messages['0xa1'].data[6:], byteorder='little') / 10
+        if self.bus.messages['0xa2'].data:
             self.rtd_4_temperature = int.from_bytes(
-                self.bus.messages['0xa2'].data[2:0:-1], byteorder='big') / 10
+                self.bus.messages['0xa2'].data[0:2], byteorder='little') / 10
             self.rtd_5_temperature = int.from_bytes(
-                self.bus.messages['0xa2'].data[4:2:-1], byteorder='big') / 10
+                self.bus.messages['0xa2'].data[2:4], byteorder='little') / 10
 
     def convert_low_voltages(self) -> None:
         if self.bus.messages['0xa3'].data:
@@ -86,6 +89,17 @@ class DTSManager:
                 self.bus.messages['0xa9'].data[4:6], byteorder='little') / 100
             self.twelve_system_voltage = int.from_bytes(
                 self.bus.messages['0xa9'].data[6:], byteorder='little') / 100
+
+    def convert_currents(self) -> None:
+        if self.bus.messages['0xa6'].data:
+            self.phase_a_current = int.from_bytes(
+                self.bus.messages['0xa6'].data[0:2], byteorder='little') / 10
+            self.phase_b_current = int.from_bytes(
+                self.bus.messages['0xa6'].data[2:4], byteorder='little') / 10
+            self.phase_c_current = int.from_bytes(
+                self.bus.messages['0xa6'].data[4:6], byteorder='little') / 10
+            self.dc_bus_current = int.from_bytes(
+                self.bus.messages['0xa6'].data[6:], byteorder='little') / 10
 
     def convert_torques(self) -> None:
         pass
