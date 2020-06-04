@@ -1,10 +1,10 @@
 from can_manager import can_manager
 
 
-class DTSManager:
+class DTSManager():
 
-    def __init__(self, bus_name: str):
-        self.bus = can_manager.CanManager(bus_name)
+    def __init__(self, bus: can_manager.CanManager):
+        self.bus = bus
         self.module_a_temperature = None
         self.module_b_temperature = None
         self.module_c_temperature = None
@@ -39,6 +39,8 @@ class DTSManager:
         self.digital_input_8 = None
         self.id_feedback = None
         self.iq_feedback = None
+        self.torque_shudder = None
+        self.commanded_torque = None
 
     def configure_motor(self, configuration: dict) -> None:
         # Extract commands from dict
@@ -62,7 +64,6 @@ class DTSManager:
 
     def convert_temperatures(self) -> None:
         if self.bus.messages['0xa0'].data:
-            print(self.bus.messages['0xa0'].data[1])
             self.module_a_temperature = int.from_bytes(
                 self.bus.messages['0xa0'].data[0:2], byteorder='little') / 10
             self.module_b_temperature = int.from_bytes(
@@ -162,12 +163,20 @@ class DTSManager:
             self.digital_input_8 = bool(digital_input_status & BIT_7)
 
     def convert_torques(self) -> None:
-        pass
+        if self.bus.messages['0xa2'].data:
+            self.torque_shudder = int.from_bytes(
+                self.bus.messages['0xa2'].data[6:], byteorder='little') / 10
+        if self.bus.messages['0xac'].data:
+            self.commanded_torque = int.from_bytes(
+                self.bus.messages['0xac'].data[0:2], byteorder='little') / 10
+            self.torque_feedback = int.from_bytes(
+                self.bus.messages['0xac'].data[2:4], byteorder='little') / 10
 
 
 if __name__ == "__main__":
     import can
-    dts = DTSManager('vcan0')
+    bus = can_manager.CanManager('vcan0')
+    dts = DTSManager(bus)
     dts.bus.read_message_config('dts', 'message_config.json')
 
     motorConfiguration = {
