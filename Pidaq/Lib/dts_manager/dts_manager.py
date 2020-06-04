@@ -19,10 +19,26 @@ class DTSManager:
         self.analog_input_2 = None
         self.analog_input_3 = None
         self.analog_input_4 = None
+        self.dc_bus_voltage = None
+        self.output_voltage = None
+        self.vab_vd_voltage = None
+        self.vbc_vq_voltage = None
+        self.motor_angle = None
+        self.delta_filter_resolved = None
         self.one_five_voltage_ref = None
         self.two_five_voltage_ref = None
         self.five_voltage_ref = None
         self.twelve_system_voltage = None
+        self.digital_input_1 = None
+        self.digital_input_2 = None
+        self.digital_input_3 = None
+        self.digital_input_4 = None
+        self.digital_input_5 = None
+        self.digital_input_6 = None
+        self.digital_input_7 = None
+        self.digital_input_8 = None
+        self.id_feedback = None
+        self.iq_feedback = None
 
     def configure_motor(self, configuration: dict) -> None:
         # Extract commands from dict
@@ -90,6 +106,17 @@ class DTSManager:
             self.twelve_system_voltage = int.from_bytes(
                 self.bus.messages['0xa9'].data[6:], byteorder='little') / 100
 
+    def convert_high_voltages(self) -> None:
+        if self.bus.messages['0xa7'].data:
+            self.dc_bus_voltage = int.from_bytes(
+                self.bus.messages['0xa7'].data[0:2], byteorder='little') / 10
+            self.output_voltage = int.from_bytes(
+                self.bus.messages['0xa7'].data[2:4], byteorder='little') / 10
+            self.vab_vd_voltage = int.from_bytes(
+                self.bus.messages['0xa7'].data[4:6], byteorder='little') / 10
+            self.vbc_vq_voltage = int.from_bytes(
+                self.bus.messages['0xa7'].data[6:], byteorder='little') / 10
+
     def convert_currents(self) -> None:
         if self.bus.messages['0xa6'].data:
             self.phase_a_current = int.from_bytes(
@@ -100,6 +127,39 @@ class DTSManager:
                 self.bus.messages['0xa6'].data[4:6], byteorder='little') / 10
             self.dc_bus_current = int.from_bytes(
                 self.bus.messages['0xa6'].data[6:], byteorder='little') / 10
+        if self.bus.messages['0xa8'].data:
+            self.id_feedback = int.from_bytes(
+                self.bus.messages['0xa8'].data[4:6], byteorder='little') / 10
+            self.iq_feedback = int.from_bytes(
+                self.bus.messages['0xa8'].data[6:], byteorder='little') / 10
+
+    def convert_angles(self) -> None:
+        if self.bus.messages['0xa5'].data:
+            self.motor_angle = int.from_bytes(
+                self.bus.messages['0xa5'].data[0:2], byteorder='little') / 10
+            self.delta_filter_resolved = int.from_bytes(
+                self.bus.messages['0xa5'].data[6:], byteorder='little') / 10
+
+    def convert_booleans(self) -> None:
+        BIT_0 = 1
+        BIT_1 = 2
+        BIT_2 = 4
+        BIT_3 = 8
+        BIT_4 = 16
+        BIT_5 = 32
+        BIT_6 = 64
+        BIT_7 = 128
+        if self.bus.messages['0xa4']:
+            digital_input_status = int.from_bytes(
+                self.bus.messages['0xa4'].data[0:], byteorder='little')
+            self.digital_input_1 = bool(digital_input_status & BIT_0)
+            self.digital_input_2 = bool(digital_input_status & BIT_1)
+            self.digital_input_3 = bool(digital_input_status & BIT_2)
+            self.digital_input_4 = bool(digital_input_status & BIT_3)
+            self.digital_input_5 = bool(digital_input_status & BIT_4)
+            self.digital_input_6 = bool(digital_input_status & BIT_5)
+            self.digital_input_7 = bool(digital_input_status & BIT_6)
+            self.digital_input_8 = bool(digital_input_status & BIT_7)
 
     def convert_torques(self) -> None:
         pass
