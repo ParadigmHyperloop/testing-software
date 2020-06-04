@@ -66,7 +66,6 @@ class CanManager:
                     reading['message_id'],
                     reading['reading'],
                     reading['conversion_factor'],
-                    reading['conversion_factor_type']
                 )
                 self.message_ids.append(int(reading['message_id'], 16))
 
@@ -115,34 +114,11 @@ class SensorReading:
     """
 
     def __init__(self, project: str, message_id: str, reading: str,
-                 conversion_factor: str, conversion_factor_type: str) -> None:
+                 conversion_factor) -> None:
         self.message_id = int(message_id, 16)
         self.reading = reading
-        self.conversion_factor = parse_conversion_factor(conversion_factor,
-                                                         conversion_factor_type)
+        self.conversion_factor = conversion_factor
         self.data = None
-
-
-def parse_conversion_factor(conversion_factor: str, conversion_factor_type: str):
-    """Converts a string conversion factor into the correct numerical representation
-
-    Given the string representation of a conversion factor, as well as its type,
-    this function returns the conversion factor in its correct numerical representation,
-    either int or float
-
-    Parameters:
-        conversion_factor(str)
-        conversion_factor_type(str)
-
-    Returns:
-        conversion_factor(int or float)
-    """
-    if conversion_factor_type.lower() == 'float':
-        return float(conversion_factor)
-    elif conversion_factor_type.lower() == 'int':
-        return int(conversion_factor)
-    else:
-        raise ValueError('Error: conversion_factor_type is invalid')
 
 
 if __name__ == "__main__":
