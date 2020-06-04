@@ -4,86 +4,69 @@
             {
                 "reading": "temperatures1",
                 "message_id": "0xa0",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             },
             {
                 "reading": "temperatures2",
                 "message_id": "0xa1",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             },
             {
                 "reading": "temperatures3",
                 "message_id": "0xa2",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             },
             {
                 "reading": "analogInputVoltages",
                 "message_id": "0xa3",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 100
             },
             {
                 "reading": "digitalInputStatus",
                 "message_id": "0xa4",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 0
             },
             {
                 "reading": "motorPositionInformation",
-                "message_id": "0xa5",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "message_id": "0xa5"
             },
             {
                 "reading": "currentInformation",
                 "message_id": "0xa6",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             },
             {
                 "reading": "voltageInformation",
                 "message_id": "0xa7",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             },
             {
                 "reading": "fluxInformation",
                 "message_id": "0xa8",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": { "flux": 1000, "current": 10 }
             },
             {
                 "reading": "internalVoltages",
                 "message_id": "0xa9",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 100
             },
             {
                 "reading": "internalStates",
-                "message_id": "0xaa",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "message_id": "0xaa"
             },
             {
                 "reading": "faultCodes",
-                "message_id": "0xab",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "message_id": "0xab"
             },
             {
                 "reading": "torque&timerInformation",
                 "message_id": "0xac",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             },
             {
                 "reading": "modulationIndex&fluxWeakeningOutput",
                 "message_id": "0xad",
-                "conversion_factor": "0",
-                "conversion_factor_type": "int"
+                "conversion_factor": 10
             }
         ]
     },
