@@ -120,7 +120,7 @@ class SensorReading:
         self.message_id = message_id
 =======
     def __init__(self, project: str, message_id: str, reading: str,
-                 conversion_factor: str, conversion_factor_type: str) -> None:
+                 conversion_factor) -> None:
         self.message_id = int(message_id, 16)
 >>>>>>> Bug fixes to get interface to begin sucessfully receving messages from the simulator
         self.reading = reading
