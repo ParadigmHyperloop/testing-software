@@ -8,7 +8,7 @@ from googleapiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 
-class uploadCsv:
+class UploadCsv:
     def __init__(self):      
         self.SCOPES = 'https://www.googleapis.com/auth/drive'
         self.store = file.Storage('credentials.json') 
@@ -30,7 +30,8 @@ class uploadCsv:
                 self.parentDictionary = json.load(json_file)
                 
         except FileNotFoundError:
-            logging.error('Creating a drive options dictionary file...')
+            logging.warning('Json file could not be found, \
+            \ncreating a default drive options dictionary file...')
             
             newDictionary = {'default': self.defaultID}
             with open('drive_options.json', 'w') as new_file:    
@@ -100,8 +101,7 @@ class uploadCsv:
             logging.warning('error in uploading the csv file')
         
     def checkExistingSubFolder(self, folderName):
-        """ Queries the drive for the folder with the given name and parent folder
-        """
+        """ Queries the drive for the folder with the given name and parent folder"""
         query = f" name = '{folderName}' and parents = '{self.parentFolderID}'"
         response = self.DRIVE.files().list(q = query).execute()
 
@@ -118,8 +118,7 @@ class uploadCsv:
             logging.warning("More than one file found")
 
     def getFolderId(self, fName):
-        """ Performs the query to return the ID of the folder with the given name
-        """
+        """ Performs the query to return the ID of the folder with the given name"""
         # Searches in the drive using the parameters passed
         query = f" name = '{fName}' and parents = '{self.parentFolderID}'"
         response = self.DRIVE.files().list(q = query).execute()
