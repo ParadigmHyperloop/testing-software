@@ -36,11 +36,8 @@ class UploadCsv:
             newDictionary = {'default': self.defaultID}
             with open('drive_options.json', 'w') as new_file:    
                 json.dump(newDictionary, new_file)
+            self.parentDictionary = newDictionary
     
-            with open('drive_options.json') as json_file:
-                self.parentDictionary = json.load(json_file)
-
-
     def execute(self, filePath, parentName):
         """ Uploads a csv file from a local directory to a folder on Google Drive.
         Parameters:
