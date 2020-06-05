@@ -1,7 +1,31 @@
 from can_manager import can_manager
 
+class DTSControl():
+    def __init__(self, bus: can_manager.CanManager):
+        self.bus = bus
 
-class DTSManager():
+    def configure_motor(self, configuration: dict) -> None:
+        # Extract commands from dict
+        self.torque_command = int(
+            configuration['torque']).to_bytes(2, 'little')
+        self.speed_command = int(configuration['speed']).to_bytes(2, 'little')
+        self.direction_command = int(
+            configuration['direction']).to_bytes(1, 'little')
+        self.inverter_enable = int(configuration['inverterEnable'])
+        self.inverter_discharge = int(configuration['inverterDischarge'])
+        self.speed_mode_enable = int(configuration['speedModeEnable'])
+        self.mode = ((int(self.speed_mode_enable) << 2) +
+                     (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
+        self.commanded_torque_limit = int(
+            configuration['commandedTorqueLimit']).to_bytes(2, 'little')
+
+    def send_motor_command(self) -> None:
+        command_list = self.torque_command + self.speed_command + \
+            self.direction_command + self.mode + self.commanded_torque_limit
+        self.bus.send_message(192, command_list)
+
+
+class DTSTelemetry():
 
     def __init__(self, bus: can_manager.CanManager):
         self.bus = bus
@@ -41,26 +65,6 @@ class DTSManager():
         self.iq_feedback = None
         self.torque_shudder = None
         self.commanded_torque = None
-
-    def configure_motor(self, configuration: dict) -> None:
-        # Extract commands from dict
-        self.torque_command = int(
-            configuration['torque']).to_bytes(2, 'little')
-        self.speed_command = int(configuration['speed']).to_bytes(2, 'little')
-        self.direction_command = int(
-            configuration['direction']).to_bytes(1, 'little')
-        self.inverter_enable = int(configuration['inverterEnable'])
-        self.inverter_discharge = int(configuration['inverterDischarge'])
-        self.speed_mode_enable = int(configuration['speedModeEnable'])
-        self.mode = ((int(self.speed_mode_enable) << 2) +
-                     (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
-        self.commanded_torque_limit = int(
-            configuration['commandedTorqueLimit']).to_bytes(2, 'little')
-
-    def send_motor_command(self) -> None:
-        command_list = self.torque_command + self.speed_command + \
-            self.direction_command + self.mode + self.commanded_torque_limit
-        self.bus.send_message(192, command_list)
 
     def convert_temperatures(self) -> None:
         if self.bus.messages['0xa0'].data:
@@ -176,8 +180,9 @@ class DTSManager():
 if __name__ == "__main__":
     import can
     bus = can_manager.CanManager('vcan0')
-    dts = DTSManager(bus)
-    dts.bus.read_message_config('dts', 'message_config.json')
+    control = DTSControl(bus)
+    telemetry = DTSTelemetry(bus)
+    telemetry.bus.read_message_config('dts', 'message_config.json')
 
     motorConfiguration = {
         'torque': 2000,
@@ -189,13 +194,13 @@ if __name__ == "__main__":
         'commandedTorqueLimit': 5000
     }
 
-    dts.configure_motor(motorConfiguration)
+    control.configure_motor(motorConfiguration)
     while True:
-        dts.send_motor_command()
-        current_message = dts.bus.read_bus()
-        dts.bus.assign_message_data(current_message)
-        dts.convert_low_voltages()
-        print(dts.one_five_voltage_ref)
-        print(dts.two_five_voltage_ref)
-        print(dts.five_voltage_ref)
-        print(dts.twelve_system_voltage)
+        control.send_motor_command()
+        current_message = telemetry.bus.read_bus()
+        telemetry.bus.assign_message_data(current_message)
+        telemetry.convert_low_voltages()
+        print(telemetry.one_five_voltage_ref)
+        print(telemetry.two_five_voltage_ref)
+        print(telemetry.five_voltage_ref)
+        print(telemetry.twelve_system_voltage)
