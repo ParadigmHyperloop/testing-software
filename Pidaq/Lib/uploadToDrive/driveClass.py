@@ -58,7 +58,7 @@ class UploadCsv:
             # Uploads to a default folder if the folder name does
             # Not exist in the dictionary
             self.parentFolderID = self.parentDictionary['default']
-            logging.error('Folder name not found \nuploading to "Default"')
+            logging.warning('Folder name not found \nuploading to "Default"')
                 
         # Today's date in YYYY-MM-DD format is stored in the variable "date"
         date = datetime.today().strftime('%Y-%m-%d')
@@ -86,7 +86,7 @@ class UploadCsv:
             return
         
         # Extracts the .csv file name from the path
-        filename= os.path.basename(filePath)
+        filename = os.path.basename(filePath)
         metadata = {'name': filename, 'parents' : [folderId] }
         # Uploads the .csv file
         response = self.DRIVE.files().create(body=metadata,
@@ -95,7 +95,7 @@ class UploadCsv:
         if response:
             logging.warning('Uploaded "%s" (%s)' % (metadata['name'], response['mimeType']))
         else:
-            logging.warning('error in uploading the csv file')
+            logging.error('error in uploading the csv file')
         
     def checkExistingSubFolder(self, folderName):
         """ Queries the drive for the folder with the given name and parent folder"""
