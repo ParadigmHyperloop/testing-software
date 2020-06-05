@@ -41,10 +41,10 @@ class UploadCsv:
     def execute(self, filePath, parentName):
         """ Uploads a csv file from a local directory to a folder on Google Drive.
         Parameters:
-        "filePath" is the path of the csv file itself and
-                    should be passed without quotations.
-        "parentName" is the name of the testing folder in the drive
-                and only a specific set of values are allowed.
+            "filePath" is the path of the csv file itself and
+                        should be passed without quotations.
+            "parentName" is the name of the testing folder in the drive
+                    and only a specific set of values are allowed.
         The parent folder is supposedly going to be fixed for a
         long period of time.
         """
