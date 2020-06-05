@@ -65,7 +65,7 @@ class UploadCsv:
         
         # If the folder does not exist, should be the case
         # When running for the first time on a given day
-        if self.checkExistingSubFolder(date) == 0:
+        if self.__checkExistingSubFolder(date) == 0:
             folder_metadata = {
                 'name' : date,
                 'mimeType': 'application/vnd.google-apps.folder',
@@ -75,11 +75,11 @@ class UploadCsv:
             folder = self.DRIVE.files().create(body = folder_metadata,
                                                fields = 'id').execute()
             # Returns the date folder's ID
-            folderId = self.getFolderId(date)
+            folderId = self.__getFolderId(date)
         # Executes if the folder already exists  
-        elif self.checkExistingSubFolder(date) == 1:
+        elif self.__checkExistingSubFolder(date) == 1:
             logging.warning("found folder for today's date")
-            folderId = self.getFolderId(date)
+            folderId = self.__getFolderId(date)
         # Executes if more than one folder exists
         else:
             logging.warning('unexpected count of folders named with a given date')
@@ -97,7 +97,7 @@ class UploadCsv:
         else:
             logging.error('error in uploading the csv file')
         
-    def checkExistingSubFolder(self, folderName):
+    def __checkExistingSubFolder(self, folderName):
         """ Queries the drive for the folder with the given name and parent folder"""
         query = f" name = '{folderName}' and parents = '{self.parentFolderID}'"
         response = self.DRIVE.files().list(q = query).execute()
@@ -114,7 +114,7 @@ class UploadCsv:
         else:
             logging.warning("More than one file found")
 
-    def getFolderId(self, fName):
+    def __getFolderId(self, fName):
         """ Performs the query to return the ID of the folder with the given name"""
         # Searches in the drive using the parameters passed
         query = f" name = '{fName}' and parents = '{self.parentFolderID}'"
