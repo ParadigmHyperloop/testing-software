@@ -45,8 +45,6 @@ class UploadCsv:
                         should be passed without quotations.
             "parentName" is the name of the testing folder in the drive
                     and only a specific set of values are allowed.
-        The parent folder is supposedly going to be fixed for a
-        long period of time.
         """
                 # Searches for the parent name in the dictionary
         lowerDictionary = {}
@@ -54,7 +52,7 @@ class UploadCsv:
             lowerDictionary[key.lower()] = value
         try:
             self.parentFolderID = lowerDictionary[parentName.lower()]
-        except NameError:
+        except KeyError:
             # Uploads to a default folder if the folder name does
             # Not exist in the dictionary
             self.parentFolderID = self.parentDictionary['default']
