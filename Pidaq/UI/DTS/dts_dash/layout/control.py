@@ -29,8 +29,7 @@ add_command_btn = dbc.Button("Add Command",
                             id="add-command-btn",
                             style={"text-align": "center"})
 
-start_test_btn =  dbc.Button(
-                            "Start",
+start_test_btn =  dbc.Button("Start",
                             color="success",
                             className="mr-1",
                             id="test-start-btn",
