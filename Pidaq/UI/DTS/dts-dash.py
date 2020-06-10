@@ -6,9 +6,10 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
 from dts_dash.app import app
+from dts_dash.callbacks import control_callbacks
 from dts_dash.layout.control import control_layout
 from dts_dash.layout.manual import manual_layout
-from dts_dash.callbacks import control_callbacks, sensors_callbacks
+
 
 
 tabs = dbc.Tabs(
@@ -22,3 +23,4 @@ app.layout = tabs
 
 if __name__ == "__main__":
     app.run_server(debug=False)
+    
