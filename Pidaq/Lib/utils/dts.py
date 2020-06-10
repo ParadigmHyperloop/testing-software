@@ -1,7 +1,7 @@
 """ dts.py
 
 This module contains utility classes for dts testing. They are used
-primarily in the dash app and the 
+primarily in the dash app.
 
 Classes:
     DtsTestType(str, Enum) - Enum containing test types RPM and TORQUE
@@ -18,7 +18,7 @@ from pandas import DataFrame
 
 
 class DtsTestType(str, enum.Enum):
-    """ Enum containing the test types """
+    """ Enum containing the DTS test types """
     
     RPM = "RPM"
     TORQUE = "TORQUE"
@@ -34,8 +34,8 @@ class DtsCommand():
     
     """
     
-    def __init__(self, cmdType: DtsTestType, step: int, value: int):
-        self.type = cmdType
+    def __init__(self, cmd_type: DtsTestType, step: int, value: int):
+        self.type = cmd_type
         self.step = step
         self.value = value
     
@@ -56,28 +56,32 @@ class DtsTestProfile():
     
     Attributes: 
         name(str) - test profile name
-        testType(:obj: DtsTestType) - type of the test profile (RPM or TORQUE)
+        test_type(DtsTestType) - type of the test profile (RPM or TORQUE)
         commands(list of :obj: DtsCommand) - list of commands to send to the motor  
 
     Methods:
-        exportJson() - exports this profile to JSON 
-        getDf() - returns a commands dataframe
-        
+        add_command(command) - appends a command to the profile 
+        clear_last() - removes the most recently added command 
+        clear_all() - clears all commands 
+        refresh() - restores the profile to default values
+        export_json(filepath) - exports profile to a JSON 
+        get_df() - returns the list of commands in a dataframe
+        to_dict() - returns a dict representation of the test profile
     """
     
-    def __init__(self, name: str, testType:DtsTestType=DtsTestType.RPM, commands:list=[]):
+    def __init__(self, name: str, test_type: DtsTestType=DtsTestType.RPM, commands: list=[]):
         self.name = name
-        self.testType = testType
+        self.test_type = test_type
         self.commands = commands
         
-    def addCommand(self, command: DtsCommand):
+    def add_command(self, command: DtsCommand):
         """ Adds a command """
         if type(command) != DtsCommand:
             raise TypeError("COMMAND TYPE HAS TO BE DTS COMMAND")
         else:
             self.commands.append(command)
         
-    def clearLast(self):
+    def clear_last(self):
         """ Removes the last (most recently added) command"""
         try:
             command = self.commands.pop(-1)
@@ -88,44 +92,45 @@ class DtsTestProfile():
             
         return command
         
-    def clearAll(self):
+    def clear_all(self):
+        """ Removes all commands from the profile """
         self.commands = []
 
     def refresh(self):
         """ Restore the profile to the default values """
         self.name = None
-        self.testType = DtsTestType.RPM
+        self.test_type = DtsTestType.RPM
         self.commands = []
         
-    def exportJson(self, folderPath:str=None):
+    def export_json(self, folder_path: str=None):
         """ Export the profile to a json file in the specified folder
         
         Args:
-            folderPath(str): Folder to place profiles.json in
+            folder_path(str): Folder to place profiles.json in
                 default - cwd
         """
         logger = logging.getLogger("DTS-DASH")
-        if folderPath is None:
-            folderPath = os.getcwd()
+        if folder_path is None:
+            folder_path = os.getcwd()
         
-        pathToFile = os.path.join(folderPath, "profiles.json")
+        path_to_file = os.path.join(folder_path, "profiles.json")
         
         # If folder DNE, create it
-        if not os.path.exists(folderPath):
-            os.makedirs(folderPath)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
         
         # If file DNE, create and initialize it
-        if not os.path.isfile(pathToFile):
+        if not os.path.isfile(path_to_file):
             initialDict = {
                 "profiles": []
             }
-            with open(pathToFile, 'w') as profileJson:
+            with open(path_to_file, 'w') as profileJson:
                 json.dump(initialDict, profileJson, indent=4)
         
-        with open(pathToFile, "r") as profileJson:
+        with open(path_to_file, "r") as profileJson:
             current_profiles = json.load(profileJson)['profiles']
         
-        with open(pathToFile, 'w') as profileJson:
+        with open(path_to_file, 'w') as profileJson:
             # Update profile if it already exists, otherwise create a new one
             for profile in current_profiles:
                 if profile['name'] == self.name:
@@ -140,7 +145,7 @@ class DtsTestProfile():
         
         return 0
     
-    def getDf(self):
+    def get_df(self):
         """ Return a dataframe built from DTS Commands """
         return DataFrame([cmd.to_dict() for cmd in self.commands])
         
@@ -148,9 +153,8 @@ class DtsTestProfile():
         """ Return a dict representation of the test profile """
         profile_dict = {
             "name": self.name,
-            "type": self.testType,
+            "type": self.test_type,
             "commands": [command.to_dict() for command in self.commands]
         }
         return profile_dict
         
-   

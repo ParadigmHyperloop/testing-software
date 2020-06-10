@@ -107,7 +107,7 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
     
     # Use global test profile
     global test_profile
-    ret_value = test_profile.getDf().to_dict('records'), no_update, no_update, no_update
+    ret_value = test_profile.get_df().to_dict('records'), no_update, no_update, no_update
     
     ctx = dash.callback_context
     
@@ -135,33 +135,32 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
         else:
             toggle_time_warning = False
             
-        testType = test_profile.testType
-        command = DtsCommand(testType, step, value)
-        test_profile.addCommand(command)
+        test_type = test_profile.test_type
+        command = DtsCommand(test_type, step, value)
+        test_profile.add_command(command)
     
         logger.info(f"COMMAND ADDED: {test_profile.commands[-1]}")
-        ret_value = test_profile.getDf().to_dict('records'), no_update, toggle_time_warning, no_update
+        ret_value = test_profile.get_df().to_dict('records'), no_update, toggle_time_warning, no_update
         
     elif button_id == "clear-all-btn":
-        test_profile.clearAll()
-        ret_value = test_profile.getDf().to_dict('records'), no_update, no_update, no_update
+        test_profile.clear_all()
+        ret_value = test_profile.get_df().to_dict('records'), no_update, no_update, no_update
         logger.info(f"CLEAR ALL PRESSED - CLEARED ALL COMMANDS")
     
     elif button_id == "clear-last-btn":
-        removed_cmd = test_profile.clearLast()
-        ret_value = test_profile.getDf().to_dict('records'), no_update, no_update, no_update
+        removed_cmd = test_profile.clear_last()
+        ret_value = test_profile.get_df().to_dict('records'), no_update, no_update, no_update
         logger.info(f"CLEAR LAST PRESSED - REMOVED COMMAND: {removed_cmd}")
    
     elif button_id == "rpm-toggle-btn":
-        
         # If test type wasnt rpm, update test profile to rpm and clear commands 
-        if test_profile.testType != DtsTestType.RPM:
-            test_profile.testType = DtsTestType.RPM
+        if test_profile.test_type != DtsTestType.RPM:
+            test_profile.test_type = DtsTestType.RPM
             test_profile.commands = []
             logger.info(f"Test type updated to RPM, updated " 
-                        f"profile test type to: {test_profile.testType}")
+                        f"profile test type to: {test_profile.test_type}")
             
-            ret_value = test_profile.getDf().to_dict('records'), "RPM", no_update, no_update
+            ret_value = test_profile.get_df().to_dict('records'), "RPM", no_update, no_update
             
         # If test profile type is already rpm - do nothing
         else:
@@ -170,13 +169,13 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
         
     elif button_id == "torque-toggle-btn":
         
-        if test_profile.testType != DtsTestType.TORQUE:
-            test_profile.testType = DtsTestType.TORQUE
+        if test_profile.test_type != DtsTestType.TORQUE:
+            test_profile.test_type = DtsTestType.TORQUE
             test_profile.commands = []
             logger.info(f"Test type updated to torque, updated " 
-                        f"profile test type to: {test_profile.testType}")
+                        f"profile test type to: {test_profile.test_type}")
             
-            ret_value = test_profile.getDf().to_dict('records'), "TORQUE", no_update, no_update
+            ret_value = test_profile.get_df().to_dict('records'), "TORQUE", no_update, no_update
         
         else:
             logging.info("TORQUE TOGGLE CLICKED - TEST TYPE IS ALREADY TORQUE - NO ACTION TAKEN ")
@@ -194,5 +193,5 @@ def export_profile(n_clicks):
         raise dash.exceptions.PreventUpdate
         
     global test_profile
-    test_profile.exportJson()
+    test_profile.export_json()
     return ""
