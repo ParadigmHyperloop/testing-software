@@ -21,13 +21,14 @@ DTS
     ├── app.py                      # The dash app that gets imported by callback modules and dts.py  
     ├── assets/                     # Contains bootstrap css framework, and one custom .css file  
         ├── css
-        ├── js
-        ├── img                       
+        ├── img
+        ├── js 
+    ├── callbacks/                  # Subpackage defining dash callbacks for the sensor and control tab  
+        ├── __init__.py  
+        ├── control_callbacks.py                       
     ├── layout/                     # Subpackage containing layouts built using dash elements  
         ├── __init__.py                  
         ├── control.py  
         ├── manual.py  
-    ├── callbacks/                  # Subpackage defining dash callbacks for the sensor and control tab  
-        ├── __init__.py  
-        ├── control_callbacks.py  
+     
 ```
