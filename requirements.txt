@@ -13,4 +13,3 @@ influxdb==5.2.3
 protobuf==3.11.3
 pylint==2.4.4
 pandas==1.0.3
-
