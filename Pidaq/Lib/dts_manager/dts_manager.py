@@ -1,6 +1,7 @@
 from can_manager import can_manager
 
 class DTSControl():
+
     def __init__(self, bus: can_manager.CanManager):
         self.bus = bus
 
@@ -69,94 +70,94 @@ class DTSTelemetry():
     def convert_temperatures(self) -> None:
         if self.bus.messages['0xa0'].data:
             self.module_a_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xa0'].data[0:2], byteorder='little', signed=True) / 10
             self.module_b_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[2:4], byteorder='little') / 10
+                self.bus.messages['0xa0'].data[2:4], byteorder='little', signed=True) / 10
             self.module_c_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[4:6], byteorder='little') / 10
+                self.bus.messages['0xa0'].data[4:6], byteorder='little', signed=True) / 10
             self.gate_driver_board_temperature = int.from_bytes(
-                self.bus.messages['0xa0'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa0'].data[6:], byteorder='little', signed=True) / 10
         if self.bus.messages['0xa1'].data:
             self.control_board_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xa1'].data[0:2], byteorder='little', signed=True) / 10
             self.rtd_1_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[2:4], byteorder='little') / 10
+                self.bus.messages['0xa1'].data[2:4], byteorder='little', signed=True) / 10
             self.rtd_2_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[4:6], byteorder='little') / 10
+                self.bus.messages['0xa1'].data[4:6], byteorder='little', signed=True) / 10
             self.rtd_3_temperature = int.from_bytes(
-                self.bus.messages['0xa1'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa1'].data[6:], byteorder='little', signed=True) / 10
         if self.bus.messages['0xa2'].data:
             self.rtd_4_temperature = int.from_bytes(
-                self.bus.messages['0xa2'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xa2'].data[0:2], byteorder='little', signed=True) / 10
             self.rtd_5_temperature = int.from_bytes(
-                self.bus.messages['0xa2'].data[2:4], byteorder='little') / 10
+                self.bus.messages['0xa2'].data[2:4], byteorder='little', signed=True) / 10
 
     def convert_low_voltages(self) -> None:
         if self.bus.messages['0xa3'].data:
             self.analog_input_1 = int.from_bytes(
-                self.bus.messages['0xa3'].data[0:2], byteorder='little') / 100
+                self.bus.messages['0xa3'].data[0:2], byteorder='little', signed=True) / 100
             self.analog_input_2 = int.from_bytes(
-                self.bus.messages['0xa3'].data[2:4], byteorder='little') / 100
+                self.bus.messages['0xa3'].data[2:4], byteorder='little', signed=True) / 100
             self.analog_input_3 = int.from_bytes(
-                self.bus.messages['0xa3'].data[4:6], byteorder='little') / 100
+                self.bus.messages['0xa3'].data[4:6], byteorder='little', signed=True) / 100
             self.analog_input_4 = int.from_bytes(
-                self.bus.messages['0xa3'].data[6:], byteorder='little') / 100
+                self.bus.messages['0xa3'].data[6:], byteorder='little', signed=True) / 100
         if self.bus.messages['0xa9'].data:
             self.one_five_voltage_ref = int.from_bytes(
-                self.bus.messages['0xa9'].data[0:2], byteorder='little') / 100
+                self.bus.messages['0xa9'].data[0:2], byteorder='little', signed=True) / 100
             self.two_five_voltage_ref = int.from_bytes(
-                self.bus.messages['0xa9'].data[2:4], byteorder='little') / 100
+                self.bus.messages['0xa9'].data[2:4], byteorder='little', signed=True) / 100
             self.five_voltage_ref = int.from_bytes(
-                self.bus.messages['0xa9'].data[4:6], byteorder='little') / 100
+                self.bus.messages['0xa9'].data[4:6], byteorder='little', signed=True) / 100
             self.twelve_system_voltage = int.from_bytes(
-                self.bus.messages['0xa9'].data[6:], byteorder='little') / 100
+                self.bus.messages['0xa9'].data[6:], byteorder='little', signed=True) / 100
 
     def convert_high_voltages(self) -> None:
         if self.bus.messages['0xa7'].data:
             self.dc_bus_voltage = int.from_bytes(
-                self.bus.messages['0xa7'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xa7'].data[0:2], byteorder='little', signed=True) / 10
             self.output_voltage = int.from_bytes(
-                self.bus.messages['0xa7'].data[2:4], byteorder='little') / 10
+                self.bus.messages['0xa7'].data[2:4], byteorder='little', signed=True) / 10
             self.vab_vd_voltage = int.from_bytes(
-                self.bus.messages['0xa7'].data[4:6], byteorder='little') / 10
+                self.bus.messages['0xa7'].data[4:6], byteorder='little', signed=True) / 10
             self.vbc_vq_voltage = int.from_bytes(
-                self.bus.messages['0xa7'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa7'].data[6:], byteorder='little', signed=True) / 10
 
     def convert_currents(self) -> None:
         if self.bus.messages['0xa6'].data:
             self.phase_a_current = int.from_bytes(
-                self.bus.messages['0xa6'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xa6'].data[0:2], byteorder='little', signed=True) / 10
             self.phase_b_current = int.from_bytes(
-                self.bus.messages['0xa6'].data[2:4], byteorder='little') / 10
+                self.bus.messages['0xa6'].data[2:4], byteorder='little', signed=True) / 10
             self.phase_c_current = int.from_bytes(
-                self.bus.messages['0xa6'].data[4:6], byteorder='little') / 10
+                self.bus.messages['0xa6'].data[4:6], byteorder='little', signed=True) / 10
             self.dc_bus_current = int.from_bytes(
-                self.bus.messages['0xa6'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa6'].data[6:], byteorder='little', signed=True) / 10
         if self.bus.messages['0xa8'].data:
             self.id_feedback = int.from_bytes(
-                self.bus.messages['0xa8'].data[4:6], byteorder='little') / 10
+                self.bus.messages['0xa8'].data[4:6], byteorder='little', signed=True) / 10
             self.iq_feedback = int.from_bytes(
-                self.bus.messages['0xa8'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa8'].data[6:], byteorder='little', signed=True) / 10
 
     def convert_angles(self) -> None:
         if self.bus.messages['0xa5'].data:
             self.motor_angle = int.from_bytes(
-                self.bus.messages['0xa5'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xa5'].data[0:2], byteorder='little', signed=True) / 10
             self.delta_filter_resolved = int.from_bytes(
-                self.bus.messages['0xa5'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa5'].data[6:], byteorder='little', signed=True) / 10
 
     def convert_booleans(self) -> None:
-        BIT_0 = 1
-        BIT_1 = 2
-        BIT_2 = 4
-        BIT_3 = 8
-        BIT_4 = 16
-        BIT_5 = 32
-        BIT_6 = 64
-        BIT_7 = 128
+        BIT_0 = 1<<0
+        BIT_1 = 1<<1
+        BIT_2 = 1<<2
+        BIT_3 = 1<<3
+        BIT_4 = 1<<4
+        BIT_5 = 1<<5
+        BIT_6 = 1<<6
+        BIT_7 = 1<<7
         if self.bus.messages['0xa4']:
             digital_input_status = int.from_bytes(
-                self.bus.messages['0xa4'].data[0:], byteorder='little')
+                self.bus.messages['0xa4'].data[0:], byteorder='little', signed=False)
             self.digital_input_1 = bool(digital_input_status & BIT_0)
             self.digital_input_2 = bool(digital_input_status & BIT_1)
             self.digital_input_3 = bool(digital_input_status & BIT_2)
@@ -169,12 +170,12 @@ class DTSTelemetry():
     def convert_torques(self) -> None:
         if self.bus.messages['0xa2'].data:
             self.torque_shudder = int.from_bytes(
-                self.bus.messages['0xa2'].data[6:], byteorder='little') / 10
+                self.bus.messages['0xa2'].data[6:], byteorder='little', signed=True) / 10
         if self.bus.messages['0xac'].data:
             self.commanded_torque = int.from_bytes(
-                self.bus.messages['0xac'].data[0:2], byteorder='little') / 10
+                self.bus.messages['0xac'].data[0:2], byteorder='little', signed=True) / 10
             self.torque_feedback = int.from_bytes(
-                self.bus.messages['0xac'].data[2:4], byteorder='little') / 10
+                self.bus.messages['0xac'].data[2:4], byteorder='little', signed=True) / 10
 
 
 if __name__ == "__main__":
