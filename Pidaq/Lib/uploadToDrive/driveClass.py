@@ -23,7 +23,7 @@ class UploadCsv:
         # Change this for the ID of the default folder 
         self.defaultID = '1VDOOjuOeyNRJgdKmmRTJC1HVjq91F4Q8'
             
-        # Searches for the Json file containing folder names and IDS
+        # Searches for the Json file containing folder names and IDs
         # These IDs are to be stored manually.
         try:
             with open('drive_options.json') as json_file:
@@ -103,7 +103,7 @@ class UploadCsv:
         # Returns 0 if no folder exists with today's date
         # In the specified parent folder
         if len(response.get('files',[])) == 0: 
-            logging.warning("creating a new folder...")
+            logging.warning("creating a new folder with today's date...")
             return 0
         # Returns 1 if the folder with today's date
         # Exists in the specified parent folder
