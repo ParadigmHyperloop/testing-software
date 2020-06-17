@@ -6,18 +6,6 @@ from enum import Enum
 import can
 
 
-class DTSState(Enum):
-    START_STATE = 0
-    PRE_CHARGE_INITIAL = 1
-    PRE_CHARGE_ACTIVE = 2
-    PRE_CHARGE_FINISH = 3
-    WAIT = 4
-    READY = 5
-    MOTOR_RUNNING = 6
-    FAULT = 7
-    RECYCLE_POWER = 65535
-
-
 class DTSSimulator:
 
     def __init__(self, bus_name: str):
