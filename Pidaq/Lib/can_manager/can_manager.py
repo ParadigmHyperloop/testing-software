@@ -25,7 +25,6 @@ class CanManager:
         messages (dict): dict of all the messages to be expected from the
                          sensor board. Keys are message ids, and values are
                          SensorReading objects
-        message_ids (list(int)): list of all the message ids, hexidecimal integers
 
     Methods:
         read_message_config(project: str)
@@ -40,7 +39,6 @@ class CanManager:
     def __init__(self, bus_name: str) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
         self.messages = {}
-        self.message_ids = []
 
     def read_message_config(self, project: str, config_file: str, path=None) -> None:
         """Reads sensor readings configuration from messageconfig.json
@@ -67,10 +65,9 @@ class CanManager:
                     reading['reading'],
                     reading['conversion_factor'],
                 )
-                self.message_ids.append(int(reading['message_id'], 16))
 
     def send_message(self, id: int, data: list) -> None:
-        if id in self.message_ids:
+        if id in self.messages.keys():
             raise Exception(f'Error: ID: {id} is already in use')
         message = can.Message(arbitration_id=id, data=data)
         self.bus.send(message)
@@ -90,7 +87,7 @@ class CanManager:
             bus_message(can.Message)
         """
         message_id = bus_message.arbitration_id
-        if message_id in self.message_ids:
+        if message_id in self.messages.keys():
             message_id_fmt = str(hex(message_id)).upper()
             message_id_fmt = message_id_fmt[:1] + 'x' + message_id_fmt[2:]
             self.messages[message_id_fmt].data = bytes(bus_message.data)
@@ -136,7 +133,7 @@ if __name__ == "__main__":
 
     # Print contents of method_ids list
     print('Message ids in use:')
-    for message_id in bus.message_ids:
+    for message_id in bus.messages.key():
         print(message_id)
 
     # Start receiving messages and assigning message data
