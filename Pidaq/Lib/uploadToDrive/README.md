@@ -38,7 +38,7 @@ Paradigm's Comp5 Google Drive
 **Viewing files:** The files will be uploaded in their csv format. In order to open them in the Drive, locate the file you want to open, and double-click on it. Locate "Google Sheets" and choose it.
 
 ## Running runInCmd.py from a Raspberry Pi remotely
-If this is the first time running, please see "Setting up drive_options.json" and "Getting credentials.json" first.
+If this is the first time running, please see "Setting up drive_options.json", "Packages", and "Getting credentials.json" first.
 1. Launch a command-line window
 2. Type ```python3 runInCmd.py --noauth_local_webserver```
 3. Copy the full path to the CSV file including the file's name and paste it without including quotations.
@@ -50,7 +50,7 @@ If this is the first time running, please see "Setting up drive_options.json" an
 
 ## Running runInCmd.py from a laptop or a Raspberry Pi directly
 If this is the first time running, please see "Setting up drive_options.json", "Packages", and "Getting credentials.json" first.
-1. Open a command-line interface from [Windows](https://www.howtogeek.com/235101/10-ways-to-open-the-command-prompt-in-windows-10/), from [Mac](https://www.wikihow.com/Get-to-the-Command-Line-on-a-Mac), or [Pi](https://www.raspberrypi.org/documentation/usage/terminal/)
+1. Open a command-line interface
 2. Type the following: ```Python3 runInCmd.py```
 3. Copy the full path to the CSV file including the file's name and paste it without including quotations. [Here](https://www.pcworld.com/article/251406/windows-tips-copy-a-file-path-show-or-hide-extensions.html) is a shortcut to copying it from Windows. If you are running for the first time or if you are directed to a browser tab, please see "Authorization"
 4. The options for the folders will be displayed. Write the name of the folder where you want the file to be uploaded, and hit enter. 
