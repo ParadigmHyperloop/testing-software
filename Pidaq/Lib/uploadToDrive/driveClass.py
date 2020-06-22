@@ -9,7 +9,11 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 
 class UploadCsv:
-    def __init__(self):      
+    def __init__(self):   
+        
+        # Change this for the ID of the default folder 
+        self.defaultID = '1VDOOjuOeyNRJgdKmmRTJC1HVjq91F4Q8'
+        
         self.SCOPES = 'https://www.googleapis.com/auth/drive'
         self.store = file.Storage('client.json') 
         self.creds = self.store.get()
@@ -19,9 +23,6 @@ class UploadCsv:
             self.creds = tools.run_flow(self.flow, self.store)
             
         self.DRIVE = build('drive', 'v3', http= self.creds.authorize(Http()))
-
-        # Change this for the ID of the default folder 
-        self.defaultID = '1VDOOjuOeyNRJgdKmmRTJC1HVjq91F4Q8'
             
         # Searches for the Json file containing folder names and IDs
         # These IDs are to be stored manually.
