@@ -11,11 +11,11 @@ from oauth2client import file, client, tools
 class UploadCsv:
     def __init__(self):      
         self.SCOPES = 'https://www.googleapis.com/auth/drive'
-        self.store = file.Storage('credentials.json') 
+        self.store = file.Storage('client.json') 
         self.creds = self.store.get()
 
         if not self.creds or self.creds.invalid:
-            self.flow = client.flow_from_clientsecrets('client_secret.json', self.SCOPES)
+            self.flow = client.flow_from_clientsecrets('credentials.json', self.SCOPES)
             self.creds = tools.run_flow(self.flow, self.store)
             
         self.DRIVE = build('drive', 'v3', http= self.creds.authorize(Http()))
