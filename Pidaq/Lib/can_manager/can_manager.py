@@ -105,9 +105,9 @@ class SensorReading:
         data (int or float)
     """
 
-    def __init__(self, project: str, message_id: str, reading: str,
+    def __init__(self, message_id: str, reading: str,
                  conversion_factor) -> None:
-        self.message_id = int(message_id, 16)
+        self.message_id = message_id
         self.reading = reading
         self.conversion_factor = conversion_factor
         self.data = None
