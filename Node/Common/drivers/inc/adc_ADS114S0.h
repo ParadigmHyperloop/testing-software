@@ -3,7 +3,7 @@
 
 #include <SPI.h>
 
-enum InputMux
+enum class InputMux: uint8_t
 {
     MUX_SINGLE_0    = 0x0C, // Single-ended AIN0
     MUX_SINGLE_1    = 0x1C, // Single-ended AIN1
@@ -19,7 +19,7 @@ enum InputMux
     MUX_SINGLE_11   = 0xBC  // Single-ended AIN11
 };
 
-enum PGAGain
+enum class PGAGain: uint8_t
 {
     GAIN_DISABLE    = 0x00, // Default
     GAIN_2          = 0x09,
@@ -31,7 +31,7 @@ enum PGAGain
     GAIN_128        = 0x0F
 };
 
-enum DataRate
+enum class DataRate: uint8_t
 {
     SPS_2_5     = 0x10, // 2.5 Samples Per Second
     SPS_5       = 0x11, // 5 Samples Per Second
@@ -49,10 +49,23 @@ enum DataRate
     SPS_4000    = 0x1D  // 4000 Samples Per Second
 };
 
+enum class Command: uint8_t
+{
+    WAKEUP      = 0x02,
+    POWERDOWN   = 0x04,
+    RESET       = 0x06,
+    START       = 0x08,
+    STOP        = 0x0A,
+    SYOCAL      = 0x16, // System offset calibration
+    SYGCAL      = 0x17, // System gain calibration
+    SFOCAL      = 0x19, // Self offset calibration
+    RDATA       = 0x12
+};
+
 class ADS114S0
 {
 public:
-    ADS114S0(SPIClass spi, uint8_t SS_PIN);
+    ADS114S0(uint8_t CS);
     void init();
     void writeRegister(uint8_t, uint8_t);
     uint8_t readRegister(uint8_t);
@@ -66,18 +79,8 @@ public:
 private:
     SPIClass spi;
     SPISettings spiSettings = SPISettings(20000000, MSBFIRST, SPI_MODE1);
-    uint8_t SS_PIN;
+    uint8_t CS;
     uint8_t DRDY_PIN;
-    // Commands for interfacing with adc
-    static const uint8_t WAKEUP = 0x02;
-    static const uint8_t POWERDOWN = 0x04;
-    static const uint8_t RESET = 0x06;
-    static const uint8_t START = 0x016;
-    static const uint8_t STOP = 0x0a;
-    static const uint8_t SYOCAL = 0x16; // System offset calibration
-    static const uint8_t SYGCAL = 0x17; // System gain calibration
-    static const uint8_t SFOCAL = 0x19; // Self offset calibration
-    static const uint16_t RDATA = 0x1200;
 };
 
 #endif
