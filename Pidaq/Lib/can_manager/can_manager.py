@@ -88,9 +88,7 @@ class CanManager:
         """
         message_id = bus_message.arbitration_id
         if message_id in self.messages.keys():
-            message_id_fmt = str(hex(message_id)).upper()
-            message_id_fmt = message_id_fmt[:1] + 'x' + message_id_fmt[2:]
-            self.messages[message_id_fmt].data = bytes(bus_message.data)
+            self.messages[message_id].data = bytes(bus_message.data)
 
 
 class SensorReading:
