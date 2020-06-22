@@ -105,9 +105,6 @@ class SensorReading:
         conversion_factor (int or float)
         conversion_factor_type (str)
         data (int or float)
-
-    Methods:
-
     """
 
     def __init__(self, project: str, message_id: str, reading: str,
