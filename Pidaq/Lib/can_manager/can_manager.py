@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     # Print contents of method_ids list
     print('Message ids in use:')
-    for message_id in bus.messages.key():
+    for message_id in bus.messages.keys():
         print(message_id)
 
     # Start receiving messages and assigning message data
