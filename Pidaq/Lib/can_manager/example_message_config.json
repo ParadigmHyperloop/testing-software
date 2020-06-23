@@ -1,0 +1,36 @@
+{
+    "dts": {
+        "readings": [
+            {
+                "reading": "Pressure1",
+                "message_id": 5,
+                "conversion_factor": "10",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "Temperature1",
+                "message_id": 100,
+                "conversion_factor": "6.3",
+                "conversion_factor_type": "float"
+            },
+            {
+                "reading": "Velocity1",
+                "message_id": 200,
+                "conversion_factor": "10.62",
+                "conversion_factor_type": "float"
+            },
+            {
+                "reading": "Distance1",
+                "message_id": 74,
+                "conversion_factor": "100",
+                "conversion_factor_type": "int"
+            },
+            {
+                "reading": "Pressure2",
+                "message_id": 29,
+                "conversion_factor": "10",
+                "conversion_factor_type": "int"
+            }
+        ]
+    }
+}

@@ -1,13 +1,10 @@
 {
   "canInfo": {
-    "serialPort": "COM6",
-    "busType": "slcan",
+    "serialPort": "vcan0",
+    "busType": "socketcan",
     "bitrate": 500000,
     "busFilters": [
       {
-        "canId": 100,
-        "canMask": 224,
-        "extended": false
       }
     ]
   }

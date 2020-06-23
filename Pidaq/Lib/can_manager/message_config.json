@@ -1,0 +1,26 @@
+{
+    "dts": {
+        "readings": [{
+            "reading": "Placeholder",
+            "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "conversion_factor": "Placeholder",
+            "conversion_factor_type": "Placeholder"
+        }]
+    },
+    "suspension": {
+        "readings": [{
+            "reading": "Placeholder",
+            "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "conversion_factor": "Placeholder",
+            "conversion_factor_type": "Placeholder"
+        }]
+    },
+    "windtunnel": {
+        "readings": [{
+            "reading": "Placeholder",
+            "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+            "conversion_factor": "Placeholder",
+            "conversion_factor_type": "Placeholder"
+        }]
+    }
+}
