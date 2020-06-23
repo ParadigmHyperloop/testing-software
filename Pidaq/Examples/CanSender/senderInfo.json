@@ -3,32 +3,60 @@
     "serialPort": "vcan0",
     "busType": "socketcan",
     "bitrate": 500000,
-    "messageFrequency": 50,
+    "messageFrequency": 5,
     "messages": [
       {
         "msgId": 5,
         "isExtendedId": 0,
-        "data": [5, 6, 7, 8, 9, 10]
+        "data": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
       },
       {
         "msgId": 100,
         "isExtendedId": 0,
-        "data": [72, 54, 32, 87]
+        "data": [
+          72,
+          54,
+          32,
+          87
+        ]
       },
       {
         "msgId": 200,
         "isExtendedId": 0,
-        "data": [100, 253, 0, 87]
+        "data": [
+          100,
+          253,
+          0,
+          87
+        ]
       },
       {
         "msgId": 74,
         "isExtendedId": 0,
-        "data": [87]
+        "data": [
+          87
+        ]
       },
       {
         "msgId": 29,
         "isExtendedId": 0,
-        "data": [98, 56, 182, 78, 28, 37, 16, 82]
+        "data": [
+          98,
+          56,
+          182,
+          78,
+          28,
+          37,
+          16,
+          82
+        ]
       }
     ]
   }

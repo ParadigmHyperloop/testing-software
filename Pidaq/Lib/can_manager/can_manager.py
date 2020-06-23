@@ -60,7 +60,6 @@ class CanManager:
             for reading in config_dict[project.lower()]['readings']:
                 message_id = reading['message_id']
                 self.messages[message_id] = SensorReading(
-                    project,
                     reading['message_id'],
                     reading['reading'],
                     reading['conversion_factor'],
@@ -88,7 +87,7 @@ class CanManager:
         """
         message_id = bus_message.arbitration_id
         if message_id in self.messages.keys():
-            self.messages[message_id].data = bytes(bus_message.data)
+            self.messages[message_id].data = bus_message.data
 
 
 class SensorReading:
