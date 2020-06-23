@@ -2,3 +2,4 @@
 .venv
 !important .vscode/tasks.json
 __pycache__
+profiles.json
