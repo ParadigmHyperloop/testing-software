@@ -86,8 +86,8 @@ This JSON dictionary drive_options.json will include the names of the testing fo
 
 1. In order for the script to locate the folder where it needs to upload the CSV file, the ID must match the corresponding folder's ID in the Drive.
 2. To get the folder ID, open Paradigm's Drive, then find the folder where files will be uploaded, for example, "DTS". Open the folder.
-3. In the address bar, the URL will be something like "https://drive.google.com/drive/u/1/folders/**1WolqpYfnQDC_T7u7lI45XQLOsl-U71VV**".
-4. The folder ID is all the characters after "folders/", highlighted in boldface above. Copy this ID and paste in the drive_options.json as shown below.
+3. In the address bar, the URL will be something like "https://drive.google.com/drive/u/1/folders/1WolqpYfnQDC_T7u7lI45XQLOsl-U71VV".
+4. The folder ID is all the characters after "folders/". Copy this ID and paste in the drive_options.json as shown below.
 5. The name for the folder must be all lowercase. It is highly recommended to make the name the same as the one in the Drive to avoid confusion.
 
 Create a new entry in the JSON file as shown below, where ```testing folder 1``` and ```default``` already exist in drive_options:
