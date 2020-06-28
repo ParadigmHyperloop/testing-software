@@ -175,7 +175,7 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
             logger.info(f"Test type updated to torque, updated " 
                         f"profile test type to: {test_profile.test_type}")
             
-            ret_value = test_profile.get_df().to_dict('records'), "TORQUE", no_update, no_update
+            ret_value = test_profile.get_df().to_dict('records'), "TOR", no_update, no_update
         
         else:
             logging.info("TORQUE TOGGLE CLICKED - TEST TYPE IS ALREADY TORQUE - NO ACTION TAKEN ")

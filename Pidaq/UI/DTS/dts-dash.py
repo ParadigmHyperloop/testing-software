@@ -11,7 +11,6 @@ from dts_dash.layout.control import control_layout
 from dts_dash.layout.manual import manual_layout
 
 
-
 tabs = dbc.Tabs(
     [
         dbc.Tab(control_layout, label="Controls", tabClassName="hov-pointer"),
