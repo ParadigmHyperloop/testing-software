@@ -62,7 +62,7 @@ class CanManager:
                 self.messages[message_id] = SensorReading(
                     reading['message_id'],
                     reading['reading'],
-                    reading['conversion_factor'],
+                    reading['conversion_factor'] if reading['conversion_factor'] else None,
                 )
 
     def send_message(self, id: int, data: list) -> None:
