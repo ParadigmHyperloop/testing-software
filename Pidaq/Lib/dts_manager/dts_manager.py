@@ -91,6 +91,8 @@ class DTSTelemetry():
                 self.bus.messages['0xa2'].data[0:2], byteorder='little', signed=True) / 10
             self.rtd_5_temperature = int.from_bytes(
                 self.bus.messages['0xa2'].data[2:4], byteorder='little', signed=True) / 10
+            self.motor_temperature = int.from_bytes(
+                self.bus.messages['0xa2'].data[4:6], byteorder='little', signed=True) / 10
 
     def convert_low_voltages(self) -> None:
         if self.bus.messages['0xa3'].data:
