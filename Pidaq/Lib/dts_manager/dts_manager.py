@@ -1,3 +1,5 @@
+from enum import Enum
+
 from can_manager import can_manager
 
 
@@ -6,20 +8,17 @@ class DTSControl():
     def __init__(self, bus: can_manager.CanManager):
         self.bus = bus
 
-    def configure_motor(self, configuration: dict) -> None:
+    def configure_motor(self, configuration: MotorConfig) -> None:
+        self.torque_command = int(configuration.torque_command * 10).to_bytes(2, 'little')
         # Extract commands from dict
-        self.torque_command = int(
-            configuration['torque']).to_bytes(2, 'little')
-        self.speed_command = int(configuration['speed']).to_bytes(2, 'little')
-        self.direction_command = int(
-            configuration['direction']).to_bytes(1, 'little')
-        self.inverter_enable = int(configuration['inverterEnable'])
-        self.inverter_discharge = int(configuration['inverterDischarge'])
-        self.speed_mode_enable = int(configuration['speedModeEnable'])
+        self.speed_command = int(configuration.speed_command * 10).to_bytes(2, 'little')
+        self.direction_command = int(configuration.direction).to_bytes(1, 'little')
+        self.inverter_enable = int(configuration.inverter_enable)
+        self.inverter_discharge = int(configuration.inverter_discharge)
+        self.speed_mode_enable = int(configuration.mode)
         self.mode = ((int(self.speed_mode_enable) << 2) +
                      (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
-        self.commanded_torque_limit = int(
-            configuration['commandedTorqueLimit']).to_bytes(2, 'little')
+        self.commanded_torque_limit = int(configuration.commanded_torque_limit * 10).to_bytes(2, 'little')
 
     def send_motor_command(self) -> None:
         command_list = self.torque_command + self.speed_command + \
@@ -179,6 +178,33 @@ class DTSTelemetry():
                 self.bus.messages[172].data[0:2], byteorder='little', signed=True) / 10
             self.torque_feedback = int.from_bytes(
                 self.bus.messages[172].data[2:4], byteorder='little', signed=True) / 10
+
+class InverterMode(Enum):
+    Torque = 0
+    Speed  = 1
+
+class InverterDirection(Enum):
+    Reverse = 0
+    Forward = 1
+
+class InverterEnable(Enum):
+    Inverter_Off = 0
+    Inverter_On  = 1
+
+class InverterDischarge(Enum):
+    Disable = 0
+    Enable = 1
+
+class MotorConfig():
+    def __init__(self, command: float, direction: InverterDirection, enable: InverterEnable,
+                 discharge: InverterDischarge, mode: InverterMode, commanded_torque_limit: float=0):
+        self.torque_command = command if mode == InverterMode.Torque else 0
+        self.speed_command = command if mode == InverterMode.Speed else 0
+        self.direction = direction.value
+        self.inverter_enable = enable.value
+        self.inverter_discharge = discharge.value
+        self.mode = mode.value
+        self.commanded_torque_limit = commanded_torque_limit
 
 
 if __name__ == "__main__":
