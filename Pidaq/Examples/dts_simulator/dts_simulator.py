@@ -5,13 +5,13 @@ from enum import Enum
 
 import can
 
-from can_manager import CanManager
+from can_manager import can_manager
 
 class DTSSimulator:
 
     def __init__(self, bus_name: str):
         # Configure bus
-        self.can_bus =  CanManager(bus_name) 
+        self.can_bus =  can_manager.CanManager(bus_name) 
 
         # Configure messages
         self.temperature1 = can.Message(arbitration_id=160, dlc=8)
@@ -301,6 +301,7 @@ def run_simulation(bus_name: str):
         sim.update_modulation_index()
         sim.send_information_messages_10hz()
         sim.send_information_messages_100hz()
+        print(sim)
 
 
 if __name__ == "__main__":
