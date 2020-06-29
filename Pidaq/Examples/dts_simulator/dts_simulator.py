@@ -5,12 +5,13 @@ from enum import Enum
 
 import can
 
+from can_manager import CanManager
 
 class DTSSimulator:
 
     def __init__(self, bus_name: str):
         # Configure bus
-        self.bus = can.interfaces.socketcan.SocketcanBus(bus_name)
+        self.can_bus =  CanManager(bus_name) 
 
         # Configure messages
         self.temperature1 = can.Message(arbitration_id=160, dlc=8)
@@ -154,23 +155,23 @@ class DTSSimulator:
 
     def send_information_messages_10hz(self):
         time.sleep(1 / 10)
-        self.bus.send(self.temperature1)
-        self.bus.send(self.temperature2)
-        self.bus.send(self.temperature3)
-        self.bus.send(self.internal_voltages)
-        self.bus.send(self.fault_codes)
+        self.can_bus.bus.send(self.temperature1)
+        self.can_bus.bus.send(self.temperature2)
+        self.can_bus.bus.send(self.temperature3)
+        self.can_bus.bus.send(self.internal_voltages)
+        self.can_bus.bus.send(self.fault_codes)
 
     def send_information_messages_100hz(self):
         time.sleep(1 / 100)
-        self.bus.send(self.analog_input_voltages)
-        self.bus.send(self.digital_input_status)
-        self.bus.send(self.motor_position_information)
-        self.bus.send(self.current_information)
-        self.bus.send(self.voltage_information)
-        self.bus.send(self.flux_information)
-        self.bus.send(self.internal_states)
-        self.bus.send(self.torque_timer_info)
-        self.bus.send(self.modulation_index_flux_weakening)
+        self.can_bus.bus.send(self.analog_input_voltages)
+        self.can_bus.bus.send(self.digital_input_status)
+        self.can_bus.bus.send(self.motor_position_information)
+        self.can_bus.bus.send(self.current_information)
+        self.can_bus.bus.send(self.voltage_information)
+        self.can_bus.bus.send(self.flux_information)
+        self.can_bus.bus.send(self.internal_states)
+        self.can_bus.bus.send(self.torque_timer_info)
+        self.can_bus.bus.send(self.modulation_index_flux_weakening)
 
 
 def run_simulation(bus_name: str):
