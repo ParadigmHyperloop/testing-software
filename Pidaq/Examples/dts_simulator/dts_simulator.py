@@ -37,6 +37,72 @@ class DTSSimulator:
         self.firmware_information = can.Message(arbitration_id=174, dlc=8)
         self.last_received_command_message = 0
 
+    def __str__(self):
+        return f'''
+        Current DTS Sim State:
+        {self.display_temps()} 
+
+        {self.display_voltages()}
+
+        {self.display_currents()}
+
+        {self.display_motor_info()}
+        '''
+    # TODO Store integer values in class instead of byte objects for easier printing
+    def display_temps(self):
+        return f'''
+        Current Temperature Status:
+        Module A Temperature: {self.module_a_temp / 10}
+        Module B Temperature: {self.module_b_temp / 10}
+        Module C Temperature: {self.module_c_temp / 10}
+        Gate Driver Board Temperature: {self.gate_driver_board_temp / 10}
+        Control Board Temperature: {self.control_board_temp / 10}
+        RTD 1 Temperature: {self.rtd_1_temp / 10}
+        RTD 2 Temperature: {self.rtd_2_temp / 10}
+        RTD 3 Temperature: {self.rtd_4_temp / 10}
+        RTD 4 Temperature: {self.rtd_4_temp / 10}
+        RTD 5 Temperature: {self.rtd_5_temp / 10}
+        Motor Temperature: {self.motor_temp / 10}
+        '''
+
+    def display_voltages(self):
+        return f'''
+        Current Voltage Status:
+        Analog Input 1 Voltage: {self.analog_input_1 / 100}V
+        Analog Input 2 Voltage: {self.analog_input_2 / 100}V
+        Analog Input 3 Voltage: {self.analog_input_3 / 100}V
+        Analog Input 4 Voltage: {self.analog_input_4 / 100}V
+        1.5V Reference Voltage: {self.one_five_voltage_ref / 100}V
+        2.5V Reference Voltage: {self.two_five_voltage_ref / 100}V
+        5.0V Reference Voltage: {self.five_voltage_ref / 100}V
+        12V System Voltage: {self.twelve_system_voltage / 100}V
+        DC Bus Voltage: {self.dc_bus_voltage / 10}V
+        Output Voltage: {self.output_voltage / 10}V
+        VAB_Vd Voltage: {self.vab_vd_voltage / 10}V
+        VBC_Vq Voltage: {self.vbc_vq_voltage / 10}V
+        '''
+    
+    def display_currents(self):
+        return f'''
+        Current Status:
+        Phase A Current: {self.phase_a_current / 10}A
+        Phase B Current: {self.phase_b_current / 10}A
+        Phase C Current: {self.phase_c_current / 10}A
+        DC Bus Current: {self.dc_bus_current / 10}A
+        Id Feedback Current: {self.id_feedback / 10}A
+        Iq Feedback Current: {self.iq_feedback / 10}A
+        '''
+
+    def display_motor_info(self):
+        return f'''
+        Motor Position Information:
+        Motor Angle: {self.motor_angle / 10}Degrees
+        Motor Speed: {self.motor_speed}RPM
+        Electrical Output Frequency: {self.electrical_output_frequency / 10}Hz
+        Delta Filter Resolved: {self.delta_filter_resolved / 10}Degrees
+        Commanded Torque: {self.torque_command / 10} Nm
+        '''
+
     def check_can_timeout(self, message: can.Message):
         if not self.last_received_command_message:
             self.last_received_command_message = time.time()
@@ -47,84 +113,115 @@ class DTSSimulator:
                 self.last_received_command_message = time.time()
 
     def update_temperature1(self):
-        module_a_temperature = int(200 + random() * 5.0).to_bytes(2, 'little')
-        module_b_temperature = int(210 + random() * 4.5).to_bytes(2, 'little')
-        module_c_temperature = int(205 + random() * 3.7).to_bytes(2, 'little')
-        gate_driver_board_temperature = int(
-            190 + random() * 6.2).to_bytes(2, 'little')
-        self.temperature1.data = module_a_temperature + module_b_temperature + \
-            module_c_temperature + gate_driver_board_temperature
+        self.module_a_temp = 200 + random() * 5.0
+        self.module_b_temp = 210 + random() * 4.5
+        self.module_c_temp = 205 + random() * 3.7
+        self.gate_driver_board_temp = 190 + random() * 6.2
+        module_a_temp_bytes = int(self.module_a_temp).to_bytes(2, 'little')
+        module_b_temp_bytes = int(self.module_b_temp).to_bytes(2, 'little')
+        module_c_temp_bytes = int(self.module_c_temp).to_bytes(2, 'little')
+        gate_driver_board_temp_bytes = int(self.gate_driver_board_temp).to_bytes(2, 'little')
+        self.temperature1.data = module_a_temp_bytes + module_b_temp_bytes + \
+            module_c_temp_bytes + gate_driver_board_temp_bytes
 
     def update_temperature2(self):
-        control_board_temperature = int(
-            240 + random() * 4.5).to_bytes(2, 'little')
-        rtd_1_temperature = int(230 + random() * 6.3).to_bytes(2, 'little')
-        rtd_2_temperature = int(225 + random() * 3.4).to_bytes(2, 'little')
-        rtd_3_temperature = int(220 + random() * 2.3).to_bytes(2, 'little')
-        self.temperature2.data = control_board_temperature + \
-            rtd_1_temperature + rtd_2_temperature + rtd_3_temperature
+        self.control_board_temp = 240 + random() * 4.5
+        self.rtd_1_temp = 230 + random() * 6.3
+        self.rtd_2_temp = 225 + random() * 3.4
+        self.rtd_3_temp = 220 + random() * 2.3
+        control_board_temp_bytes = int(self.control_board_temp).to_bytes(2, 'little')
+        rtd_1_temp_bytes = int(self.rtd_1_temp).to_bytes(2, 'little')
+        rtd_2_temp_bytes = int(self.rtd_2_temp).to_bytes(2, 'little')
+        rtd_3_temp_bytes = int(self.rtd_3_temp).to_bytes(2, 'little')
+        self.temperature2.data = control_board_temp_bytes + \
+            rtd_1_temp_bytes + rtd_2_temp_bytes + rtd_3_temp_bytes
 
     def update_temperature3(self):
-        rtd_4_temperature = int(203 + random() * 2.1).to_bytes(2, 'little')
-        rtd_5_temperature = int(256 + random() * 3.9).to_bytes(2, 'little')
-        motor_temperature = int(232 + random() * 4.2).to_bytes(2, 'little')
+        self.rtd_4_temp = 203 + random() * 2.1
+        self.rtd_5_temp = 256 + random() * 3.9
+        self.motor_temp = 232 + random() * 4.2
+        rtd_4_temp_bytes = int(self.rtd_4_temp).to_bytes(2, 'little')
+        rtd_5_temp_bytes = int(self.rtd_5_temp).to_bytes(2, 'little')
+        motor_temp_bytes = int(self.motor_temp).to_bytes(2, 'little')
         # TODO once set torque value gets stored
-        torque_shudder = int(0).to_bytes(2, 'little')
-        self.temperature3.data = rtd_4_temperature + \
-            rtd_5_temperature + motor_temperature + torque_shudder
+        torque_shudder_bytes = int(0).to_bytes(2, 'little')
+        self.temperature3.data = rtd_4_temp_bytes + \
+            rtd_5_temp_bytes + motor_temp_bytes + torque_shudder_bytes
 
     def update_analog_input_voltages(self):
-        analog_input_1 = int(120 + random() * 10.4).to_bytes(2, 'little')
-        analog_input_2 = int(200 + random() * 7.1).to_bytes(2, 'little')
-        analog_input_3 = int(178 + random() * 2.3).to_bytes(2, 'little')
-        analog_input_4 = int(153 + random() * 6.6).to_bytes(2, 'little')
-        self.analog_input_voltages.data = analog_input_1 + \
-            analog_input_2 + analog_input_3 + analog_input_4
+        self.analog_input_1 = 120 + random() * 10.4
+        self.analog_input_2 = 200 + random() * 7.1
+        self.analog_input_3 = 178 + random() * 2.3
+        self.analog_input_4 = 153 + random() * 6.6
+        analog_input_1_bytes = int(self.analog_input_1).to_bytes(2, 'little')
+        analog_input_2_bytes = int(self.analog_input_2).to_bytes(2, 'little')
+        analog_input_3_bytes = int(self.analog_input_3).to_bytes(2, 'little')
+        analog_input_4_bytes = int(self.analog_input_4).to_bytes(2, 'little')
+        self.analog_input_voltages.data = analog_input_1_bytes + \
+            analog_input_2_bytes + analog_input_3_bytes + analog_input_4_bytes
 
     def update_digital_input_status(self):
         pass
 
     def update_motor_position_information(self):
-        motor_angle = self.direction_command.to_bytes(2, 'little')
-        motor_speed = (
-            self.speed_command if self.speed_mode_enable else self.torque_command).to_bytes(2, 'little')
-        electrical_output_frequency = int(
-            1000 + random() * 20).to_bytes(2, 'little')
-        delta_filter_resolved = int(900 + random() * 900).to_bytes(2, 'little')
-        self.motor_position_information.data = motor_angle + motor_speed + \
-            electrical_output_frequency + delta_filter_resolved
+        self.motor_angle = self.direction_command
+        self.motor_speed = self.speed_command if self.speed_mode_enable else self.torque_command
+        self.electrical_output_frequency = 1000 + random() * 20
+        self.delta_filter_resolved = 900 + random() * 900
+        motor_angle_bytes = self.direction_command.to_bytes(2, 'little')
+        motor_speed_bytes = (self.motor_speed).to_bytes(2, 'little')
+        electrical_output_frequency_bytes = int(self.electrical_output_frequency).to_bytes(2, 'little')
+        delta_filter_resolved_bytes = int(self.delta_filter_resolved).to_bytes(2, 'little')
+        self.motor_position_information.data = motor_angle_bytes + motor_speed_bytes + \
+            electrical_output_frequency_bytes + delta_filter_resolved_bytes
 
     def update_current_information(self):
-        phase_a_current = int(20 + random() * 5).to_bytes(2, 'little')
-        phase_b_current = int(20 + random() * 5).to_bytes(2, 'little')
-        phase_c_current = int(20 + random() * 5).to_bytes(2, 'little')
-        dc_bus_current = int(15 + random() * 6).to_bytes(2, 'little')
-        self.current_information.data = phase_a_current + \
-            phase_b_current + phase_c_current + dc_bus_current
+        self.phase_a_current = 20 + random() * 5
+        self.phase_b_current = 20 + random() * 5
+        self.phase_c_current = 20 + random() * 5
+        self.dc_bus_current = 15 + random() * 6
+        phase_a_current_bytes = int(self.phase_a_current).to_bytes(2, 'little')
+        phase_b_current_bytes = int(self.phase_b_current).to_bytes(2, 'little')
+        phase_c_current_bytes = int(self.phase_c_current).to_bytes(2, 'little')
+        dc_bus_current_bytes = int(self.dc_bus_current).to_bytes(2, 'little')
+        self.current_information.data = phase_a_current_bytes + \
+            phase_b_current_bytes + phase_c_current_bytes + dc_bus_current_bytes
 
     def update_voltage_information(self):
-        dc_bus_voltage = int(200 + random() * 7.1).to_bytes(2, 'little')
-        output_voltage = int(205 + random() * 5.5).to_bytes(2, 'little')
-        vab_vd_voltage = int(190 + random() * 9.1).to_bytes(2, 'little')
-        vbc_vq_voltage = int(180 + random() * 6.4).to_bytes(2, 'little')
-        self.voltage_information.data = dc_bus_voltage + \
-            output_voltage + vab_vd_voltage + vbc_vq_voltage
+        self.dc_bus_voltage = 200 + random() * 7.1
+        self.output_voltage = 205 + random() * 5.5
+        self.vab_vd_voltage = 190 + random() * 9.1
+        self.vbc_vq_voltage = 180 + random() * 6.4
+        dc_bus_voltage_bytes = int(self.dc_bus_voltage).to_bytes(2, 'little')
+        output_voltage_bytes = int(self.output_voltage).to_bytes(2, 'little')
+        vab_vd_voltage_bytes = int(self.vab_vd_voltage).to_bytes(2, 'little')
+        vbc_vq_voltage_bytes = int(self.vbc_vq_voltage).to_bytes(2, 'little')
+        self.voltage_information.data = dc_bus_voltage_bytes + \
+            output_voltage_bytes + vab_vd_voltage_bytes + vbc_vq_voltage_bytes
 
     def update_flux_information(self):
-        flux_command = int(2 + random() * .64).to_bytes(2, 'little')
-        flux_feedback = int(2 + random() * .64).to_bytes(2, 'little')
-        id_feedback = int(20 + random() * 5).to_bytes(2, 'little')
-        iq_feedback = int(20 + random() * 5).to_bytes(2, 'little')
-        self.flux_information.data = flux_command + \
-            flux_feedback + id_feedback + iq_feedback
+        self.flux_command = 2 + random() * .64
+        self.flux_feedback = 2 + random() * .64
+        self.id_feedback = 20 + random() * 5
+        self.iq_feedback = 20 + random() * 5
+        flux_command_bytes = int(self.flux_command).to_bytes(2, 'little')
+        flux_feedback_bytes = int(self.flux_feedback).to_bytes(2, 'little')
+        id_feedback_bytes = int(self.id_feedback).to_bytes(2, 'little')
+        iq_feedback_bytes = int(self.iq_feedback).to_bytes(2, 'little')
+        self.flux_information.data = flux_command_bytes + \
+            flux_feedback_bytes + id_feedback_bytes + iq_feedback_bytes
 
     def update_internal_voltages(self):
-        one_five_voltage_ref = int(150).to_bytes(2, 'little')
-        two_five_voltage_ref = int(250).to_bytes(2, 'little')
-        five_voltage_ref = int(500).to_bytes(2, 'little')
-        twelve_system_voltage = int(1200).to_bytes(2, 'little')
-        self.internal_voltages.data = one_five_voltage_ref + \
-            two_five_voltage_ref + five_voltage_ref + twelve_system_voltage
+        self.one_five_voltage_ref = 150
+        self.two_five_voltage_ref = 250
+        self.five_voltage_ref = 500
+        self.twelve_system_voltage = 1200
+        one_five_voltage_ref_bytes = int(self.one_five_voltage_ref).to_bytes(2, 'little')
+        two_five_voltage_ref_bytes = int(self.two_five_voltage_ref).to_bytes(2, 'little')
+        five_voltage_ref_bytes = int(self.five_voltage_ref).to_bytes(2, 'little')
+        twelve_system_voltage_bytes = int(self.twelve_system_voltage).to_bytes(2, 'little')
+        self.internal_voltages.data = one_five_voltage_ref_bytes + \
+            two_five_voltage_ref_bytes + five_voltage_ref_bytes + twelve_system_voltage_bytes
 
     def update_internal_states(self):
         pass
@@ -133,10 +230,11 @@ class DTSSimulator:
         pass
 
     def update_torque_timer_information(self):
-        commanded_torque = int(self.torque_command).to_bytes(2, 'little')
-        torque_feedback = int(self.torque_command).to_bytes(2, 'little')
-        power_on_timer = int(time.time() * 0.03).to_bytes(4, 'little')
-        self.internal_states.data = commanded_torque + torque_feedback + power_on_timer
+        self.power_on_timer = time.time() * 0.03
+        commanded_torque_bytes = int(self.torque_command).to_bytes(2, 'little')
+        torque_feedback_bytes = int(self.torque_command).to_bytes(2, 'little')
+        power_on_timer_bytes = int(self.power_on_timer).to_bytes(4, 'little')
+        self.internal_states.data = commanded_torque_bytes + torque_feedback_bytes + power_on_timer_bytes
 
     def update_modulation_index(self):
         pass
@@ -185,6 +283,8 @@ def run_simulation(bus_name: str):
     while True:
         message = sim.bus.recv(0.1)
         sim.check_can_timeout(message)
+        if message.arbitration_id == 192:
+            sim.read_configuration_message(message)
         sim.update_temperature1()
         sim.update_temperature2()
         sim.update_temperature3()
