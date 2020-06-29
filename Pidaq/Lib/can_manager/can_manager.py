@@ -64,10 +64,6 @@ class CanManager:
                     reading['reading'],
                     reading['conversion_factor'],
                 )
-<<<<<<< HEAD
-=======
-                self.message_ids.append(reading['message_id'])
->>>>>>> Bug fixes to get interface to begin sucessfully receving messages from the simulator
 
     def send_message(self, id: int, data: list) -> None:
         if id in self.messages.keys():
@@ -89,15 +85,9 @@ class CanManager:
         Parameters:
             bus_message(can.Message)
         """
-<<<<<<< HEAD
         message_id = bus_message.arbitration_id
         if message_id in self.messages.keys():
             self.messages[message_id].data = bus_message.data
-=======
-        message_id = hex(bus_message.arbitration_id)
-        if message_id in self.message_ids:
-            self.messages[message_id].data = bytes(bus_message.data)
->>>>>>> Bug fixes to get interface to begin sucessfully receving messages from the simulator
 
 
 class SensorReading:
@@ -114,15 +104,9 @@ class SensorReading:
         data (int or float)
     """
 
-<<<<<<< HEAD
     def __init__(self, message_id: str, reading: str,
                  conversion_factor) -> None:
         self.message_id = message_id
-=======
-    def __init__(self, project: str, message_id: str, reading: str,
-                 conversion_factor) -> None:
-        self.message_id = int(message_id, 16)
->>>>>>> Bug fixes to get interface to begin sucessfully receving messages from the simulator
         self.reading = reading
         self.conversion_factor = conversion_factor
         self.data = None
@@ -137,11 +121,7 @@ if __name__ == "__main__":
     bus.read_message_config('dts', 'example_message_config.json')
 
     # Print SensorReading objects
-<<<<<<< HEAD
     for id, message in bus.messages.items():
-=======
-    for message in bus.messages:
->>>>>>> Bug fixes to get interface to begin sucessfully receving messages from the simulator
         print(
             f'Message id: {message.message_id}    Reading: {message.reading}    Conversion Factor: {message.conversion_factor}')
 
