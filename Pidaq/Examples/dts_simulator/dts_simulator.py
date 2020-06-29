@@ -7,11 +7,12 @@ import can
 
 from can_manager import can_manager
 
+
 class DTSSimulator:
 
     def __init__(self, bus_name: str):
         # Configure bus
-        self.can_bus =  can_manager.CanManager(bus_name) 
+        self.can_bus = can_manager.CanManager(bus_name)
 
         # Configure messages
         self.temperature1 = can.Message(arbitration_id=160, dlc=8)
@@ -49,6 +50,7 @@ class DTSSimulator:
         {self.display_motor_info()}
         '''
     # TODO Store integer values in class instead of byte objects for easier printing
+
     def display_temps(self):
         return f'''
         Current Temperature Status:
@@ -81,7 +83,7 @@ class DTSSimulator:
         VAB_Vd Voltage: {self.vab_vd_voltage / 10}V
         VBC_Vq Voltage: {self.vbc_vq_voltage / 10}V
         '''
-    
+
     def display_currents(self):
         return f'''
         Current Status:
@@ -100,7 +102,7 @@ class DTSSimulator:
         Motor Speed: {self.motor_speed}RPM
         Electrical Output Frequency: {self.electrical_output_frequency / 10}Hz
         Delta Filter Resolved: {self.delta_filter_resolved / 10}Degrees
-        Commanded Torque: {self.torque_command / 10} Nm
+        Commanded Torque: {self.torque_command} Nm
         '''
 
     def check_can_timeout(self, message: can.Message):
@@ -120,7 +122,8 @@ class DTSSimulator:
         module_a_temp_bytes = int(self.module_a_temp).to_bytes(2, 'little')
         module_b_temp_bytes = int(self.module_b_temp).to_bytes(2, 'little')
         module_c_temp_bytes = int(self.module_c_temp).to_bytes(2, 'little')
-        gate_driver_board_temp_bytes = int(self.gate_driver_board_temp).to_bytes(2, 'little')
+        gate_driver_board_temp_bytes = int(
+            self.gate_driver_board_temp).to_bytes(2, 'little')
         self.temperature1.data = module_a_temp_bytes + module_b_temp_bytes + \
             module_c_temp_bytes + gate_driver_board_temp_bytes
 
@@ -129,7 +132,8 @@ class DTSSimulator:
         self.rtd_1_temp = 230 + random() * 6.3
         self.rtd_2_temp = 225 + random() * 3.4
         self.rtd_3_temp = 220 + random() * 2.3
-        control_board_temp_bytes = int(self.control_board_temp).to_bytes(2, 'little')
+        control_board_temp_bytes = int(
+            self.control_board_temp).to_bytes(2, 'little')
         rtd_1_temp_bytes = int(self.rtd_1_temp).to_bytes(2, 'little')
         rtd_2_temp_bytes = int(self.rtd_2_temp).to_bytes(2, 'little')
         rtd_3_temp_bytes = int(self.rtd_3_temp).to_bytes(2, 'little')
@@ -164,14 +168,17 @@ class DTSSimulator:
         pass
 
     def update_motor_position_information(self):
-        self.motor_angle = self.direction_command
-        self.motor_speed = self.speed_command if self.speed_mode_enable else self.torque_command
+        self.motor_angle = self.direction_command * 10
+        self.motor_speed = (
+            self.speed_command if self.speed_mode_enable else self.torque_command)
         self.electrical_output_frequency = 1000 + random() * 20
         self.delta_filter_resolved = 900 + random() * 900
         motor_angle_bytes = self.direction_command.to_bytes(2, 'little')
-        motor_speed_bytes = (self.motor_speed).to_bytes(2, 'little')
-        electrical_output_frequency_bytes = int(self.electrical_output_frequency).to_bytes(2, 'little')
-        delta_filter_resolved_bytes = int(self.delta_filter_resolved).to_bytes(2, 'little')
+        motor_speed_bytes = int(self.motor_speed * 10).to_bytes(2, 'little')
+        electrical_output_frequency_bytes = int(
+            self.electrical_output_frequency).to_bytes(2, 'little')
+        delta_filter_resolved_bytes = int(
+            self.delta_filter_resolved).to_bytes(2, 'little')
         self.motor_position_information.data = motor_angle_bytes + motor_speed_bytes + \
             electrical_output_frequency_bytes + delta_filter_resolved_bytes
 
@@ -216,10 +223,14 @@ class DTSSimulator:
         self.two_five_voltage_ref = 250
         self.five_voltage_ref = 500
         self.twelve_system_voltage = 1200
-        one_five_voltage_ref_bytes = int(self.one_five_voltage_ref).to_bytes(2, 'little')
-        two_five_voltage_ref_bytes = int(self.two_five_voltage_ref).to_bytes(2, 'little')
-        five_voltage_ref_bytes = int(self.five_voltage_ref).to_bytes(2, 'little')
-        twelve_system_voltage_bytes = int(self.twelve_system_voltage).to_bytes(2, 'little')
+        one_five_voltage_ref_bytes = int(
+            self.one_five_voltage_ref).to_bytes(2, 'little')
+        two_five_voltage_ref_bytes = int(
+            self.two_five_voltage_ref).to_bytes(2, 'little')
+        five_voltage_ref_bytes = int(
+            self.five_voltage_ref).to_bytes(2, 'little')
+        twelve_system_voltage_bytes = int(
+            self.twelve_system_voltage).to_bytes(2, 'little')
         self.internal_voltages.data = one_five_voltage_ref_bytes + \
             two_five_voltage_ref_bytes + five_voltage_ref_bytes + twelve_system_voltage_bytes
 
@@ -231,10 +242,13 @@ class DTSSimulator:
 
     def update_torque_timer_information(self):
         self.power_on_timer = time.time() * 0.03
-        commanded_torque_bytes = int(self.torque_command).to_bytes(2, 'little')
-        torque_feedback_bytes = int(self.torque_command).to_bytes(2, 'little')
+        commanded_torque_bytes = int(
+            self.torque_command * 10).to_bytes(2, 'little')
+        torque_feedback_bytes = int(
+            self.torque_command * 10).to_bytes(2, 'little')
         power_on_timer_bytes = int(self.power_on_timer).to_bytes(4, 'little')
-        self.internal_states.data = commanded_torque_bytes + torque_feedback_bytes + power_on_timer_bytes
+        self.internal_states.data = commanded_torque_bytes + \
+            torque_feedback_bytes + power_on_timer_bytes
 
     def update_modulation_index(self):
         pass
@@ -243,13 +257,16 @@ class DTSSimulator:
         BIT_1 = 1
         BIT_2 = 2
         BIT_3 = 4
-        self.torque_command = message.data[1] + message.data[0]
-        self.speed_command = message.data[3] + message.data[2]
-        self.direction_command = message.data[4]
+        self.torque_command = int.from_bytes(
+            message.data[:2], byteorder='little', signed=True) / 10
+        self.speed_command = int.from_bytes(
+            message.data[2:4], byteorder='little', signed=True) / 10
+        self.direction_command = bool(message.data[4])
         self.inverter_enable = message.data[5] & BIT_1
         self.inverter_discharge = message.data[5] & BIT_2
         self.speed_mode_enable = message.data[5] & BIT_3
-        self.commanded_torque_limit = message.data[7] + message.data[6]
+        self.commanded_torque_limit = int.from_bytes(
+            message.data[6:], byteorder='little', signed=True) / 10
 
     def send_information_messages_10hz(self):
         time.sleep(1 / 10)
@@ -276,15 +293,16 @@ def run_simulation(bus_name: str):
     sim = DTSSimulator(bus_name)
     simulator_configured = False
     while simulator_configured == False:
-        message = sim.bus.recv()
+        message = sim.can_bus.bus.recv()
         if message.arbitration_id == 192:
             sim.read_configuration_message(message)
             simulator_configured = True
     while True:
-        message = sim.bus.recv(0.1)
-        sim.check_can_timeout(message)
-        if message.arbitration_id == 192:
-            sim.read_configuration_message(message)
+        message = sim.can_bus.bus.recv(0.1)
+        if message is not None:
+            sim.check_can_timeout(message)
+            if message.arbitration_id == 192:
+                sim.read_configuration_message(message)
         sim.update_temperature1()
         sim.update_temperature2()
         sim.update_temperature3()

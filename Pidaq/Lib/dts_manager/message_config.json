@@ -28,7 +28,8 @@
             },
             {
                 "reading": "motorPositionInformation",
-                "message_id": 165
+                "message_id": 165,
+                "conversion_factor": 0
             },
             {
                 "reading": "currentInformation",
@@ -43,7 +44,10 @@
             {
                 "reading": "fluxInformation",
                 "message_id": 168,
-                "conversion_factor": { "flux": 1000, "current": 10 }
+                "conversion_factor": {
+                    "flux": 1000,
+                    "current": 10
+                }
             },
             {
                 "reading": "internalVoltages",
@@ -52,11 +56,13 @@
             },
             {
                 "reading": "internalStates",
-                "message_id": 170
+                "message_id": 170,
+                "conversion_factor": 0
             },
             {
                 "reading": "faultCodes",
-                "message_id": 171
+                "message_id": 171,
+                "conversion_factor": 0
             },
             {
                 "reading": "torque&timerInformation",
