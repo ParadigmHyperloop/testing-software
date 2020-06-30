@@ -127,6 +127,7 @@ class DTSTelemetry():
         convert_torques(self)
         convert_temperatures(self)
     '''
+
     def __init__(self, bus: can_manager.CanManager):
         ''' Takes reference to a CanManager instance to be used for receiving can messages'''
         self.bus = bus

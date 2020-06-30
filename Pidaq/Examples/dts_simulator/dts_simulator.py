@@ -18,7 +18,7 @@ class DTSSimulator:
     Fields:
         See methods, too many to list here, but all are data that the real inverter
         sends through CAN messages
-    
+
     Methods:
         check_can_timeout(self, message)
         display_currents(self)
@@ -43,6 +43,7 @@ class DTSSimulator:
         update_torque_timer_information(self)
         update_voltage_information(self)
     '''
+
     def __init__(self, bus_name: str):
         # Configure bus
         self.can_bus = can_manager.CanManager(bus_name)
@@ -154,14 +155,18 @@ class DTSSimulator:
                    self.iq_feedback / 10)
 
     def display_motor_info(self):
-        return f'''
+        return '''
         Motor Position Information:
-        Motor Angle: {self.motor_angle / 10}Degrees
-        Motor Speed: {self.motor_speed}RPM
-        Electrical Output Frequency: {self.electrical_output_frequency / 10}Hz
-        Delta Filter Resolved: {self.delta_filter_resolved / 10}Degrees
-        Commanded Torque: {self.torque_command} Nm
-        '''
+        Motor Angle: {:.2f}Degrees
+        Motor Speed: {:.2f}RPM
+        Electrical Output Frequency: {:.2f}Hz
+        Delta Filter Resolved: {:.2f}Degrees
+        Commanded Torque: {:.2f} Nm
+        '''.format(self.motor_angle / 10,
+                   self.motor_speed,
+                   self.electrical_output_frequency / 10,
+                   self.delta_filter_resolved / 10,
+                   self.torque_command)
 
     def check_can_timeout(self, message: can.Message):
         if not self.last_received_command_message:
