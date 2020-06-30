@@ -4,26 +4,45 @@ from can_manager import can_manager
 
 
 class InverterMode(Enum):
+    ''' Used to indicate the desired inverter mode'''
     Torque = 0
     Speed = 1
 
 
 class InverterDirection(Enum):
+    ''' Used to indicate the desired inverter direction'''
     Reverse = 0
     Forward = 1
 
 
 class InverterEnable(Enum):
+    ''' Used to indicate whether or not the inverter is to be enabled'''
     Inverter_Off = 0
     Inverter_On = 1
 
 
 class InverterDischarge(Enum):
+    ''' Used to indicate whether or not the inverter is discharging'''
     Disable = 0
     Enable = 1
 
 
 class MotorConfig():
+    ''' Structure to hold motor configuration info to be sent in config message
+
+    Fields:
+        torque_command (float): The desired motor torque
+        speed_command (float): The desired motor speed
+        direction (InverterDirection)
+        inverter_enable (InverterEnable)
+        inverter_discharge (InverterDischarge)
+        mode (InverterMode): The desired inverter mode, whichever mode is not selected, the
+                             respective command will be set to 0
+        commanded_torque_limit (float): torque that the motor will not exceed,
+                                        defaults to 0, which will read default
+                                        torque limit from EEPROM
+    '''
+
     def __init__(self, command: float, direction: InverterDirection, enable: InverterEnable,
                  discharge: InverterDischarge, mode: InverterMode, commanded_torque_limit: float = 0):
         self.torque_command = command if mode == InverterMode.Torque else 0
@@ -36,11 +55,34 @@ class MotorConfig():
 
 
 class DTSControl():
+    ''' Handles control aspects of DTS motor/inverter
+
+    Fields:
+        bus (can_manager.CanManager): instance of CanManager to communicate with Can bus
+        torque_command (int)
+        speed_command (int)
+        direction_command (int)
+        inverter_enable (int)
+        inverter_discharge (int)
+        speed_mode_enable (int)
+        mode (int)
+        commanded_torque_limit (int)
+
+    Methods:
+        configure_motor(self, configuration: MotorConfig) -> None:
+            When given a MotorConfig object, this method reads all the properties,
+            converts them to bytes which can then be sent in the command message
+
+        send_motor_command(self):
+            Sends motor command over the can bus with the correct message ID to be interpreted
+            by the DTS inverter
+    '''
 
     def __init__(self, bus: can_manager.CanManager):
         self.bus = bus
 
     def configure_motor(self, configuration: MotorConfig) -> None:
+        ''' Configures the motor configuration message'''
         self.torque_command = int(
             configuration.torque_command * 10).to_bytes(2, 'little')
         # Extract commands from dict
@@ -57,14 +99,36 @@ class DTSControl():
             configuration.commanded_torque_limit * 10).to_bytes(2, 'little')
 
     def send_motor_command(self) -> None:
+        ''' Send motor command over the can bus
+
+        Note: This method should not be called until after the configure_motor method has been called
+              at least once to configure a command message.
+        '''
         command_list = self.torque_command + self.speed_command + \
             self.direction_command + self.mode + self.commanded_torque_limit
         self.bus.send_message(192, command_list)
 
 
 class DTSTelemetry():
+    ''' Handles the telemetry and data acquisition from the DTS motor/inverter
 
+    Fields:
+        See __init__ for fields, all possible data fields are stored within the class
+
+    Methods:
+    Note: each method converts a different set of data, depending on the conversion factor
+          defined in the CAN message format manual for the inverter
+
+        convert_angles(self)
+        convert_booleans(self)
+        convert_currents(self)
+        convert_high_voltages(self)
+        convert_low_voltages(self)
+        convert_torques(self)
+        convert_temperatures(self)
+    '''
     def __init__(self, bus: can_manager.CanManager):
+        ''' Takes reference to a CanManager instance to be used for receiving can messages'''
         self.bus = bus
         self.module_a_temperature = None
         self.module_b_temperature = None
@@ -221,7 +285,7 @@ if __name__ == "__main__":
     bus = can_manager.CanManager('vcan0')
     control = DTSControl(bus)
     telemetry = DTSTelemetry(bus)
-    telemetry.bus.read_message_config('dts', 'message_config.json')
+    bus.read_message_config('dts', 'message_config.json')
 
     motorConfiguration = MotorConfig(200, InverterDirection.Forward, InverterEnable.Inverter_On,
                                      InverterDischarge.Enable, InverterMode.Torque, 400)

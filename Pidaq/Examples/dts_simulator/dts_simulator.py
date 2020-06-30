@@ -9,7 +9,40 @@ from can_manager import can_manager
 
 
 class DTSSimulator:
+    ''' Class for simulating the behaviour of the DTS motor/inverter
 
+    The majority of the data sent over the can bus contains spoofed data, however
+    the simulator is able to correctly interpret command messages, and send back the correct
+    data based on the command message received.
+
+    Fields:
+        See methods, too many to list here, but all are data that the real inverter
+        sends through CAN messages
+    
+    Methods:
+        check_can_timeout(self, message)
+        display_currents(self)
+        display_motor_info(self)
+        display_temps(self)
+        display_voltages(self)
+        read_configuration_message(self)
+        send_information_messages_10Hz(self)
+        send_information_messages_100Hz(self)
+        update_analog_input_voltages(self)
+        update_current_information(self)
+        update_digital_input_status(self) - To be defined
+        update_fault_codes(self) - To be defined
+        update_flux_information(self)
+        update_internal_states(self) - To be defined
+        update_internal_voltages(self)
+        update_modulation_index(self) - To be defined
+        update_motor_position_information(self)
+        update_temperature1(self)
+        update_temperature2(self)
+        update_temperature3(self)
+        update_torque_timer_information(self)
+        update_voltage_information(self)
+    '''
     def __init__(self, bus_name: str):
         # Configure bus
         self.can_bus = can_manager.CanManager(bus_name)
@@ -49,51 +82,76 @@ class DTSSimulator:
 
         {self.display_motor_info()}
         '''
-    # TODO Store integer values in class instead of byte objects for easier printing
 
     def display_temps(self):
-        return f'''
+        return '''
         Current Temperature Status:
-        Module A Temperature: {self.module_a_temp / 10}
-        Module B Temperature: {self.module_b_temp / 10}
-        Module C Temperature: {self.module_c_temp / 10}
-        Gate Driver Board Temperature: {self.gate_driver_board_temp / 10}
-        Control Board Temperature: {self.control_board_temp / 10}
-        RTD 1 Temperature: {self.rtd_1_temp / 10}
-        RTD 2 Temperature: {self.rtd_2_temp / 10}
-        RTD 3 Temperature: {self.rtd_4_temp / 10}
-        RTD 4 Temperature: {self.rtd_4_temp / 10}
-        RTD 5 Temperature: {self.rtd_5_temp / 10}
-        Motor Temperature: {self.motor_temp / 10}
-        '''
+        Module A Temperature: {:.2f}
+        Module B Temperature: {:.2f}
+        Module C Temperature: {:.2f}
+        Gate Driver Board Temperature: {:.2f}
+        Control Board Temperature: {:.2f}
+        RTD 1 Temperature: {:.2f}
+        RTD 2 Temperature: {:.2f}
+        RTD 3 Temperature: {:.2f}
+        RTD 4 Temperature: {:.2f}
+        RTD 5 Temperature: {:.2f}
+        Motor Temperature: {:.2f}
+        '''.format(self.module_a_temp / 10,
+                   self.module_b_temp / 10,
+                   self.module_c_temp / 10,
+                   self.gate_driver_board_temp / 10,
+                   self.control_board_temp / 10,
+                   self.rtd_1_temp / 10,
+                   self.rtd_2_temp / 10,
+                   self.rtd_4_temp / 10,
+                   self.rtd_4_temp / 10,
+                   self.rtd_5_temp / 10,
+                   self.motor_temp / 10)
 
     def display_voltages(self):
-        return f'''
+        return '''
         Current Voltage Status:
-        Analog Input 1 Voltage: {self.analog_input_1 / 100}V
-        Analog Input 2 Voltage: {self.analog_input_2 / 100}V
-        Analog Input 3 Voltage: {self.analog_input_3 / 100}V
-        Analog Input 4 Voltage: {self.analog_input_4 / 100}V
-        1.5V Reference Voltage: {self.one_five_voltage_ref / 100}V
-        2.5V Reference Voltage: {self.two_five_voltage_ref / 100}V
-        5.0V Reference Voltage: {self.five_voltage_ref / 100}V
-        12V System Voltage: {self.twelve_system_voltage / 100}V
-        DC Bus Voltage: {self.dc_bus_voltage / 10}V
-        Output Voltage: {self.output_voltage / 10}V
-        VAB_Vd Voltage: {self.vab_vd_voltage / 10}V
-        VBC_Vq Voltage: {self.vbc_vq_voltage / 10}V
-        '''
+        Analog Input 1 Voltage: {:.2f}V
+        Analog Input 2 Voltage: {:.2f}V
+        Analog Input 3 Voltage: {:.2f}V
+        Analog Input 4 Voltage: {:.2f}V
+        1.5V Reference Voltage: {:.2f}V
+        2.5V Reference Voltage: {:.2f}V
+        5.0V Reference Voltage: {:.2f}V
+        12V System Voltage: {:.2f}V
+        DC Bus Voltage: {:.2f}V
+        Output Voltage: {:.2f}V
+        VAB_Vd Voltage: {:.2f}V
+        VBC_Vq Voltage: {:.2f}V
+        '''.format(self.analog_input_1 / 100,
+                   self.analog_input_2 / 100,
+                   self.analog_input_3 / 100,
+                   self.analog_input_4 / 100,
+                   self.one_five_voltage_ref / 100,
+                   self.two_five_voltage_ref / 100,
+                   self.five_voltage_ref / 100,
+                   self.twelve_system_voltage / 100,
+                   self.dc_bus_voltage / 10,
+                   self.output_voltage / 10,
+                   self.vab_vd_voltage / 10,
+                   self.vbc_vq_voltage / 10)
 
     def display_currents(self):
-        return f'''
+        return '''
         Current Status:
-        Phase A Current: {self.phase_a_current / 10}A
-        Phase B Current: {self.phase_b_current / 10}A
-        Phase C Current: {self.phase_c_current / 10}A
-        DC Bus Current: {self.dc_bus_current / 10}A
-        Id Feedback Current: {self.id_feedback / 10}A
-        Iq Feedback Current: {self.iq_feedback / 10}A
-        '''
+        Phase A Current: {:.2f}A
+        Phase B Current: {:.2f}A
+        Phase C Current: {:.2f}A
+        DC Bus Current: {:.2f}A
+        Id Feedback Current: {:.2f}A
+        Iq Feedback Current: {:.2f}A
+        '''.format(self.phase_a_current / 10,
+                   self.phase_b_current / 10,
+                   self.phase_c_current / 10,
+                   self.dc_bus_current / 10,
+                   self.id_feedback / 10,
+                   self.iq_feedback / 10)
 
     def display_motor_info(self):
         return f'''
