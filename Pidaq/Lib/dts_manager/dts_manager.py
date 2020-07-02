@@ -231,128 +231,128 @@ class DTS():
             self.torque_timer_id = self.default_can_offset + 12
             self.modulation_index_id = self.default_can_offset + 13
 
-        def get_temp1_data(self):
-            return self.bus.messages[self.temp1_id].data
+        def get_temp1_data(self, start=0, stop=8):
+            return self.bus.messages[self.temp1_id].data[start:stop]
 
-        def get_temp2_data(self):
-            return self.bus.messages[self.temp2_id].data
+        def get_temp2_data(self, start=0, stop=8):
+            return self.bus.messages[self.temp2_id].data[start:stop]
 
-        def get_temp3_data(self):
-            return self.bus.messages[self.temp3_id].data
+        def get_temp3_data(self, start=0, stop=8):
+            return self.bus.messages[self.temp3_id].data[start:stop]
 
-        def get_analog_input_voltages_data(self):
-            return self.bus.messages[self.analog_inputs_id].data
+        def get_analog_input_voltages_data(self, start=0, stop=8):
+            return self.bus.messages[self.analog_inputs_id].data[start:stop]
 
-        def get_digital_input_status_data(self):
-            return self.bus.messages[self.digital_input_status_id].data
+        def get_digital_input_status_data(self, start=0, stop=8):
+            return self.bus.messages[self.digital_input_status_id].data[start:stop]
 
-        def get_motor_position_data(self):
-            return self.bus.messages[self.motor_position_id].data
+        def get_motor_position_data(self, start=0, stop=8):
+            return self.bus.messages[self.motor_position_id].data[start:stop]
 
-        def get_current_data(self):
-            return self.bus.messages[self.current_info_id].data
+        def get_current_data(self, start=0, stop=8):
+            return self.bus.messages[self.current_info_id].data[start:stop]
 
-        def get_voltage_data(self):
-            return self.bus.messages[self.voltage_info_id].data
+        def get_voltage_data(self, start=0, stop=8):
+            return self.bus.messages[self.voltage_info_id].data[start:stop]
 
-        def get_flux_data(self):
-            return self.bus.messages[self.flux_info_id].data
+        def get_flux_data(self, start=0, stop=8):
+            return self.bus.messages[self.flux_info_id].data[start:stop]
 
-        def get_internal_voltages_data(self):
-            return self.bus.messages[self.internal_voltages_id].data
+        def get_internal_voltages_data(self, start=0, stop=8):
+            return self.bus.messages[self.internal_voltages_id].data[start:stop]
 
-        def get_internal_states_data(self):
-            return self.bus.messages[self.internal_states_id].data
+        def get_internal_states_data(self, start=0, stop=8):
+            return self.bus.messages[self.internal_states_id].data[start:stop]
 
-        def get_faults_data(self):
-            return self.bus.messages[self.fault_codes_id].data
+        def get_faults_data(self, start=0, stop=8):
+            return self.bus.messages[self.fault_codes_id].data[start:stop]
 
-        def get_torque_timer_data(self):
-            return self.bus.messages[self.torque_timer_id].data
+        def get_torque_timer_data(self, start=0, stop=8):
+            return self.bus.messages[self.torque_timer_id].data[start:stop]
 
-        def get_modulation_index_data(self):
-            return self.bus.messages[self.modulation_index_id].data
+        def get_modulation_index_data(self, start=0, stop=8):
+            return self.bus.messages[self.modulation_index_id].data[start:stop]
 
         def convert_temperatures(self) -> None:
             if self.get_temp1_data():
                 self.module_a_temperature = int.from_bytes(
-                    self.get_temp1_data()[0:2], byteorder='little', signed=True) / 10
+                    self.get_temp1_data(0, 2), byteorder='little', signed=True) / 10
                 self.module_b_temperature = int.from_bytes(
-                    self.get_temp1_data()[2:4], byteorder='little', signed=True) / 10
+                    self.get_temp1_data(2, 4), byteorder='little', signed=True) / 10
                 self.module_c_temperature = int.from_bytes(
-                    self.get_temp1_data()[4:6], byteorder='little', signed=True) / 10
+                    self.get_temp1_data(4, 6), byteorder='little', signed=True) / 10
                 self.gate_driver_board_temperature = int.from_bytes(
-                    self.get_temp1_data()[6:], byteorder='little', signed=True) / 10
+                    self.get_temp1_data(6, 8), byteorder='little', signed=True) / 10
             if self.get_temp2_data():
                 self.control_board_temperature = int.from_bytes(
-                    self.get_temp2_data()[0:2], byteorder='little', signed=True) / 10
+                    self.get_temp2_data(0, 2), byteorder='little', signed=True) / 10
                 self.rtd_1_temperature = int.from_bytes(
-                    self.get_temp2_data()[2:4], byteorder='little', signed=True) / 10
+                    self.get_temp2_data(2, 4), byteorder='little', signed=True) / 10
                 self.rtd_2_temperature = int.from_bytes(
-                    self.get_temp2_data()[4:6], byteorder='little', signed=True) / 10
+                    self.get_temp2_data(4, 6), byteorder='little', signed=True) / 10
                 self.rtd_3_temperature = int.from_bytes(
-                    self.get_temp2_data()[6:], byteorder='little', signed=True) / 10
+                    self.get_temp2_data(6, 8), byteorder='little', signed=True) / 10
             if self.get_temp3_data():
                 self.rtd_4_temperature = int.from_bytes(
-                    self.get_temp3_data()[0:2], byteorder='little', signed=True) / 10
+                    self.get_temp3_data(0, 2), byteorder='little', signed=True) / 10
                 self.rtd_5_temperature = int.from_bytes(
-                    self.get_temp3_data()[2:4], byteorder='little', signed=True) / 10
+                    self.get_temp3_data(2, 4), byteorder='little', signed=True) / 10
                 self.motor_temperature = int.from_bytes(
-                    self.get_temp3_data()[4:6], byteorder='little', signed=True) / 10
+                    self.get_temp3_data(4, 6), byteorder='little', signed=True) / 10
 
         def convert_low_voltages(self) -> None:
             if self.get_analog_input_voltages_data():
                 self.analog_input_1 = int.from_bytes(
-                    self.get_analog_input_voltages_data()[0:2], byteorder='little', signed=True) / 100
+                    self.get_analog_input_voltages_data(0, 2), byteorder='little', signed=True) / 100
                 self.analog_input_2 = int.from_bytes(
-                    self.get_analog_input_voltages_data()[2:4], byteorder='little', signed=True) / 100
+                    self.get_analog_input_voltages_data(2, 4), byteorder='little', signed=True) / 100
                 self.analog_input_3 = int.from_bytes(
-                    self.get_analog_input_voltages_data()[4:6], byteorder='little', signed=True) / 100
+                    self.get_analog_input_voltages_data(4, 6), byteorder='little', signed=True) / 100
                 self.analog_input_4 = int.from_bytes(
-                    self.get_analog_input_voltages_data()[6:], byteorder='little', signed=True) / 100
+                    self.get_analog_input_voltages_data(6, 8), byteorder='little', signed=True) / 100
             if self.get_internal_voltages_data():
                 self.one_five_voltage_ref = int.from_bytes(
-                    self.get_internal_voltages_data()[0:2], byteorder='little', signed=True) / 100
+                    self.get_internal_voltages_data(0, 2), byteorder='little', signed=True) / 100
                 self.two_five_voltage_ref = int.from_bytes(
-                    self.get_internal_voltages_data()[2:4], byteorder='little', signed=True) / 100
+                    self.get_internal_voltages_data(2, 4), byteorder='little', signed=True) / 100
                 self.five_voltage_ref = int.from_bytes(
-                    self.get_internal_voltages_data()[4:6], byteorder='little', signed=True) / 100
+                    self.get_internal_voltages_data(4, 6), byteorder='little', signed=True) / 100
                 self.twelve_system_voltage = int.from_bytes(
-                    self.get_internal_voltages_data()[6:], byteorder='little', signed=True) / 100
+                    self.get_internal_voltages_data(6, 8), byteorder='little', signed=True) / 100
 
         def convert_high_voltages(self) -> None:
             if self.get_voltage_data():
                 self.dc_bus_voltage = int.from_bytes(
-                    self.get_voltage_data()[0:2], byteorder='little', signed=True) / 10
+                    self.get_voltage_data(0, 2), byteorder='little', signed=True) / 10
                 self.output_voltage = int.from_bytes(
-                    self.get_voltage_data()[2:4], byteorder='little', signed=True) / 10
+                    self.get_voltage_data(2, 4), byteorder='little', signed=True) / 10
                 self.vab_vd_voltage = int.from_bytes(
-                    self.get_voltage_data()[4:6], byteorder='little', signed=True) / 10
+                    self.get_voltage_data(4, 6), byteorder='little', signed=True) / 10
                 self.vbc_vq_voltage = int.from_bytes(
-                    self.get_voltage_data()[6:], byteorder='little', signed=True) / 10
+                    self.get_voltage_data(6, 8), byteorder='little', signed=True) / 10
 
         def convert_currents(self) -> None:
             if self.get_current_data():
                 self.phase_a_current = int.from_bytes(
-                    self.get_current_data()[0:2], byteorder='little', signed=True) / 10
+                    self.get_current_data(0, 2), byteorder='little', signed=True) / 10
                 self.phase_b_current = int.from_bytes(
-                    self.get_current_data()[2:4], byteorder='little', signed=True) / 10
+                    self.get_current_data(2, 4), byteorder='little', signed=True) / 10
                 self.phase_c_current = int.from_bytes(
-                    self.get_current_data()[4:6], byteorder='little', signed=True) / 10
+                    self.get_current_data(4,6), byteorder='little', signed=True) / 10
                 self.dc_bus_current = int.from_bytes(
-                    self.get_current_data()[6:], byteorder='little', signed=True) / 10
+                    self.get_current_data(6, 8), byteorder='little', signed=True) / 10
             if self.get_flux_data():
                 self.id_feedback = int.from_bytes(
-                    self.get_flux_data()[4:6], byteorder='little', signed=True) / 10
+                    self.get_flux_data(4, 6), byteorder='little', signed=True) / 10
                 self.iq_feedback = int.from_bytes(
-                    self.get_flux_data()[6:], byteorder='little', signed=True) / 10
+                    self.get_flux_data(6, 8), byteorder='little', signed=True) / 10
 
         def convert_angles(self) -> None:
             if self.get_motor_position_data():
                 self.motor_angle = int.from_bytes(
-                    self.get_motor_position_data(), byteorder='little', signed=True) / 10
+                    self.get_motor_position_data(0, 2), byteorder='little', signed=True) / 10
                 self.delta_filter_resolved = int.from_bytes(
-                    self.get_motor_position_data(), byteorder='little', signed=True) / 10
+                    self.get_motor_position_data(6, 8), byteorder='little', signed=True) / 10
 
         def convert_booleans(self) -> None:
             BIT_0 = 1 << 0
@@ -365,7 +365,7 @@ class DTS():
             BIT_7 = 1 << 7
             if self.get_digital_input_status_data():
                 digital_input_status = int.from_bytes(
-                    self.get_digital_input_status_data()[0:], byteorder='little', signed=False)
+                    self.get_digital_input_status_data(), byteorder='little', signed=False)
                 self.digital_input_1 = bool(digital_input_status & BIT_0)
                 self.digital_input_2 = bool(digital_input_status & BIT_1)
                 self.digital_input_3 = bool(digital_input_status & BIT_2)
@@ -378,12 +378,12 @@ class DTS():
         def convert_torques(self) -> None:
             if self.get_temp3_data():
                 self.torque_shudder = int.from_bytes(
-                    self.get_temp3_data()[6:], byteorder='little', signed=True) / 10
+                    self.get_temp3_data(6, 8), byteorder='little', signed=True) / 10
             if self.get_torque_timer_data():
                 self.commanded_torque = int.from_bytes(
-                    self.get_torque_timer_data()[0:2], byteorder='little', signed=True) / 10
+                    self.get_torque_timer_data(0, 2), byteorder='little', signed=True) / 10
                 self.torque_feedback = int.from_bytes(
-                    self.get_torque_timer_data()[2:4], byteorder='little', signed=True) / 10
+                    self.get_torque_timer_data(2, 4), byteorder='little', signed=True) / 10
 
 
 if __name__ == "__main__":
