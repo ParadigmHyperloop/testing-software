@@ -68,6 +68,7 @@ class MotorCommand():
         self.duration = duration
 
 
+
 class DTS():
     def __init__(self, bus: can_manager.CanManager):
         self.control = DTS.DTSControl(bus)
