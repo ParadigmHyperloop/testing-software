@@ -72,6 +72,8 @@ class DTS():
             speed_mode_enable (int)
             mode (int)
             commanded_torque_limit (int)
+            message_offset (int)
+            command_id (int)
 
         Methods:
             configure_motor(self, configuration=MotorConfig()) -> None:
@@ -117,7 +119,16 @@ class DTS():
                 self.direction_command + self.mode + self.commanded_torque_limit
             self.bus.send_message(self.command_id, command_list)
 
-        def send_motor_command(self, command, mode=InverterMode.Torque):
+        def send_motor_command(self, command: float, mode=InverterMode.Torque):
+            """ Sends a motor command using existing info plus new speed/torque command and mode
+            
+            Uses all existing message configuration except for speed/torque command, and mode.
+            Can be used to issue subsequent commands after the motor has been configured intially
+
+            Args:
+                command (float): New speed/torque command, depending on the mode
+                mode (InverterMode)
+            """ 
             speed_command = int(command if mode == InverterMode.Speed else 0).to_bytes(2, 'little')
             torque_commmand = (command if mode == InverterMode.Torque else 0).to_bytes(2, 'little')
             mode = ((int(self.mode.value) << 2) +
@@ -143,6 +154,21 @@ class DTS():
             convert_low_voltages(self)
             convert_torques(self)
             convert_temperatures(self)
+            Data Getters:
+                get_analog_input_voltages_data(self)
+                get_current_data(self)
+                get_digital_input_status_data(self)
+                get_faults_data(self)
+                get_flux_data(self)
+                get_internal_states_data(self)
+                get_internal_voltages_data(self)
+                get_modulation_index_data(self)
+                get_motor_position_data(self)
+                get_temp1_data(self)
+                get_temp2_data(self)
+                get_temp3_data(self)
+                get_torque_timer_data(self)
+                get_voltage_data(self)
         '''
 
         def __init__(self, bus: can_manager.CanManager):
