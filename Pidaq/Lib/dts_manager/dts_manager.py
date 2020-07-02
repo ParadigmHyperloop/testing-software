@@ -53,6 +53,7 @@ class MotorConfig():
         self.mode = mode.value
         self.commanded_torque_limit = commanded_torque_limit
 
+
 class DTS():
     def __init__(self, bus: can_manager.CanManager):
         self.control = DTS.DTSControl(bus)
@@ -105,7 +106,7 @@ class DTS():
             self.inverter_discharge = int(configuration.inverter_discharge)
             self.speed_mode_enable = int(configuration.mode)
             self.mode = ((int(self.speed_mode_enable) << 2) +
-                        (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
+                         (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
             self.commanded_torque_limit = int(
                 configuration.commanded_torque_limit * 10).to_bytes(2, 'little')
 
@@ -129,10 +130,12 @@ class DTS():
                 command (float): New speed/torque command, depending on the mode
                 mode (InverterMode)
             """ 
-            speed_command = int(command if mode == InverterMode.Speed else 0).to_bytes(2, 'little')
-            torque_commmand = (command if mode == InverterMode.Torque else 0).to_bytes(2, 'little')
-            mode = ((int(self.mode.value) << 2) +
-                   (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
+            speed_command = int(
+                command * 10 if mode == InverterMode.Speed else 0).to_bytes(2, 'little')
+            torque_commmand = (
+                command * 10 if mode == InverterMode.Torque else 0).to_bytes(2, 'little')
+            mode = ((int(mode.value) << 2) +
+                    (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
             command_list = torque_commmand + speed_command + \
                 self.direction_command + mode + self.commanded_torque_limit
             self.bus.send_message(self.command_id, command_list)
@@ -210,7 +213,7 @@ class DTS():
             self.iq_feedback = None
             self.torque_shudder = None
             self.commanded_torque = None
-            
+
             # Default can offset is 160, can be changed in EEPROM
             self.default_can_offset = 160
             self.temp1_id = self.default_can_offset
@@ -227,22 +230,22 @@ class DTS():
             self.fault_codes_id = self.default_can_offset + 11
             self.torque_timer_id = self.default_can_offset + 12
             self.modulation_index_id = self.default_can_offset + 13
-        
+
         def get_temp1_data(self):
             return self.bus.messages[self.temp1_id].data
-        
+
         def get_temp2_data(self):
             return self.bus.messages[self.temp2_id].data
-        
+
         def get_temp3_data(self):
             return self.bus.messages[self.temp3_id].data
 
         def get_analog_input_voltages_data(self):
             return self.bus.messages[self.analog_inputs_id].data
-        
+
         def get_digital_input_status_data(self):
             return self.bus.messages[self.digital_input_status_id].data
-        
+
         def get_motor_position_data(self):
             return self.bus.messages[self.motor_position_id].data
 
@@ -257,7 +260,7 @@ class DTS():
 
         def get_internal_voltages_data(self):
             return self.bus.messages[self.internal_voltages_id].data
-        
+
         def get_internal_states_data(self):
             return self.bus.messages[self.internal_states_id].data
 
@@ -266,7 +269,7 @@ class DTS():
 
         def get_torque_timer_data(self):
             return self.bus.messages[self.torque_timer_id].data
-        
+
         def get_modulation_index_data(self):
             return self.bus.messages[self.modulation_index_id].data
 
@@ -402,4 +405,5 @@ if __name__ == "__main__":
         print(dts.telemetry.two_five_voltage_ref)
         print(dts.telemetry.five_voltage_ref)
         print(dts.telemetry.twelve_system_voltage)
-        dts.control.send_motor_command(random.randrange(190, 220), InverterMode.Torque)
+        dts.control.send_motor_command(
+            random.randrange(190, 220), InverterMode.Torque)
