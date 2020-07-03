@@ -11,7 +11,7 @@ ADS114S0::ADS114S0(const uint8_t CS)
 
 void ADS114S0::beginSPI()
 {
-    SPI.beginTransaction(SPISettings(SPI_CLOCK, MSB_FIRST, SPI_MODE1));
+    SPI.beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE1));
     digitalWrite(m_CS, LOW);
 }
 
@@ -87,14 +87,32 @@ void ADS114S0::setMode(const DataRate rate, const ClockSource clock, const Conve
     writeRegister(DATARATE, rate | clock | mode);
 }
 
+void ADS114S0::setConversionMode(const ConversionMode mode)
+{
+    uint8_t currentSettings = readRegister(DATARATE);
+    writeRegister(DATARATE, currentSettings | mode);
+}
+
 void ADS114S0::startConversion()
 {
+    beginSPI();
+    SPI.transfer(START);
+    endSPI();
 }
 
 void ADS114S0::stopConversion()
 {
+    beginSPI();
+    SPI.transfer(STOP);
+    endSPI();
 }
 
 uint16_t ADS114S0::readData()
 {
+    beginSPI();
+    SPI.transfer(RDATA);
+    uint16_t data = SPI.transfer16(0x0000);
+    endSPI();
+
+    return data;
 }
