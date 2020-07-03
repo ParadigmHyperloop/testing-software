@@ -115,6 +115,7 @@ public:
     void setMux(const InputMux);
     void setPGAGain(const PGAGain);
     void setMode(const DataRate, const ClockSource, const ConversionMode);
+    void setConversionMode(const ConversionMode);
     void startConversion();
     void stopConversion();
 
