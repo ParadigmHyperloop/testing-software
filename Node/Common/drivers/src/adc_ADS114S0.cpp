@@ -1,104 +1,100 @@
 #include "adc_ADS114S0.h"
 
-ADS114S0::ADS114S0(SPIClass spi, uint8_t SS_PIN) : spi(spi), SS_PIN(SS_PIN)
+ADS114S0::ADS114S0(const uint8_t CS)
+    : m_CS(CS)
 {
+    SPI.begin();
+
+    pinMode(m_CS, OUTPUT);
+    endSPI();
 }
 
-void ADS114S0::init()
+void ADS114S0::beginSPI()
 {
-    pinMode(SS_PIN, OUTPUT);
-    spi.begin();
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    uint8_t reset = spi.transfer(RESET);
-    delay(4096 * (1 / 20000000));
-    uint16_t resetStatus = spi.transfer16(0x3101);
-    uint8_t writeReg = spi.transfer(0x00);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
+    SPI.beginTransaction(SPISettings(SPI_CLOCK, MSB_FIRST, SPI_MODE1));
+    digitalWrite(m_CS, LOW);
 }
 
-void ADS114S0::writeRegister(uint8_t reg, uint8_t value)
+void ADS114S0::endSPI()
 {
-    uint16_t command = ((0x40 + reg) << 8) + 0x01;
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer16(command);
-    spi.transfer(value);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
+    digitalWrite(m_CS, HIGH);
+    SPI.endTransaction();
 }
 
-uint8_t ADS114S0::readRegister(uint8_t reg)
+void ADS114S0::reset()
 {
-    uint16_t command = ((0x20 + reg) << 8) + 0x01;
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer16(command);
-    uint8_t data = spi.transfer(0x00);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
-    return data;
+    beginSPI();
+    SPI.transfer(RESET);
+    endSPI();
+
+    delay(10);
+
+    writeRegisters(STATUS, DEFAULTS, 16);
 }
 
-uint16_t ADS114S0::readData()
+void ADS114S0::writeRegister(const Register reg, const uint8_t value)
 {
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer(RDATA);
-    uint16_t data = spi.transfer16(0x0000);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
-    return data;
+    beginSPI();
+    SPI.transfer16(WREG | reg<<16);
+    SPI.transfer(value);
+    endSPI();
 }
 
-void ADS114S0::setMux(InputMux mux)
+void ADS114S0::writeRegisters(const Register reg, const uint8_t values[], const uint8_t num)
 {
-    uint16_t writeCommand = 0x4201;
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer16(writeCommand);
-    spi.transfer(mux);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
+    beginSPI();
+    SPI.transfer16(WREG | reg<<16 | (num - 1)<<8);
+    for (uint8_t i = 0; i < num; i++)
+    {
+        SPI.transfer(values[i]);
+    }
+    endSPI();
 }
 
-void ADS114S0::setPGAGain(PGAGain gain)
+uint8_t ADS114S0::readRegister(const Register reg)
 {
-    uint16_t writeCommand = 0x4301;
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer16(writeCommand);
-    spi.transfer(gain);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
+    beginSPI();
+    SPI.transfer16(RREG | reg<<16);
+    uint8_t value = SPI.transfer(0x00);
+    endSPI();
+
+    return value;
 }
 
-void ADS114S0::setDataRate(DataRate rate)
+void ADS114S0::readRegisters(const Register reg, uint8_t values[], const uint8_t num)
 {
-    uint16_t writeCommand = 0x4401;
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer16(writeCommand);
-    spi.transfer(rate);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
+    beginSPI();
+    SPI.transfer16(RREG | reg<<16 | (num - 1)<<8);
+    for (uint8_t i = 0; i < num; i++)
+    {
+        values[i] = SPI.transfer(0x00);
+    }
+    endSPI();
+}
+
+void ADS114S0::setMux(const InputMux mux)
+{
+    writeRegister(INPMUX, mux);
+}
+
+void ADS114S0::setPGAGain(const PGAGain gain)
+{
+    writeRegister(PGA, gain);
+}
+
+void ADS114S0::setMode(const DataRate rate, const ClockSource clock, const ConversionMode mode)
+{
+    writeRegister(DATARATE, rate | clock | mode);
 }
 
 void ADS114S0::startConversion()
 {
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer(START);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
 }
 
 void ADS114S0::stopConversion()
 {
-    spi.beginTransaction(spiSettings);
-    digitalWrite(SS_PIN, LOW);
-    spi.transfer(STOP);
-    digitalWrite(SS_PIN, HIGH);
-    spi.endTransaction();
+}
+
+uint16_t ADS114S0::readData()
+{
 }
