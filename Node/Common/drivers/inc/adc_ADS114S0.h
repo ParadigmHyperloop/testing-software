@@ -3,7 +3,26 @@
 
 #include <SPI.h>
 
-enum class InputMux: uint8_t
+enum Register : uint8_t
+{
+    STATUS   = 0x01,
+    INPMUX   = 0x02,
+    PGA      = 0x03,
+    DATARATE = 0x04,
+    REF      = 0x05,
+    IDACMAG  = 0x06,
+    IDACMUX  = 0x07,
+    VBIAS    = 0x08,
+    SYS      = 0x09,
+    OFCAL0   = 0x0B,
+    OFCAL1   = 0x0C,
+    FSCAL0   = 0x0E,
+    FSCAL1   = 0x0F,
+    GPIODAT  = 0x10,
+    GPIOCON  = 0x11
+};
+
+enum InputMux : uint8_t
 {
     MUX_SINGLE_0    = 0x0C, // Single-ended AIN0
     MUX_SINGLE_1    = 0x1C, // Single-ended AIN1
@@ -19,9 +38,10 @@ enum class InputMux: uint8_t
     MUX_SINGLE_11   = 0xBC  // Single-ended AIN11
 };
 
-enum class PGAGain: uint8_t
+enum PGAGain : uint8_t
 {
     GAIN_DISABLE    = 0x00, // Default
+    GAIN_1          = 0x08,
     GAIN_2          = 0x09,
     GAIN_4          = 0x0A,
     GAIN_8          = 0x0B,
@@ -31,7 +51,7 @@ enum class PGAGain: uint8_t
     GAIN_128        = 0x0F
 };
 
-enum class DataRate: uint8_t
+enum DataRate : uint8_t
 {
     SPS_2_5     = 0x10, // 2.5 Samples Per Second
     SPS_5       = 0x11, // 5 Samples Per Second
@@ -49,7 +69,19 @@ enum class DataRate: uint8_t
     SPS_4000    = 0x1D  // 4000 Samples Per Second
 };
 
-enum class Command: uint8_t
+enum ConversionMode : uint8_t
+{
+    SINGLE = 0x10,
+    CONTINUOUS = 0x30
+};
+
+enum ClockSource : uint8_t
+{
+    INTERNAL_CLK = 0x10,
+    EXTERNAL_CLK = 0x50
+};
+
+enum Command : uint8_t
 {
     WAKEUP      = 0x02,
     POWERDOWN   = 0x04,
@@ -62,24 +94,34 @@ enum class Command: uint8_t
     RDATA       = 0x12
 };
 
+static const uint16_t RREG = 0x2000;
+static const uint16_t WREG = 0x3000;
+static const uint8_t DEFAULTS[] = { 0x80, 0x01, 0x00, 0x14, 0x10, 0x00,
+                                    0xFF, 0x00, 0x10, 0x00, 0x00, 0x00,
+                                    0x00, 0x00, 0x40, 0x00, 0x00 };
+
 class ADS114S0
 {
 public:
-    ADS114S0(uint8_t CS);
-    void init();
-    void writeRegister(uint8_t, uint8_t);
-    uint8_t readRegister(uint8_t);
+    ADS114S0(const uint8_t CS);
+    void beginSPI();
+    void endSPI();
+    void reset();
+    void writeRegister(const Register, const uint8_t);
+    void writeRegisters(const Register, const uint8_t[], const uint8_t);
+    uint8_t readRegister(const Register);
+    void ADS114S0::readRegisters(const Register, uint8_t[], const uint8_t);
     uint16_t readData();
-    void setMux(InputMux);
-    void setPGAGain(PGAGain);
-    void setDataRate(DataRate);
+    void setMux(const InputMux);
+    void setPGAGain(const PGAGain);
+    void setMode(const DataRate, const ClockSource, const ConversionMode);
     void startConversion();
     void stopConversion();
 
+    static const uint32_t SPI_CLOCK = 20000000;
 private:
-    SPIClass spi;
     SPISettings spiSettings = SPISettings(20000000, MSBFIRST, SPI_MODE1);
-    uint8_t CS;
+    const uint8_t m_CS;
     uint8_t DRDY_PIN;
 };
 
