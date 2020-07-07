@@ -1,4 +1,3 @@
-import enum
 import json
 import logging
 import os
@@ -6,7 +5,6 @@ import os
 import dash
 from dash.dependencies import Input, Output, State
 from dash.dash import no_update 
-from pandas import DataFrame
 
 from dts_dash.app import app
 from dts_dash.layout.control import control_layout
@@ -20,6 +18,10 @@ logger.info("ROOT LOGGER INITIALIZED")
 
 logger = logging.getLogger("DTS-DASH")
 logger.setLevel("INFO")
+
+# Restrict werkzeug logger to warning level
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel("WARNING")
 
 # Instantiate test profile 
 test_profile = DtsTestProfile(None)
@@ -84,13 +86,15 @@ def update_title(n_clicks, title):
     
     return title
 
-
+# TODO refactor to move alerts to their own callbacks
+# This way, this function need not return 80000 no updates
 # Fired by any button that changes the timestep readout
 @app.callback(
-    [Output("timestep-readout-tbl", "data"),
+    [Output("timestep-readout-tbl", "children"),
     Output("rpm-torque-display", "children"),
     Output("exceed-60s-alert", "is_open"),
-    Output("no-name-alert", "is_open")],
+    Output("no-name-alert", "is_open"),
+    Output("invalid-value-alert", "is_open")],
     [Input("add-command-btn", "n_clicks"),
      Input("clear-last-btn", "n_clicks"),
      Input("clear-all-btn", "n_clicks"),
@@ -107,7 +111,7 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
     
     # Use global test profile
     global test_profile
-    ret_value = test_profile.get_df().to_dict('records'), no_update, no_update, no_update
+    ret_value = test_profile.get_table_data(), no_update, no_update, no_update, no_update
     
     ctx = dash.callback_context
     
@@ -117,12 +121,18 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
     else:
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
+    # TODO Not allow adding a value of its invalid
     if button_id == "add-command-btn":
+        # Cancel adding the command if the value is None
+        if value is None or step is None:
+            logger.warning("TRIED TO ADD A COMMAND WITH NO TIMESTEP OR NO VALUE")
+            ret_value = ret_value = no_update, no_update, no_update, no_update, True
+            return ret_value
         
         # Cancel adding command if name, step, or value is None - display warning
         if test_profile.name is None:
             logger.warning("NO NAME SELECTED - PLEASE SELECT A PROFILE NAME BEFORE ADDING COMMANDS") 
-            ret_value = no_update, no_update, no_update, True
+            ret_value = no_update, no_update, no_update, True, no_update
             return ret_value
             
         # Warn if new command makes test length > 60 secs (60 000ms)
@@ -140,16 +150,16 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
         test_profile.add_command(command)
     
         logger.info(f"COMMAND ADDED: {test_profile.commands[-1]}")
-        ret_value = test_profile.get_df().to_dict('records'), no_update, toggle_time_warning, no_update
+        ret_value = test_profile.get_table_data(), no_update, toggle_time_warning, no_update, no_update
         
     elif button_id == "clear-all-btn":
         test_profile.clear_all()
-        ret_value = test_profile.get_df().to_dict('records'), no_update, no_update, no_update
+        ret_value = test_profile.get_table_data(), no_update, no_update, no_update, no_update
         logger.info(f"CLEAR ALL PRESSED - CLEARED ALL COMMANDS")
     
     elif button_id == "clear-last-btn":
         removed_cmd = test_profile.clear_last()
-        ret_value = test_profile.get_df().to_dict('records'), no_update, no_update, no_update
+        ret_value = test_profile.get_table_data(), no_update, no_update, no_update, no_update
         logger.info(f"CLEAR LAST PRESSED - REMOVED COMMAND: {removed_cmd}")
    
     elif button_id == "rpm-toggle-btn":
@@ -160,7 +170,7 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
             logger.info(f"Test type updated to RPM, updated " 
                         f"profile test type to: {test_profile.test_type}")
             
-            ret_value = test_profile.get_df().to_dict('records'), "RPM", no_update, no_update
+            ret_value = test_profile.get_table_data(), "RPM", no_update, no_update, no_update
             
         # If test profile type is already rpm - do nothing
         else:
@@ -168,14 +178,14 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
             raise dash.exceptions.PreventUpdate
         
     elif button_id == "torque-toggle-btn":
-        
+        # If test type wasnt torque, update test profile to torque and clear commands 
         if test_profile.test_type != DtsTestType.TORQUE:
             test_profile.test_type = DtsTestType.TORQUE
             test_profile.commands = []
             logger.info(f"Test type updated to torque, updated " 
                         f"profile test type to: {test_profile.test_type}")
             
-            ret_value = test_profile.get_df().to_dict('records'), "TOR", no_update, no_update
+            ret_value = test_profile.get_table_data(), "TOR", no_update, no_update, no_update
         
         else:
             logging.info("TORQUE TOGGLE CLICKED - TEST TYPE IS ALREADY TORQUE - NO ACTION TAKEN ")
