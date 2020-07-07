@@ -110,7 +110,7 @@ public:
     void writeRegister(const Register, const uint8_t);
     void writeRegisters(const Register, const uint8_t[], const uint8_t);
     uint8_t readRegister(const Register);
-    void ADS114S0::readRegisters(const Register, uint8_t[], const uint8_t);
+    void readRegisters(const Register, uint8_t[], const uint8_t);
     uint16_t readData();
     void setMux(const InputMux);
     void setPGAGain(const PGAGain);
@@ -121,9 +121,7 @@ public:
 
     static const uint32_t SPI_CLOCK = 20000000;
 private:
-    SPISettings spiSettings = SPISettings(20000000, MSBFIRST, SPI_MODE1);
     const uint8_t m_CS;
-    uint8_t DRDY_PIN;
 };
 
 #endif
