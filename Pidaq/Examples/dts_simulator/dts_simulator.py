@@ -1,7 +1,7 @@
 import sys
 import time
-from random import random
 from enum import Enum
+from random import random
 
 import can
 
@@ -9,7 +9,7 @@ from can_manager import can_manager
 
 
 class DTSSimulator:
-    ''' Class for simulating the behaviour of the DTS motor/inverter
+    """ Class for simulating the behaviour of the DTS motor/inverter
 
     The majority of the data sent over the can bus contains spoofed data, however
     the simulator is able to correctly interpret command messages, and send back the correct
@@ -42,7 +42,7 @@ class DTSSimulator:
         update_temperature3(self)
         update_torque_timer_information(self)
         update_voltage_information(self)
-    '''
+    """
 
     def __init__(self, bus_name: str):
         # Configure bus

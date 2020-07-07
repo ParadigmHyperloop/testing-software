@@ -99,8 +99,8 @@ class SensorReading:
     Attributes:
         message_id (int): represents the can arbitration id, is a hexidecimal integer
         reading (str): contains the name of the measurement
-        conversion_factor (int or float)
-        conversion_factor_type (str)
+        conversion_factor: contains the conversion factor for the reading, or a dict of factors
+                           there are multiple
         data (int or float)
     """
 

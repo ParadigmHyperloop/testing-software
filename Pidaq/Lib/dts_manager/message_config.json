@@ -14,7 +14,10 @@
             {
                 "reading": "temperatures3",
                 "message_id": 162,
-                "conversion_factor": 10
+                "conversion_factor": {
+                    "temp": 10,
+                    "torque": 10
+                }
             },
             {
                 "reading": "analogInputVoltages",
@@ -24,12 +27,16 @@
             {
                 "reading": "digitalInputStatus",
                 "message_id": 164,
-                "conversion_factor": 0
+                "conversion_factor": 1
             },
             {
                 "reading": "motorPositionInformation",
                 "message_id": 165,
-                "conversion_factor": 0
+                "conversion_factor": {
+                    "angle": 10,
+                    "angular_velocity": 1,
+                    "frequency": 10
+                }
             },
             {
                 "reading": "currentInformation",
@@ -57,12 +64,12 @@
             {
                 "reading": "internalStates",
                 "message_id": 170,
-                "conversion_factor": 0
+                "conversion_factor": 1
             },
             {
                 "reading": "faultCodes",
                 "message_id": 171,
-                "conversion_factor": 0
+                "conversion_factor": 1
             },
             {
                 "reading": "torque&timerInformation",
