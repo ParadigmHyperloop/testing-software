@@ -169,13 +169,12 @@ class DTSSimulator:
                    self.torque_command)
 
     def check_can_timeout(self, message: can.Message):
-        if not self.last_received_command_message:
+        if self.last_received_command_message == 0:
             self.last_received_command_message = time.time()
-        if message and message.arbitration_id == 192:
-            if time.time() - self.last_received_command_message > .5:
-                sys.exit()
-            else:
-                self.last_received_command_message = time.time()
+        if message is not None and message.arbitration_id == 192:
+            self.last_received_command_message = time.time()
+        if time.time() - self.last_received_command_message > .5:
+            sys.exit()
 
     def update_temperature1(self):
         self.module_a_temp = 200 + random() * 5.0
@@ -362,10 +361,9 @@ def run_simulation(bus_name: str):
             simulator_configured = True
     while True:
         message = sim.can_bus.bus.recv(0.1)
-        if message is not None:
-            sim.check_can_timeout(message)
-            if message.arbitration_id == 192:
-                sim.read_configuration_message(message)
+        sim.check_can_timeout(message)
+        if message is not None and message.arbitration_id == 192:
+            sim.read_configuration_message(message)
         sim.update_temperature1()
         sim.update_temperature2()
         sim.update_temperature3()

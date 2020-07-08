@@ -122,14 +122,14 @@ class DTS():
 
         def send_motor_command(self, command: float, mode=InverterMode.Torque):
             """ Sends a motor command using existing info plus new speed/torque command and mode
-            
+
             Uses all existing message configuration except for speed/torque command, and mode.
             Can be used to issue subsequent commands after the motor has been configured intially
 
             Args:
                 command (float): New speed/torque command, depending on the mode
                 mode (InverterMode)
-            """ 
+            """
             speed_command = int(
                 command * 10 if mode == InverterMode.Speed else 0).to_bytes(2, 'little')
             torque_commmand = (
@@ -235,46 +235,88 @@ class DTS():
             return self.bus.messages[message_id].conversion_factor
 
         def get_temp1_data(self, start=0, stop=8):
-            return self.bus.messages[self.temp1_id].data[start:stop]
+            if self.bus.messages[self.temp1_id].data:
+                return self.bus.messages[self.temp1_id].data[start:stop]
+            else:
+                return None
 
         def get_temp2_data(self, start=0, stop=8):
-            return self.bus.messages[self.temp2_id].data[start:stop]
+            if self.bus.messages[self.temp2_id].data[start:stop]:
+                return self.bus.messages[self.temp2_id].data[start:stop]
+            else:
+                return None
 
         def get_temp3_data(self, start=0, stop=8):
-            return self.bus.messages[self.temp3_id].data[start:stop]
+            if self.bus.messages[self.temp3_id].data[start:stop]:
+                return self.bus.messages[self.temp3_id].data[start:stop]
+            else:
+                return None
 
         def get_analog_input_voltages_data(self, start=0, stop=8):
-            return self.bus.messages[self.analog_inputs_id].data[start:stop]
+            if self.bus.messages[self.analog_inputs_id].data:
+                return self.bus.messages[self.analog_inputs_id].data[start:stop]
+            else:
+                return None
 
         def get_digital_input_status_data(self, start=0, stop=8):
-            return self.bus.messages[self.digital_input_status_id].data[start:stop]
+            if self.bus.messages[self.digital_input_status_id].data:
+                return self.bus.messages[self.digital_input_status_id].data[start:stop]
+            else:
+                return None
 
         def get_motor_position_data(self, start=0, stop=8):
-            return self.bus.messages[self.motor_position_id].data[start:stop]
+            if self.bus.messages[self.motor_position_id].data:
+                return self.bus.messages[self.motor_position_id].data[start:stop]
+            else:
+                return None
 
         def get_current_data(self, start=0, stop=8):
-            return self.bus.messages[self.current_info_id].data[start:stop]
+            if self.bus.messages[self.current_info_id].data:
+                return self.bus.messages[self.current_info_id].data[start:stop]
+            else:
+                return None
 
         def get_voltage_data(self, start=0, stop=8):
-            return self.bus.messages[self.voltage_info_id].data[start:stop]
+            if self.bus.messages[self.voltage_info_id].data:
+                return self.bus.messages[self.voltage_info_id].data[start:stop]
+            else:
+                return None
 
         def get_flux_data(self, start=0, stop=8):
-            return self.bus.messages[self.flux_info_id].data[start:stop]
+            if self.bus.messages[self.flux_info_id].data:
+                return self.bus.messages[self.flux_info_id].data[start:stop]
+            else:
+                return None
 
         def get_internal_voltages_data(self, start=0, stop=8):
-            return self.bus.messages[self.internal_voltages_id].data[start:stop]
+            if self.bus.messages[self.internal_voltages_id].data:
+                return self.bus.messages[self.internal_voltages_id].data[start:stop]
+            else:
+                return None
 
         def get_internal_states_data(self, start=0, stop=8):
-            return self.bus.messages[self.internal_states_id].data[start:stop]
+            if self.bus.messages[self.internal_states_id].data:
+                return self.bus.messages[self.internal_states_id].data[start:stop]
+            else:
+                return None
 
         def get_faults_data(self, start=0, stop=8):
-            return self.bus.messages[self.fault_codes_id].data[start:stop]
+            if self.bus.messages[self.fault_codes_id].data:
+                return self.bus.messages[self.fault_codes_id].data[start:stop]
+            else:
+                return None
 
         def get_torque_timer_data(self, start=0, stop=8):
-            return self.bus.messages[self.torque_timer_id].data[start:stop]
+            if self.bus.messages[self.torque_timer_id].data:
+                return self.bus.messages[self.torque_timer_id].data[start:stop]
+            else:
+                return None
 
         def get_modulation_index_data(self, start=0, stop=8):
-            return self.bus.messages[self.modulation_index_id].data[start:stop]
+            if self.bus.messages[self.modulation_index_id].data:
+                return self.bus.messages[self.modulation_index_id].data[start:stop]
+            else:
+                return None
 
         def update_temperatures(self) -> None:
             if self.get_temp1_data():
@@ -341,7 +383,7 @@ class DTS():
                 self.phase_b_current = int.from_bytes(
                     self.get_current_data(2, 4), byteorder='little', signed=True) / self.get_conversion_factor(self.current_info_id)
                 self.phase_c_current = int.from_bytes(
-                    self.get_current_data(4,6), byteorder='little', signed=True) / self.get_conversion_factor(self.current_info_id)
+                    self.get_current_data(4, 6), byteorder='little', signed=True) / self.get_conversion_factor(self.current_info_id)
                 self.dc_bus_current = int.from_bytes(
                     self.get_current_data(6, 8), byteorder='little', signed=True) / self.get_conversion_factor(self.current_info_id)
             if self.get_flux_data():
@@ -403,7 +445,7 @@ if __name__ == "__main__":
     while True:
         current_message = dts.telemetry.bus.read_bus()
         dts.telemetry.bus.assign_message_data(current_message)
-        dts.telemetry.convert_low_voltages()
+        dts.telemetry.update_low_voltages()
         print(dts.telemetry.one_five_voltage_ref)
         print(dts.telemetry.two_five_voltage_ref)
         print(dts.telemetry.five_voltage_ref)
