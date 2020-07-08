@@ -93,6 +93,8 @@ class DTS():
             self.message_offset = 160
             self.command_id = self.message_offset + 32
 
+            self.current_command_message = None
+
         def configure_motor(self, configuration=MotorConfig()) -> None:
             """ Configures the motor configuration message"""
             self.torque_command = int(
@@ -118,7 +120,10 @@ class DTS():
             """
             command_list = self.torque_command + self.speed_command + \
                 self.direction_command + self.mode + self.commanded_torque_limit
-            self.bus.send_message(self.command_id, command_list)
+            message = can.Message(arbitration_id=192, data=command_list)
+            if self.current_command_message is not None:
+                self.current_command_message.stop()
+            self.current_command_message = self.bus.bus.send_periodic(message, 0.1)
 
         def send_motor_command(self, command: float, mode=InverterMode.Torque):
             """ Sends a motor command using existing info plus new speed/torque command and mode
@@ -138,8 +143,10 @@ class DTS():
                     (int(self.inverter_discharge) << 1) + (int(self.inverter_enable) << 0)).to_bytes(1, 'little')
             command_list = torque_commmand + speed_command + \
                 self.direction_command + mode + self.commanded_torque_limit
-            self.bus.send_message(self.command_id, command_list)
-
+            message = can.Message(arbitration_id=192, data=command_list)
+            if self.current_command_message is not None:
+                self.current_command_message.stop()
+            self.current_command_message = self.bus.bus.send_periodic(message, 0.1)
     class DTSTelemetry():
         """ Handles the telemetry and data acquisition from the DTS motor/inverter
 
