@@ -307,13 +307,13 @@ class DTS():
                 return None
 
         def get_temp2_data(self, start=0, stop=8):
-            if self.bus.messages[self.temp2_id].data:
+            if self.bus.messages[self.temp2_id].data[start:stop]:
                 return self.bus.messages[self.temp2_id].data[start:stop]
             else:
                 return None
 
         def get_temp3_data(self, start=0, stop=8):
-            if self.bus.messages[self.temp3_id].data:
+            if self.bus.messages[self.temp3_id].data[start:stop]:
                 return self.bus.messages[self.temp3_id].data[start:stop]
             else:
                 return None
