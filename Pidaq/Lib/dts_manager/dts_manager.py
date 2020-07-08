@@ -137,7 +137,10 @@ class DTS():
             """
             command_list = self.torque_command + self.speed_command + \
                 self.direction_command + self.mode + self.commanded_torque_limit
-            self.bus.send_message(self.command_id, command_list)
+            message = can.Message(arbitration_id=192, data=command_list)
+            if self.current_command_message is not None:
+                self.current_command_message.stop()
+            self.current_command_message = self.bus.bus.send_periodic(message, 0.1)
 
         def send_motor_command(self, command: float, mode=InverterMode.Torque, duration=None):
             """ Sends a motor command using existing info plus new speed/torque command and mode
