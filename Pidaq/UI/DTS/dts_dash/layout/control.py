@@ -232,7 +232,7 @@ control_layout = html.Div([
                                   min=0,
                                   max=10000,
                                   value=0,
-                                  style={"width": "65%"}),
+                                  style={"width": "60%"}),
                         dbc.InputGroupAddon(add_command_btn,
                                             addon_type="append")
                     ])
