@@ -9,15 +9,17 @@ Classes:
     DtsTestProfile() - Class used to configure dts test profile
 """
 
-import enum
 import json
 import logging
 import os
+from enum import Enum
 
+import dash_bootstrap_components as dbc
+import dash_html_components as html
 from pandas import DataFrame
 
 
-class DtsTestType(str, enum.Enum):
+class DtsTestType(str, Enum):
     """ Enum containing the DTS test types """
     
     RPM = "RPM"
@@ -46,7 +48,7 @@ class DtsCommand():
             "Step Duration(ms)": self.step,
             "Value": self.value
         }
-    
+     
     def __str__(self):
         return f"TYPE: {self.type} | STEP DURATION(ms): {self.step} | VALUE: {self.value}"
     
@@ -131,6 +133,7 @@ class DtsTestProfile():
             current_profiles = json.load(profileJson)['profiles']
         
         with open(path_to_file, 'w') as profileJson:
+            
             # Update profile if it already exists, otherwise create a new one
             for profile in current_profiles:
                 if profile['name'] == self.name:
@@ -157,4 +160,24 @@ class DtsTestProfile():
             "commands": [command.to_dict() for command in self.commands]
         }
         return profile_dict
+        
+    def get_table_data(self):
+        """ Return bootstrap table representation of this profile """
+        table_header = [
+            html.Thead(html.Tr([html.Th("Type"), 
+                                html.Th("Step Duration(ms)"), 
+                                html.Th("Value")]))
+        ]
+
+        table_rows = []
+        
+        for cmd in self.commands:
+            row = html.Tr([
+                html.Td(cmd.type), html.Td(cmd.step), html.Td(cmd.value)
+            ])
+            table_rows.append(row)
+            
+        table_body = [html.Tbody(table_rows)]
+        
+        return table_header + table_body
         
