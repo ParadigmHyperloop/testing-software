@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State
 from dash.dash import no_update 
 
 from dts_dash.app import app
-from dts_dash.layout.control import control_layout
+from dts_dash.control_layout import control_layout
 from paralogging import logInit
 from utils.dts import DtsTestProfile, DtsCommand, DtsTestType
 
@@ -103,7 +103,7 @@ def update_commands(add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_
     
     # If none of the buttons that update the commands are clicked, prevent update
     clicks = [add_cmd_clicks, last_clicks, all_clicks, rpm_clicks, torque_clicks]
-    if not sum([click if click is not None else 0 for click in clicks]):
+    if not any(clicks):
         raise dash.exceptions.PreventUpdate
     
     # Use global test profile

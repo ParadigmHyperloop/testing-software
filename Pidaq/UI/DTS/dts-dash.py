@@ -2,9 +2,9 @@ import dash
 import dash_bootstrap_components as dbc
 
 from dts_dash.app import app
-from dts_dash.callbacks import control_callbacks
-from dts_dash.layout.control import control_layout
-from dts_dash.layout.manual import manual_layout
+from dts_dash import control_callbacks
+from dts_dash.control_layout import control_layout
+from dts_dash.manual_layout import manual_layout
 
 
 tabs = dbc.Tabs(
