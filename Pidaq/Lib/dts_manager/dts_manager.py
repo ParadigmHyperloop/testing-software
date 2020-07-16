@@ -1,4 +1,8 @@
+import time
+from collections import deque
 from enum import Enum
+
+import can
 
 from can_manager import can_manager
 
@@ -41,10 +45,11 @@ class MotorConfig():
         commanded_torque_limit (float): torque that the motor will not exceed,
                                         defaults to 0, which will read default
                                         torque limit from EEPROM
+        duration (float): Time duration that the message will be sent on the bus for
     """
 
     def __init__(self, command=0.0, direction=InverterDirection.Forward, enable=InverterEnable.Inverter_Off,
-                 discharge=InverterDischarge.Disable, mode=InverterMode.Torque, commanded_torque_limit=0.0):
+                 discharge=InverterDischarge.Disable, mode=InverterMode.Torque, commanded_torque_limit=0.0, duration=None):
         self.torque_command = command if mode == InverterMode.Torque else 0.0
         self.speed_command = command if mode == InverterMode.Speed else 0.0
         self.direction = direction.value
@@ -52,6 +57,15 @@ class MotorConfig():
         self.inverter_discharge = discharge.value
         self.mode = mode.value
         self.commanded_torque_limit = commanded_torque_limit
+        self.duration = duration
+
+
+class MotorCommand():
+    """ Structure to hold command info to be sent after initial configuration"""
+
+    def __init__(self, command=0.0, duration=None):
+        self.command = command
+        self.duration = duration
 
 
 class DTS():
@@ -94,6 +108,7 @@ class DTS():
             self.command_id = self.message_offset + 32
 
             self.current_command_message = None
+            self.start_time = None
 
         def configure_motor(self, configuration=MotorConfig()) -> None:
             """ Configures the motor configuration message"""
@@ -120,12 +135,9 @@ class DTS():
             """
             command_list = self.torque_command + self.speed_command + \
                 self.direction_command + self.mode + self.commanded_torque_limit
-            message = can.Message(arbitration_id=192, data=command_list)
-            if self.current_command_message is not None:
-                self.current_command_message.stop()
-            self.current_command_message = self.bus.bus.send_periodic(message, 0.1)
+            self.bus.send_message(self.command_id, command_list)
 
-        def send_motor_command(self, command: float, mode=InverterMode.Torque):
+        def send_motor_command(self, command: float, mode=InverterMode.Torque, duration=None):
             """ Sends a motor command using existing info plus new speed/torque command and mode
 
             Uses all existing message configuration except for speed/torque command, and mode.
@@ -134,6 +146,7 @@ class DTS():
             Args:
                 command (float): New speed/torque command, depending on the mode
                 mode (InverterMode)
+                duration (float): duration for which the message should be sent
             """
             speed_command = int(
                 command * 10 if mode == InverterMode.Speed else 0).to_bytes(2, 'little')
@@ -146,7 +159,30 @@ class DTS():
             message = can.Message(arbitration_id=192, data=command_list)
             if self.current_command_message is not None:
                 self.current_command_message.stop()
-            self.current_command_message = self.bus.bus.send_periodic(message, 0.1)
+            self.current_command_message = self.bus.send_message_periodic(message, duration)
+
+        def send_test_commands(self, initial_config: MotorConfig=MotorConfig(), commands=None):
+            if self.start_time is None:
+                self.configure_motor(initial_config)
+                self.send_motor_command_config()
+                self.messages = deque()
+                for command in commands:
+                    self.messages.append(command)
+                self.current_command = self.messages.popleft()
+                self.start_time = time.time()
+                self.send_motor_command(self.current_command.command)
+            elif self.current_command.duration < time.time() - self.start_time:
+                if len(self.messages) == 0:
+                    try:
+                        self.current_command_message.stop()
+                    finally:
+                        return
+                self.current_command = self.messages.popleft()
+                self.start_time = time.time()
+                self.send_motor_command(self.current_command.command)
+            else:
+                return
+
     class DTSTelemetry():
         """ Handles the telemetry and data acquisition from the DTS motor/inverter
 
@@ -238,6 +274,12 @@ class DTS():
             self.torque_timer_id = self.default_can_offset + 12
             self.modulation_index_id = self.default_can_offset + 13
 
+            # Sets of related ids for quick lookups
+            self.temp_ids = set([self.temp1_id, self.temp2_id, self.temp3_id])
+            self.low_voltage_ids = set([self.analog_inputs_id, self.internal_voltages_id])
+            self.current_ids = set([self.current_info_id, self.flux_info_id, self.modulation_index_id])
+            self.torque_ids = set([self.motor_position_id, self.torque_timer_id])
+
         def get_conversion_factor(self, message_id: int):
             return self.bus.messages[message_id].conversion_factor
 
@@ -248,13 +290,13 @@ class DTS():
                 return None
 
         def get_temp2_data(self, start=0, stop=8):
-            if self.bus.messages[self.temp2_id].data[start:stop]:
+            if self.bus.messages[self.temp2_id].data:
                 return self.bus.messages[self.temp2_id].data[start:stop]
             else:
                 return None
 
         def get_temp3_data(self, start=0, stop=8):
-            if self.bus.messages[self.temp3_id].data[start:stop]:
+            if self.bus.messages[self.temp3_id].data:
                 return self.bus.messages[self.temp3_id].data[start:stop]
             else:
                 return None
@@ -437,6 +479,25 @@ class DTS():
                 self.torque_feedback = int.from_bytes(
                     self.get_torque_timer_data(2, 4), byteorder='little', signed=True) / self.get_conversion_factor(self.torque_timer_id)
 
+        def update_data(self):
+            current_message = self.bus.read_bus()
+            self.bus.assign_message_data(current_message)
+            message_id = current_message.arbitration_id
+            if message_id in self.temp_ids:
+                self.update_temperatures()
+                self.update_torques()
+            elif message_id in self.low_voltage_ids:
+                self.update_low_voltages()
+            elif message_id == self.digital_input_status_id:
+                self.update_booleans()
+            elif message_id in self.current_ids:
+                self.update_currents()
+            elif message_id == self.voltage_info_id:
+                self.update_high_voltages()
+            elif message_id in self.current_ids:
+                self.update_torques()
+                self.update_angles()
+
 
 if __name__ == "__main__":
     import random
@@ -446,16 +507,36 @@ if __name__ == "__main__":
 
     motorConfiguration = MotorConfig(200, InverterDirection.Forward, InverterEnable.Inverter_On,
                                      InverterDischarge.Enable, InverterMode.Torque, 400)
+    
+    motorCommands = [MotorCommand(300, 5), MotorCommand(400, 5), MotorCommand(500, 5), MotorCommand(400, 5), MotorCommand(100, 5)]
 
-    dts.control.configure_motor(motorConfiguration)
-    dts.control.send_motor_command_config()
     while True:
-        current_message = dts.telemetry.bus.read_bus()
-        dts.telemetry.bus.assign_message_data(current_message)
-        dts.telemetry.update_low_voltages()
-        print(dts.telemetry.one_five_voltage_ref)
-        print(dts.telemetry.two_five_voltage_ref)
-        print(dts.telemetry.five_voltage_ref)
-        print(dts.telemetry.twelve_system_voltage)
-        dts.control.send_motor_command(
-            random.randrange(190, 220), InverterMode.Torque)
+        dts.control.send_test_commands(motorConfiguration, motorCommands)
+        dts.telemetry.update_data()
+        print('Analog Input 1: {}'.format(dts.telemetry.analog_input_1))
+        print('Analog Input 2: {}'.format(dts.telemetry.analog_input_2))
+        print('Analog Input 3: {}'.format(dts.telemetry.analog_input_3))
+        print('Analog Input 4: {}'.format(dts.telemetry.analog_input_4))
+        print('Commanded Torque: {}'.format(dts.telemetry.commanded_torque))
+        print('Control Board Temperature: {}'.format(dts.telemetry.control_board_temperature))
+        print('DC Bus Voltage: {}'.format(dts.telemetry.dc_bus_voltage))
+        print('Delta Filter Resolved: {}'.format(dts.telemetry.delta_filter_resolved))
+        print('Gate Driver Board Temp: {}'.format(dts.telemetry.gate_driver_board_temperature))
+        print('Id Feedback: {}'.format(dts.telemetry.id_feedback))
+        print('Iq Feedback: {}'.format(dts.telemetry.iq_feedback))
+        print('Module A Temperature: {}'.format(dts.telemetry.module_a_temperature))
+        print('Module B Temperature: {}'.format(dts.telemetry.module_b_temperature))
+        print('Module C Temperature: {}'.format(dts.telemetry.module_c_temperature))
+        print('Motor Angle: {}'.format(dts.telemetry.motor_angle))
+        print('1.5V Ref Voltage: {}'.format(dts.telemetry.one_five_voltage_ref))
+        print('Output Voltage: {}'.format(dts.telemetry.output_voltage))
+        print('RTD 1 Temp: {}'.format(dts.telemetry.rtd_1_temperature))
+        print('RTD 2 Temp: {}'.format(dts.telemetry.rtd_2_temperature))
+        print('RTD 3 Temp: {}'.format(dts.telemetry.rtd_3_temperature))
+        print('RTD 4 Temp: {}'.format(dts.telemetry.rtd_4_temperature))
+        print('RTD 5 Temp: {}'.format(dts.telemetry.rtd_5_temperature))
+        print('Torque Shudder: {}'.format(dts.telemetry.torque_shudder))
+        print('12V System Voltage: {}'.format(dts.telemetry.twelve_system_voltage))
+        print('2.5V Ref Voltage: {}'.format(dts.telemetry.two_five_voltage_ref))
+        print('Vab Vd Voltage: {}'.format(dts.telemetry.vab_vd_voltage))
+        print('Vbc Vq Voltage: {}\n'.format(dts.telemetry.vbc_vq_voltage))

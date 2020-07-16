@@ -71,6 +71,11 @@ class CanManager:
         message = can.Message(arbitration_id=id, data=data)
         self.bus.send(message)
 
+    def send_message_periodic(self, message: can.Message, duration: float):
+        if message.arbitration_id in self.messages.keys():
+            raise Exception(f'Error: ID: {id} is already in use')
+        return self.bus.send_periodic(message, 0.2, duration=duration)
+
     def read_bus(self, timeout_seconds=None) -> can.Message:
         message = self.bus.recv(timeout_seconds)
         return message
