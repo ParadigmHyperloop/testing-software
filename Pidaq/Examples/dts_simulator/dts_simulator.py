@@ -230,12 +230,12 @@ class DTSSimulator:
         pass
 
     def update_motor_position_information(self):
-        self.motor_angle = self.direction_command * 10
+        self.motor_angle = 180 + random() * 180
         self.motor_speed = (
             self.speed_command if self.speed_mode_enable else self.torque_command)
         self.electrical_output_frequency = 1000 + random() * 20
         self.delta_filter_resolved = 900 + random() * 900
-        motor_angle_bytes = self.direction_command.to_bytes(2, 'little')
+        motor_angle_bytes = int(self.motor_angle).to_bytes(2, 'little')
         motor_speed_bytes = int(self.motor_speed * 10).to_bytes(2, 'little')
         electrical_output_frequency_bytes = int(
             self.electrical_output_frequency).to_bytes(2, 'little')
@@ -309,7 +309,7 @@ class DTSSimulator:
         torque_feedback_bytes = int(
             self.torque_command * 10).to_bytes(2, 'little')
         power_on_timer_bytes = int(self.power_on_timer).to_bytes(4, 'little')
-        self.internal_states.data = commanded_torque_bytes + \
+        self.torque_timer_info.data = commanded_torque_bytes + \
             torque_feedback_bytes + power_on_timer_bytes
 
     def update_modulation_index(self):
