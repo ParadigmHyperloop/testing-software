@@ -36,9 +36,10 @@ class CanManager:
             assigns data to the correct SensorReading object
     """
 
-    def __init__(self, bus_name: str) -> None:
+    def __init__(self, bus_name: str, message_frequency: float) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
         self.messages = {}
+        self.message_frequency = message_frequency
 
     def read_message_config(self, project: str, config_file: str, path=None) -> None:
         """Reads sensor readings configuration from messageconfig.json
@@ -74,7 +75,7 @@ class CanManager:
     def send_message_periodic(self, message: can.Message, duration: float):
         if message.arbitration_id in self.messages.keys():
             raise Exception(f'Error: ID: {id} is already in use')
-        return self.bus.send_periodic(message, 0.2, duration=duration)
+        return self.bus.send_periodic(message, self.message_frequency, duration=duration)
 
     def read_bus(self, timeout_seconds=None) -> can.Message:
         message = self.bus.recv(timeout_seconds)

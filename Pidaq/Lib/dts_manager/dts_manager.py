@@ -109,6 +109,7 @@ class DTS():
 
             self.current_command_message = None
             self.start_time = None
+            self.commands_finished = False
 
         def configure_motor(self, configuration=MotorConfig()) -> None:
             """ Configures the motor configuration message"""
@@ -162,6 +163,14 @@ class DTS():
             self.current_command_message = self.bus.send_message_periodic(message, duration)
 
         def send_test_commands(self, initial_config: MotorConfig=MotorConfig(), commands=None):
+            """ Sends all the commands for the test, for the specified durations
+
+            Args:
+                initial_config (MotorConfig): MotorConfig object with initial motor configuration
+                commands (List[MotorCommand]): List of motor command objects, which will be executed in order
+                                               for the specified duration
+            """
+            # Initial setup branch, only executes the first time the method is ran
             if self.start_time is None:
                 self.configure_motor(initial_config)
                 self.send_motor_command_config()
@@ -171,17 +180,24 @@ class DTS():
                 self.current_command = self.messages.popleft()
                 self.start_time = time.time()
                 self.send_motor_command(self.current_command.command)
+
+            # Compares the command duration to the time that has elapsed since the command started
             elif self.current_command.duration < time.time() - self.start_time:
+
+                # No messages left to send
                 if len(self.messages) == 0:
+                    self.commands_finished = True
                     try:
                         self.current_command_message.stop()
                     finally:
-                        return
+                        return self.commands_finished
+
+                # Get next message, reset start_time, and send message
                 self.current_command = self.messages.popleft()
                 self.start_time = time.time()
                 self.send_motor_command(self.current_command.command)
             else:
-                return
+                return self.commands_finished
 
     class DTSTelemetry():
         """ Handles the telemetry and data acquisition from the DTS motor/inverter
@@ -480,6 +496,12 @@ class DTS():
                     self.get_torque_timer_data(2, 4), byteorder='little', signed=True) / self.get_conversion_factor(self.torque_timer_id)
 
         def update_data(self):
+            """ Calls the update methods as necessary
+ 
+            Reads the can bus for the current message, assigns the message to the correct
+            sensor reading object, and calls the respective update methods to update data
+            fields based on the data type stored in the message
+            """
             current_message = self.bus.read_bus()
             self.bus.assign_message_data(current_message)
             message_id = current_message.arbitration_id
@@ -507,7 +529,7 @@ if __name__ == "__main__":
 
     motorConfiguration = MotorConfig(200, InverterDirection.Forward, InverterEnable.Inverter_On,
                                      InverterDischarge.Enable, InverterMode.Torque, 400)
-    
+
     motorCommands = [MotorCommand(300, 5), MotorCommand(400, 5), MotorCommand(500, 5), MotorCommand(400, 5), MotorCommand(100, 5)]
 
     while True:
