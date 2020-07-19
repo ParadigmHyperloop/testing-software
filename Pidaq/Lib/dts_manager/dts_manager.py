@@ -497,7 +497,7 @@ class DTS():
 
         def update_data(self):
             """ Calls the update methods as necessary
- 
+
             Reads the can bus for the current message, assigns the message to the correct
             sensor reading object, and calls the respective update methods to update data
             fields based on the data type stored in the message
@@ -523,7 +523,8 @@ class DTS():
 
 if __name__ == "__main__":
     import random
-    bus = can_manager.CanManager('vcan0')
+    message_frequency = 0.2
+    bus = can_manager.CanManager('vcan0', message_frequency)
     dts = DTS(bus)
     bus.read_message_config('dts', 'message_config.json')
 
@@ -562,3 +563,4 @@ if __name__ == "__main__":
         print('2.5V Ref Voltage: {}'.format(dts.telemetry.two_five_voltage_ref))
         print('Vab Vd Voltage: {}'.format(dts.telemetry.vab_vd_voltage))
         print('Vbc Vq Voltage: {}\n'.format(dts.telemetry.vbc_vq_voltage))
+
