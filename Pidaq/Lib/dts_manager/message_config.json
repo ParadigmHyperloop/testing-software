@@ -1,0 +1,106 @@
+{
+    "dts": {
+        "readings": [
+            {
+                "reading": "temperatures1",
+                "message_id": 160,
+                "conversion_factor": 10
+            },
+            {
+                "reading": "temperatures2",
+                "message_id": 161,
+                "conversion_factor": 10
+            },
+            {
+                "reading": "temperatures3",
+                "message_id": 162,
+                "conversion_factor": {
+                    "temp": 10,
+                    "torque": 10
+                }
+            },
+            {
+                "reading": "analogInputVoltages",
+                "message_id": 163,
+                "conversion_factor": 100
+            },
+            {
+                "reading": "digitalInputStatus",
+                "message_id": 164,
+                "conversion_factor": 1
+            },
+            {
+                "reading": "motorPositionInformation",
+                "message_id": 165,
+                "conversion_factor": {
+                    "angle": 10,
+                    "angular_velocity": 1,
+                    "frequency": 10
+                }
+            },
+            {
+                "reading": "currentInformation",
+                "message_id": 166,
+                "conversion_factor": 10
+            },
+            {
+                "reading": "voltageInformation",
+                "message_id": 167,
+                "conversion_factor": 10
+            },
+            {
+                "reading": "fluxInformation",
+                "message_id": 168,
+                "conversion_factor": {
+                    "flux": 1000,
+                    "current": 10
+                }
+            },
+            {
+                "reading": "internalVoltages",
+                "message_id": 169,
+                "conversion_factor": 100
+            },
+            {
+                "reading": "internalStates",
+                "message_id": 170,
+                "conversion_factor": 1
+            },
+            {
+                "reading": "faultCodes",
+                "message_id": 171,
+                "conversion_factor": 1
+            },
+            {
+                "reading": "torque&timerInformation",
+                "message_id": 172,
+                "conversion_factor": 10
+            },
+            {
+                "reading": "modulationIndex&fluxWeakeningOutput",
+                "message_id": 173,
+                "conversion_factor": 10
+            }
+        ]
+    },
+    "suspension": {
+        "readings": [
+            {
+                "reading": "Placeholder",
+                "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+                "conversion_factor": "Placeholder",
+                "conversion_factor_type": "Placeholder"
+            }
+        ]
+    },
+    "windtunnel": {
+        "readings": [
+            {
+                "reading": "Placeholder",
+                "message_id": "Placeholder (Will hold string representation of id (0x0A for example)",
+                "conversion_factor": "Placeholder",
+                "conversion_factor_type": "Placeholder"
+            }
+        ]
+    }
+}
