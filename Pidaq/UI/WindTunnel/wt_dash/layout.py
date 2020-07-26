@@ -49,6 +49,12 @@ load_temp_btn = dbc.Button("LOAD",
                             className="mr-1",
                             id="load-temp-btn")
 
+collapse_constants_btn = dbc.Button("+",
+                                    color="primary",
+                                    className="mr-1 align-right",
+                                    id="collapse-constants-btn")
+
+
 ### Input Groups ###
 air_speed_input = dbc.InputGroup(
     [
@@ -298,27 +304,28 @@ row3 = dbc.Row([
     dbc.Col()
 ])
 
-
 calculated_values_collapse = html.Div([
-    dbc.Collapse(
-        dbc.Card(
-            dbc.CardBody([
-                # TODO -  Place items to go in dropdown collapse here
-                row1,
-                row2,
-                row3
-            ],
-            id="calculated-values-collapse")
-        ),
-        is_open=True
-    )    
+    dbc.Card([
+        dbc.CardHeader([
+            "CONSTANTS BLAH",
+            collapse_constants_btn
+        ])  
+    ]),
+        
+    dbc.Collapse([
+        dbc.Card([
+            "TEST CARD BODY"
+            
+        ], 
+        body=True)
+    ], is_open=True)
+   
 ])
 
 # Primary GUI Tab Layout
 control_gui = html.Div([
     
-    
-     dbc.Row([
+    dbc.Row([
         dbc.Col([
             system_communication_card
         ])    
