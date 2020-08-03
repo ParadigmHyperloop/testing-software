@@ -25,7 +25,7 @@ dbc.Row([
         dbc.Card([
             dbc.InputGroup([
                 dbc.InputGroupAddon("RUNTIME", addon_type="prepend"),
-                dbc.Input(),
+                dbc.Input(id="runtime"),
             ])
         ], 
         body=True)  
@@ -38,7 +38,7 @@ dbc.Row([
         dbc.Card([
             dbc.InputGroup([
                 dbc.InputGroupAddon("TIMESTEP", addon_type="prepend"),
-                dbc.Input(),
+                dbc.Input(id="timestep"),
             ])
         ],
         body=True)  
@@ -51,7 +51,7 @@ dbc.Row([
         dbc.Card([
             dbc.InputGroup([
                 dbc.InputGroupAddon("DISPLACEMENT STEP", addon_type="prepend"),
-                dbc.Input(),
+                dbc.Input(id="displacement-step"),
             ])
         ],
         body=True)  
@@ -64,7 +64,7 @@ dbc.Row([
         dbc.Card([
             dbc.InputGroup([
                 dbc.InputGroupAddon("VELOCITY STEP", addon_type="prepend"),
-                dbc.Input(),
+                dbc.Input(id="velocity-step"),
             ])
         ],
         body=True)  
@@ -77,7 +77,7 @@ dbc.Row([
         dbc.Card([
             dbc.InputGroup([
                 dbc.InputGroupAddon("ACCELERATION STEP", addon_type="prepend"),
-                dbc.Input(),
+                dbc.Input(id="acceleration-step"),
             ])
         ],
         body=True)  
@@ -90,7 +90,7 @@ dbc.Row([
         dbc.Card([
             dbc.InputGroup([
                 dbc.InputGroupAddon("PROFILE NAME", addon_type="prepend"),
-                dbc.Input(),
+                dbc.Input(id="profile-name"),
             ])
         ],
         body=True)  
@@ -102,7 +102,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.ButtonGroup([
-                dbc.Button("SAVE PROFILE"),
+                dbc.Button("SAVE PROFILE", id="save-profile"),
                 dbc.DropdownMenu([
                     dbc.DropdownMenuItem("PROFILE 1"), dbc.DropdownMenuItem("PROFILE 2")],
                     label="LOAD PROFILE",
@@ -142,5 +142,8 @@ dbc.Row([
     ],
     width={"size": 4, "offset": 4})
 ]),
+
+ # Empty div to store output of callbacks with no output
+html.Div("", id="dump-save-profile"),
 
 ])

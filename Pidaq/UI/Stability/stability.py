@@ -8,6 +8,7 @@ import dash_daq as daq
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
+import stability_dash.callbacks.control_callbacks
 from stability_dash.app import app
 from stability_dash.layout.control import control_layout
 
