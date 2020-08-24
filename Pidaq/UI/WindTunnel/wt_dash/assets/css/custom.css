@@ -1,3 +1,8 @@
+
+/* Import required google fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
 .pad-top {
     margin-top: 15px;
 }
@@ -7,11 +12,11 @@
 }
 
 .pad-left {
-    margin-left: 15vw;
+    margin-left: 0.5vw;
 }
 
 .pad-right {
-    margin-right: 15vw;
+    margin-right: 0.5vw;
 }
 
 .pad-right-s {
@@ -32,6 +37,7 @@
 
 .custom-card {
     height: 100%;
+    width: 100%;
 }
 
 .inline-block-child {
@@ -62,3 +68,32 @@
     position: relative;
     float: right;
 }
+
+p.numerical-display-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+}
+
+p.numerical-display-value {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 30px;
+}
+
+p.numerical-display-units {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 10px;
+}
+
+.card-title {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 20px;
+    display: inline-block;
+}
+
+.input-label {
+    width: 37%;
+    /*font-family: 'Open Sans', sans-serif;*/
+}
+
+
+
