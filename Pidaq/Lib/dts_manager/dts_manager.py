@@ -66,11 +66,6 @@ class MotorCommand():
     def __init__(self, command=0.0, duration=None):
         self.command = command
         self.duration = duration
-<<<<<<< HEAD
-
-=======
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
-
 
 class DTS():
     def __init__(self, bus: can_manager.CanManager):
@@ -142,18 +137,7 @@ class DTS():
                 self.direction_command + self.mode + self.commanded_torque_limit
             self.bus.send_message(self.command_id, command_list)
 
-<<<<<<< HEAD
         def send_motor_command(self, command: float, mode=InverterMode.Torque, duration=None):
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-        def send_motor_command(self, command, mode=InverterMode.Torque):
-=======
-        def send_motor_command(self, command: float, mode=InverterMode.Torque):
-=======
-        def send_motor_command(self, command: float, mode=InverterMode.Torque, duration=None):
->>>>>>> 6fa9ddc... Changes to the way command messages are sent, bug fixes and add method for updating data
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
             """ Sends a motor command using existing info plus new speed/torque command and mode
 
             Uses all existing message configuration except for speed/torque command, and mode.
@@ -178,7 +162,6 @@ class DTS():
             self.current_command_message = self.bus.send_message_periodic(message, duration)
 
         def send_test_commands(self, initial_config: MotorConfig=MotorConfig(), commands=None):
-<<<<<<< HEAD
             """ Sends all the commands for the test, for the specified durations
 
             Args:
@@ -187,8 +170,6 @@ class DTS():
                                                for the specified duration
             """
             # Initial setup branch, only executes the first time the method is ran
-=======
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
             if self.start_time is None:
                 self.configure_motor(initial_config)
                 self.send_motor_command_config()
@@ -198,7 +179,6 @@ class DTS():
                 self.current_command = self.messages.popleft()
                 self.start_time = time.time()
                 self.send_motor_command(self.current_command.command)
-<<<<<<< HEAD
 
             # Compares the command duration to the time that has elapsed since the command started
             elif self.current_command.duration < time.time() - self.start_time:
@@ -212,23 +192,11 @@ class DTS():
                         return self.commands_finished
 
                 # Get next message, reset start_time, and send message
-=======
-            elif self.current_command.duration < time.time() - self.start_time:
-                if len(self.messages) == 0:
-                    try:
-                        self.current_command_message.stop()
-                    finally:
-                        return
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
                 self.current_command = self.messages.popleft()
                 self.start_time = time.time()
                 self.send_motor_command(self.current_command.command)
             else:
-<<<<<<< HEAD
                 return self.commands_finished
-=======
-                return
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
 
     class DTSTelemetry():
         """ Handles the telemetry and data acquisition from the DTS motor/inverter
@@ -527,15 +495,12 @@ class DTS():
                     self.get_torque_timer_data(2, 4), byteorder='little', signed=True) / self.get_conversion_factor(self.torque_timer_id)
 
         def update_data(self):
-<<<<<<< HEAD
             """ Calls the update methods as necessary
 
             Reads the can bus for the current message, assigns the message to the correct
             sensor reading object, and calls the respective update methods to update data
             fields based on the data type stored in the message
             """
-=======
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
             current_message = self.bus.read_bus()
             self.bus.assign_message_data(current_message)
             message_id = current_message.arbitration_id
@@ -567,11 +532,6 @@ if __name__ == "__main__":
     
     motorCommands = [MotorCommand(300, 5), MotorCommand(400, 5), MotorCommand(500, 5), MotorCommand(400, 5), MotorCommand(100, 5)]
 
-<<<<<<< HEAD
-    motorCommands = [MotorCommand(300, 5), MotorCommand(400, 5), MotorCommand(500, 5), MotorCommand(400, 5), MotorCommand(100, 5)]
-
-=======
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
     while True:
         dts.control.send_test_commands(motorConfiguration, motorCommands)
         dts.telemetry.update_data()
