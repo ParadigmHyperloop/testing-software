@@ -1,8 +1,12 @@
 #include <Arduino.h>
 
+#include "mcp2515.h"
+
 void setup()
 {
-    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(PIN_SPI_SS, OUTPUT);
+
+    MCP2515 mcp2515{PIN_SPI_SS};
 }
 
 void loop()
