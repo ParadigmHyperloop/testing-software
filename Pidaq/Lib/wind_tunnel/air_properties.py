@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import interpolate
+import logging
 
 class linearInterpolation:
     def __init__(self):
@@ -14,14 +15,27 @@ class linearInterpolation:
         0.0186, 0.01907, 0.01953, 0.01999, 0.02088, 0.02174, 0.02279, 0.0238, 0.02478, 0.02573, 0.02666, 0.02928, 0.03287, 0.03547,
         0.03825, 0.04085, 0.04332, 0.04566, 0.04788, 0.05001])
         
-        self.f = interpolate.interp1d(self.temperature, self.density, bounds_error = True, assume_sorted = True)
+        self.densityFunc = interpolate.interp1d(self.temperature, self.density, bounds_error = True, assume_sorted = True)
         
-        self.g = interpolate.interp1d(self.temperature, self.dynmcViscosity, assume_sorted = True)
+        self.viscosityFunc = interpolate.interp1d(self.temperature, self.dynmcViscosity, bounds_error = True, assume_sorted = True)
 
     def interpolateDensity(self, inputTemp):
-        return self.f(inputTemp)
+        logger = logging.getLogger()
+        try:
+            value= self.densityFunc(inputTemp)
+        except ValueError as e:
+           logger.error("Temperature out of bounds, returning 0. " + str(e))
+           value = 0
+        return value
     
     def interpolateViscosity(self, inputTemp):
-        return self.g(inputTemp)
+        logger = logging.getLogger()
+        try:
+            value= self.viscosityFunc(inputTemp)
+        except ValueError as e:
+            logger.error("Temperature out of bounds, returning 0. " + str(e))
+            value = 0
+        return value
+
 
         

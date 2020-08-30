@@ -1,7 +1,7 @@
 from air_properties import linearInterpolation
 
 interObject = linearInterpolation() # Create the object
-x = interObject.interpolateDensity(2.5) # interpolate density at Temperature = 2.5
-y = interObject.interpolateViscosity(2.5) # interpolate dynamic viscosity at Temperature = 2.5
+x = interObject.interpolateDensity(-76) # interpolate density
+y = interObject.interpolateViscosity(-76) # interpolate dynamic viscosity 
 print(x) 
 print(y)
