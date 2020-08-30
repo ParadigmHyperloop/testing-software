@@ -73,9 +73,10 @@ def save_profile(save_clicks, profile_name, runtime, timestep, displacement, vel
     [Output("load-profile", "options"),
     Output("load-profile", "value")],
     [Input("save-load-connection", "value"),
+    Input("delete-load-connection", "value"),
     Input("save-profile", "n_clicks")]
 )
-def update_load_profile(profile_name, save_clicks):
+def update_load_profile(profile_name, empty, save_clicks):
     folder_path = os.getcwd()
     path_to_file = os.path.join(folder_path, "profiles.json")
     with open(path_to_file, 'r') as profiles_file:
@@ -115,3 +116,23 @@ def load_profile(load_profile_value):
                 acceleration = profile['acceleration-step']
 
     return profile_name, runtime, timestep, displacement, velocity, acceleration
+
+@app.callback(
+    Output("delete-load-connection", "value"),
+    [Input("delete-profile", "n_clicks")],
+    [State("load-profile", "value")]
+
+)
+def delete_profile(delete_clicks, load_profile_value ):
+    if not delete_clicks:
+        raise dash.exceptions.PreventUpdate
+
+    folder_path = os.getcwd()
+    path_to_file = os.path.join(folder_path, "profiles.json")
+    with open(path_to_file, 'r') as profiles_file:
+        profiles_json = json.load(profiles_file)
+        new_profiles_json = {}
+        new_profiles_json['profiles'] = [x for x in profiles_json['profiles'] if x['name'] != load_profile_value]
+        with open(path_to_file, 'w') as profiles_file:
+            json.dump(new_profiles_json, profiles_file, indent=4)
+        return load_profile_value

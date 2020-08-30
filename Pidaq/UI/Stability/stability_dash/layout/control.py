@@ -103,6 +103,7 @@ dbc.Row([
         dbc.Card([
             dbc.ButtonGroup([
                 dbc.Button("SAVE PROFILE", id="save-profile"),
+                dbc.Button("DELETE PROFILE", id="delete-profile"),
                 dcc.Dropdown(
                     id = "load-profile",
                     options = [
@@ -145,7 +146,7 @@ dbc.Row([
     width={"size": 4, "offset": 4})
 ]),
 
- # Empty div to store output of callbacks with no output
 html.Div("", id="save-load-connection"),
+html.Div("", id="delete-load-connection"),
 
 ])
