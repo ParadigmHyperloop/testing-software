@@ -36,9 +36,10 @@ class CanManager:
             assigns data to the correct SensorReading object
     """
 
-    def __init__(self, bus_name: str) -> None:
+    def __init__(self, bus_name: str, message_frequency: float) -> None:
         self.bus = can.interfaces.socketcan.SocketcanBus(channel=bus_name)
         self.messages = {}
+        self.message_frequency = message_frequency
 
     def read_message_config(self, project: str, config_file: str, path=None) -> None:
         """Reads sensor readings configuration from messageconfig.json
@@ -62,7 +63,7 @@ class CanManager:
                 self.messages[message_id] = SensorReading(
                     reading['message_id'],
                     reading['reading'],
-                    reading['conversion_factor'],
+                    reading['conversion_factor'] if reading['conversion_factor'] else None,
                 )
 
     def send_message(self, id: int, data: list) -> None:
@@ -70,6 +71,11 @@ class CanManager:
             raise Exception(f'Error: ID: {id} is already in use')
         message = can.Message(arbitration_id=id, data=data)
         self.bus.send(message)
+
+    def send_message_periodic(self, message: can.Message, duration: float):
+        if message.arbitration_id in self.messages.keys():
+            raise Exception(f'Error: ID: {id} is already in use')
+        return self.bus.send_periodic(message, self.message_frequency, duration=duration)
 
     def read_bus(self, timeout_seconds=None) -> can.Message:
         message = self.bus.recv(timeout_seconds)
@@ -99,8 +105,8 @@ class SensorReading:
     Attributes:
         message_id (int): represents the can arbitration id, is a hexidecimal integer
         reading (str): contains the name of the measurement
-        conversion_factor (int or float)
-        conversion_factor_type (str)
+        conversion_factor: contains the conversion factor for the reading,
+                            or a dict of factors if there are multiple
         data (int or float)
     """
 

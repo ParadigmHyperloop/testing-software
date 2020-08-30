@@ -1,10 +1,7 @@
 import dash
 import dash_bootstrap_components as dbc
-import dash_daq as daq
-import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
-import pandas as pd
 
 
 # Alerts
@@ -18,24 +15,31 @@ exceed_60s_alert = dbc.Alert("WARNING: Current test length exceeds 60s!",
 no_name_alert = dbc.Alert("ERROR: Please select a test profile name!",
                              id="no-name-alert",
                              is_open=False,
-                             duration=5000,
+                             duration=4000,
+                             color="warning",
+                             dismissable=True)
+
+invalid_value_alert = dbc.Alert("ERROR: Invalid value!",
+                             id="invalid-value-alert",
+                             is_open=False,
+                             duration=2000,
                              color="warning",
                              dismissable=True)
 
 # Buttons
-add_command_btn = dbc.Button("Add Command",
+add_command_btn = dbc.Button("Add",
                             color="primary",
                             className="mr-1",
                             id="add-command-btn",
                             style={"text-align": "center"})
 
-start_test_btn =  dbc.Button("Start",
+start_test_btn =  dbc.Button("Start Test",
                             color="success",
                             className="mr-1",
                             id="test-start-btn",
                             style={"width": "100%"})
 
-stop_test_btn =  dbc.Button("Stop",
+stop_test_btn =  dbc.Button("Stop Test",
                             color="danger",
                             className="mr-1 pad-top",
                             id="test-stop-btn",
@@ -79,7 +83,7 @@ export_profile_btn = dbc.Button("Export Profile",
                                 className="mr-1 align-right",
                                 id="export-profile-btn")
 
-load_profiles_btn = dbc.Button("Load Profile",
+load_profile_btn = dbc.Button("Load Profile",
                                 color="primary",
                                 className="mr-1 align-right",
                                 id="load-profile-btn")
@@ -105,15 +109,15 @@ start_warn_modal = dbc.Modal([
                         id="start-confirm-dialog")
 
 # Tables
-df = pd.DataFrame(columns=["Type", "Step Duration(ms)", "Value"])
+timestep_table_header = [
+    html.Thead(html.Tr([html.Th("Type"), 
+                        html.Th("Step Duration(ms)"), 
+                        html.Th("Value")]))
+]
 
-timestep_readout_table = dash_table.DataTable(
-    id="timestep-readout-tbl",
-    columns=[{"name": i, "id": i} for i in df.columns],
-    data=df.to_dict('records'),
-    editable=False,
-    style_as_list_view=True,
-    style_table={"height": 300, "overflowY": "auto"}
+timestep_readout_table = dbc.Table(
+    children=timestep_table_header,
+    id="timestep-readout-tbl"
 )
 
 # Main Control GUI Bootstrap Layout
@@ -125,6 +129,7 @@ control_layout = html.Div([
     # Alerts
     exceed_60s_alert,
     no_name_alert,
+    invalid_value_alert,
     
     # Bootstrap Layout
     dbc.Row([
@@ -147,7 +152,7 @@ control_layout = html.Div([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H3(["DTS", html.Br(), "CONTROLS"],
+                    html.H3(["DTS"],
                             style={"text-align": "center"})
                 ])
             ], className="custom-card")
@@ -186,7 +191,7 @@ control_layout = html.Div([
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("RPM / Torque", style={"text-align": "center"}),
+                dbc.CardHeader("Mode", style={"text-align": "center"}),
                 dbc.CardBody([
                     dbc.ButtonGroup(
                         [torque_toggle_btn, rpm_toggle_btn],
@@ -218,7 +223,7 @@ control_layout = html.Div([
         
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("RPM / Torque Value", style={"text-align": "center"}),
+                dbc.CardHeader("Value", style={"text-align": "center"}),
                 dbc.CardBody([
                     dbc.InputGroup([
                         dbc.Input(type="number",
@@ -226,7 +231,8 @@ control_layout = html.Div([
                                   step=100,
                                   min=0,
                                   max=10000,
-                                  value=0),
+                                  value=0,
+                                  style={"width": "60%"}),
                         dbc.InputGroupAddon(add_command_btn,
                                             addon_type="append")
                     ])
@@ -242,7 +248,7 @@ control_layout = html.Div([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader([
-                    "Time-Step Readout of Test Torque/RPM Input Profile",
+                    "Time-Step Readout of Input Profile",
                     export_profile_btn
                     ], 
                     style={"text-align": "center"}),
