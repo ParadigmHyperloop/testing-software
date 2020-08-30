@@ -11,7 +11,6 @@ ADS114S0 ads114s0{EADC_SS};
 
 void setup()
 {
-    pinMode(PIN_SPI_SS, OUTPUT);
     pinMode(A0, INPUT);
 
     ads114s0.reset();
@@ -26,8 +25,8 @@ void loop()
     Serial.println(internalReading);
     Serial.println(externalReading);
 
-    can_frame internalMessage = { 200, 2, { (uint8_t)((internalReading & 0xff00) >> 8), (uint8_t)(internalReading & 0x00ff) } };
-    can_frame externalMessage = { 201, 2, { (uint8_t)((externalReading & 0xff00) >> 8), (uint8_t)(externalReading & 0x00ff) } };
+    can_frame internalMessage = { 200, 2, {(uint8_t)((internalReading & 0xff00) >> 8), (uint8_t)(internalReading & 0x00ff)} };
+    can_frame externalMessage = { 201, 2, {(uint8_t)((externalReading & 0xff00) >> 8), (uint8_t)(externalReading & 0x00ff)} };
 
     mcp2515.sendMessage(&internalMessage);
     mcp2515.sendMessage(&externalMessage);

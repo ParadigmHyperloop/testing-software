@@ -4,6 +4,15 @@
 
 Dps310 pressure;
 
+#include "adc_ADS114S0.h"
+#include "mcp2515.h"
+
+#define EADC_SS 8
+#define CAN_SS 9
+
+MCP2515 mcp2515{CAN_SS};
+ADS114S0 ads114s0{EADC_SS};
+
 void setup()
 {
     pinMode(LED_BUILTIN, OUTPUT);
