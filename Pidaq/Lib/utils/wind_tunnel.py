@@ -15,11 +15,3 @@ class BlowerInverter:
 
     def write_registers(self, address, values):
         return self.client.write_registers(address, values, unit=0).registers
-
-    def readwrite_registers(self, read_address, read_count, write_address, write_registers, unit):
-        return self.client.readwrite_registers(read_address=read_address,
-                                               read_count=read_count,
-                                               write_address=write_address,
-                                               write_registers=write_registers,
-                                               unit=unit).registers
-
