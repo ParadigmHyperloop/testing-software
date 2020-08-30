@@ -562,7 +562,3 @@ if __name__ == "__main__":
         print('2.5V Ref Voltage: {}'.format(dts.telemetry.two_five_voltage_ref))
         print('Vab Vd Voltage: {}'.format(dts.telemetry.vab_vd_voltage))
         print('Vbc Vq Voltage: {}\n'.format(dts.telemetry.vbc_vq_voltage))
-<<<<<<< HEAD
-
-=======
->>>>>>> cbc556e... Changes to the way command messages are sent, bug fixes and add method for updating data
