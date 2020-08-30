@@ -103,10 +103,12 @@ dbc.Row([
         dbc.Card([
             dbc.ButtonGroup([
                 dbc.Button("SAVE PROFILE", id="save-profile"),
-                dbc.DropdownMenu([
-                    dbc.DropdownMenuItem("PROFILE 1"), dbc.DropdownMenuItem("PROFILE 2")],
-                    label="LOAD PROFILE",
-                    group=True,)
+                dcc.Dropdown(
+                    id = "load-profile",
+                    options = [
+                    ],
+                    placeholder="LOAD PROFILE",
+                    style={'width': '70%'})
             ])
         ],
         body=True)  
@@ -117,7 +119,7 @@ dbc.Row([
 dbc.Row([
     dbc.Col([
         dbc.Card([
-            dbc.Button("RECORD", color="success", block = True)
+            dbc.Button("RECORD", id="record", color="success", block = True)
         ])  
     ],
     width={"size": 1, "offset": 4}),
@@ -141,9 +143,6 @@ dbc.Row([
         dbc.Card([dbc.Button("EMERGENCY STOP", color="danger", block = True )] , body=True)  
     ],
     width={"size": 4, "offset": 4})
-]),
-
- # Empty div to store output of callbacks with no output
-html.Div("", id="dump-save-profile"),
+])
 
 ])
