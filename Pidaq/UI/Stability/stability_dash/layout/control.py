@@ -143,6 +143,9 @@ dbc.Row([
         dbc.Card([dbc.Button("EMERGENCY STOP", color="danger", block = True )] , body=True)  
     ],
     width={"size": 4, "offset": 4})
-])
+]),
+
+ # Empty div to store output of callbacks with no output
+html.Div("", id="save-load-connection"),
 
 ])

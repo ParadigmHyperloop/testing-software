@@ -10,7 +10,7 @@ from stability_dash.layout.control import control_layout
 
 
 @app.callback(
-    Output("load-profile", "value"),
+    Output("save-load-connection", "value"),
     [Input("save-profile", "n_clicks")],
     [State("profile-name", "value"),
      State("runtime", "value"),
@@ -70,10 +70,12 @@ def save_profile(save_clicks, profile_name, runtime, timestep, displacement, vel
     return profile_name
 
 @app.callback(
-    Output("load-profile", "options"),
-    [Input("save-profile", "n_clicks")]
+    [Output("load-profile", "options"),
+    Output("load-profile", "value")],
+    [Input("save-load-connection", "value"),
+    Input("save-profile", "n_clicks")]
 )
-def update_load_profile(save_clicks):
+def update_load_profile(profile_name, save_clicks):
     folder_path = os.getcwd()
     path_to_file = os.path.join(folder_path, "profiles.json")
     with open(path_to_file, 'r') as profiles_file:
@@ -84,7 +86,7 @@ def update_load_profile(save_clicks):
             profile_labels.append(profile['name'])
         for i in profile_labels:
             options.append({'label': i, 'value': i})
-        return options
+        return options, profile_name
 
 @app.callback(
     [Output("profile-name", "value"),
