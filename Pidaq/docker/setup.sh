@@ -20,5 +20,17 @@ fi
 sudo docker pull influxdb
 sudo docker pull grafana/grafana
 
-docker run -d --name=influxdb -p 8086:8086 -v /var/lib/influxdb:/var/lib/influxdb influxdb
-docker run -d --name=grafana -p 3000:3000 grafana/grafana
+
+if docker run -d --name=influxdb -p 8086:8086 -v /var/lib/influxdb:/var/lib/influxdb influxdb
+then
+	echo "created influxdb container" 
+else
+	docker start influxdb
+fi
+
+if docker run -d --name=grafana -p 3000:3000 grafana/grafana
+then
+	echo "created grafana container" 
+else
+	docker start grafana
+fi
