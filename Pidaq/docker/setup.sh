@@ -17,8 +17,12 @@ if ! [ -x "$(command -v docker)" ]; then
 	sudo sh get-docker.sh
 fi
 
+mkdir grafanaData 
+ID=$(id -u) 
+
 sudo docker pull influxdb
 sudo docker pull grafana/grafana
 
 docker run -d --name=influxdb -p 8086:8086 -v /var/lib/influxdb:/var/lib/influxdb influxdb
-docker run -d --name=grafana -p 3000:3000 grafana/grafana
+docker run -d --user $ID --name=grafana --volume "$PWD/grafanaData:/var/lib/grafana" -p 3000:3000 grafana/grafana grafana
+
