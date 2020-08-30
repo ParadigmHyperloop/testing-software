@@ -1,10 +1,13 @@
-# sudo apt-get update
-# sudo apt-get upgrade -y
+#!/bin/bash
+sudo apt-get update
+sudo apt-get upgrade -y
+
 cd $HOME/Desktop/
 FILE=testing-software/
+
 if [ -d "$FILE" ]
 then
-	echo "$REPO repository already exists."
+	echo "$FILE repository already exists."
 else
 	git clone https://github.com/ParadigmHyperloop/testing-software.git
 fi
@@ -16,3 +19,6 @@ fi
 
 sudo docker pull influxdb
 sudo docker pull grafana/grafana
+
+docker run -d --name=influxdb -p 8086:8086 -v /var/lib/influxdb:/var/lib/influxdb influxdb
+docker run -d --name=grafana -p 3000:3000 grafana/grafana
