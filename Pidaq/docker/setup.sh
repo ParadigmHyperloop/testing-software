@@ -17,6 +17,9 @@ if ! [ -x "$(command -v docker)" ]; then
 	sudo sh get-docker.sh
 fi
 
+mkdir grafanaData 
+ID=$(id -u) 
+
 sudo docker pull influxdb
 sudo docker pull grafana/grafana
 
@@ -28,9 +31,11 @@ else
 	docker start influxdb
 fi
 
-if docker run -d --name=grafana -p 3000:3000 grafana/grafana
+if docker run -d --user $ID --name=grafana --volume "$PWD/grafanaData:/var/lib/grafana" -p 3000:3000 grafana/grafana grafana
+
 then
 	echo "created grafana container" 
 else
 	docker start grafana
 fi
+
