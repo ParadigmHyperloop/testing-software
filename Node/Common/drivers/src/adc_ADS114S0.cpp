@@ -35,7 +35,7 @@ void ADS114S0::reset()
 void ADS114S0::writeRegister(const Register reg, const uint8_t value)
 {
     beginSPI();
-    SPI.transfer16(WREG | reg<<16);
+    SPI.transfer16(WREG | ((reg<<8) & 0xff00));
     SPI.transfer(value);
     endSPI();
 }
@@ -43,7 +43,7 @@ void ADS114S0::writeRegister(const Register reg, const uint8_t value)
 void ADS114S0::writeRegisters(const Register reg, const uint8_t values[], const uint8_t num)
 {
     beginSPI();
-    SPI.transfer16(WREG | reg<<16 | (num - 1)<<8);
+    SPI.transfer16(WREG | ((reg<<8) & 0xff00) | ((num - 1) & (0x00ff)));
     for (uint8_t i = 0; i < num; i++)
     {
         SPI.transfer(values[i]);
@@ -54,7 +54,7 @@ void ADS114S0::writeRegisters(const Register reg, const uint8_t values[], const 
 uint8_t ADS114S0::readRegister(const Register reg)
 {
     beginSPI();
-    SPI.transfer16(RREG | reg<<16);
+    SPI.transfer16(RREG | ((reg<<8) & 0xff00));
     uint8_t value = SPI.transfer(0x00);
     endSPI();
 
@@ -64,7 +64,7 @@ uint8_t ADS114S0::readRegister(const Register reg)
 void ADS114S0::readRegisters(const Register reg, uint8_t values[], const uint8_t num)
 {
     beginSPI();
-    SPI.transfer16(RREG | reg<<16 | (num - 1)<<8);
+    SPI.transfer16(WREG | ((reg<<8) & 0xff00) | ((num - 1) & (0x00ff)));
     for (uint8_t i = 0; i < num; i++)
     {
         values[i] = SPI.transfer(0x00);
