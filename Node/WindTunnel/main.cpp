@@ -20,11 +20,8 @@ CANMessage messages[] = {};
 
 void setup()
 {
-<<<<<<< HEAD
     pinMode(LED_BUILTIN, OUTPUT);
     pressure.begin(Wire);
-=======
->>>>>>> 9e38a53... Continued definition of main code using newly created SensorReading and CANMessage classes
 }
 
 void loop()

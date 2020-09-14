@@ -1,3 +1,5 @@
+#include <Wire.h>
+
 #include "adc_ADS114S0.h"
 #include "can.h"
 #include "mcp2515.h"
