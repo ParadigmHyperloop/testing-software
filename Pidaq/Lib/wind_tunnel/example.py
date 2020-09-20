@@ -1,6 +1,7 @@
 from air_properties import linearInterpolation
 import os
 import logging
+import sys
 
 logger = logging.getLogger()
 
@@ -14,6 +15,7 @@ while 1:
         logger.warning("Path does not exist. \nPlease enter a valid path: ")
 
 interObject = linearInterpolation(filePath)
+
 
 value = input("Enter temperature value, or write \"exit\" to end: ")
 while(value != "exit"):
