@@ -1,14 +1,47 @@
-import numpy as np
-from scipy import interpolate
-import logging
-import csv
-import sys
+"""Contains class that defines linear interpolation functions for wind tunnel testing
 
-class linearInterpolation:
+Classes:
+    LinearInterpolation
+"""
+
+import csv
+import logging
+import sys
+from scipy import interpolate
+
+class LinearInterpolation:
+    """Creates linear interpolation functions for density and dynamic viscosity
+
+    This class defines two functions that are used to linearly interpolate
+    density (kg/m3) and dynamic viscosity (Pa*S) based on temperature (°C)
+    for the purpose of wind tunnel testing.
+    
+    Attributes:
+        densityFunc
+        viscosityFunc
+
+    Methods:
+        interpolateDensity
+        interpolateViscosity
+    """
 
     def __init__(self, path):
+        """
+        Reads a CSV file to define two functions for each of density and dynamic
+        viscosity that can be used with temperature.  The CSV should have same
+        structure as current one in Drive, where the units are in the second row.
+        
+        Parameters:
+            path - path to a CSV file of the air properties
+        """
         self.logger = logging.getLogger()
-        with open(path) as file: # Open the csv file
+
+        try:
+            open(path) # Open the CSV file
+        except IOError as err:
+            self.logger.error(err)
+            sys.exit()
+        with open(path) as file:
             csv_reader= csv.reader(file, delimiter =',')
             next(csv_reader) # Skip the first row
             tempCol, densityCol, viscosityCol = -1,-1,-1
@@ -17,8 +50,7 @@ class linearInterpolation:
             count = 0 # For tracking the column index
             for cell in row: # This loop determines the column index for 
                     # temperature, density, and dynamic viscosity based on units
-    
-                # if the cell contains °C, store its index
+
                 if cell.find('°C') != -1:
                     tempCol = count
 
@@ -29,7 +61,8 @@ class linearInterpolation:
                     viscosityCol = count
                 count += 1
 
-            if tempCol == -1: # if °C is not in any column header, terminate the script
+            # if a unit is not found, terminate the script
+            if tempCol == -1: 
                 self.logger.error("Could not find \"°C\" in any column header.")
                 sys.exit()
             if densityCol == -1: 
@@ -47,15 +80,18 @@ class linearInterpolation:
                 densityList.append(float(row[densityCol]))
                 viscosityList.append(float(row[viscosityCol]))
             
-            # Create the interpolation function for density
+            # Define the interpolation function for density
             self.densityFunc = interpolate.interp1d(tempList, densityList,
                                                     bounds_error = True, assume_sorted = True)
             
-            # Create the interpolation function for viscosity
+            # Define the interpolation function for viscosity
             self.viscosityFunc = interpolate.interp1d(tempList, viscosityList, 
-                                                      bounds_error = True, assume_sorted = True)
+                                                        bounds_error = True, assume_sorted = True)
 
     def interpolateDensity(self, inputTemp):
+        """Return interpolated value of density based on temperature.
+        If temperature is out of bounds, return 0.        
+        """
         try:
             value= self.densityFunc(inputTemp)
         except ValueError as e:
@@ -64,6 +100,9 @@ class linearInterpolation:
         return value
     
     def interpolateViscosity(self, inputTemp):
+        """Return interpolated value of dynamic viscosity based on temperature.
+        If temperature is out of bounds, return 0.
+        """
         try:
             value= self.viscosityFunc(inputTemp)
         except ValueError as e:
