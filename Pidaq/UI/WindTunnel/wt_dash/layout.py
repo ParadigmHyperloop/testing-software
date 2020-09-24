@@ -2,22 +2,24 @@
 
 Wind Tunnel GUI dash layout
 """
+
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_daq as daq
 
+ground_speed_active = False
 
-# CONSTANTS
-MAX_AIRSPEED = 100
+# MIN/MAX CONSTANTS
 MIN_AIRSPEED = 0
+MAX_AIRSPEED = 100
 
+MIN_INCREMENTS = 1
 MAX_INCREMENTS = 100
-MIN_INCREMENTS = 100
 
 MIN_GROUNDSPEED = 0
-MAX_GROUNDSPEED = 200
+MAX_GROUNDSPEED = 100
 
 MIN_HEIGHT = 0
 MAX_HEIGHT = 100
@@ -59,24 +61,34 @@ distance_sensor_btn = dbc.Button("+",
                                  className="mr-1 align-right",
                                  id="distance-sensor-btn")
 
-update_profile_btn = dbc.Button("UPDATE PROFILE",
-                                 color="primary",
-                                 className="mr-1",
-                                 id="update-profile-btn")
+abort_btn = dbc.Button("Abort",
+                        color="danger",
+                        className="mr-1 align-right",
+                        id="collapse-constants-btn")
 
 init_stepper_btn = dbc.Button("INITIALIZE STEPPER",
                                  color="warning",
                                  className="mr-1",
-                                 id="init-stepper-btn")
+                                 id="init-stepper-btn",
+                                 style={"width":"100%",
+                                        "height":"100%"})
+
+lock_stepper_btn = dbc.Button("LOCK STEPPERS",
+                                 color="success",
+                                 className="mr-1",
+                                 id="lock-stepper-btn",
+                                 style={"width":"100%",
+                                        "height":"100%"})
 
 start_btn = dbc.Button("START",
-                        color="success",
+                        color="secondary",
                         className="mr-1",
                         id="start-btn",
+                        disabled=True,
                         style={"height":"100%",
                                "width":"100%"})
 
-estop_btn = dbc.Button("ESTOP",
+estop_btn = dbc.Button("STOP",
                         color="danger",
                         className="mr-1",
                         id="estop-btn",
@@ -84,7 +96,18 @@ estop_btn = dbc.Button("ESTOP",
                                 "width":"100%"})
 
 
-### Input Groups ###
+### Inputs ###
+test_name_input = dbc.InputGroup(
+    [
+        dbc.InputGroupAddon("Test Name", className="input-label"),
+        dbc.Input(id="test-name-input",
+                  bs_size="md",
+                  type="text"),
+        dbc.InputGroupAddon("n/a", className="input-units")
+    ],
+    className="mb-3"
+)
+
 air_speed_input = dbc.InputGroup(
     [
         dbc.InputGroupAddon("Air Speed", className="input-label"),
@@ -94,7 +117,7 @@ air_speed_input = dbc.InputGroup(
                   placeholder="Air velocity",
                   min=MIN_AIRSPEED,
                   max=MAX_AIRSPEED),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon("m/s", className="input-units")
     ],
     className="mb-3"
 )
@@ -108,7 +131,7 @@ increments_input = dbc.InputGroup(
                   placeholder="# of test increments",
                   min=MIN_INCREMENTS,
                   max=MAX_INCREMENTS),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon("n/a", className="input-units")
     ],
     className="mb-3"
 )
@@ -122,12 +145,12 @@ timestep_input = dbc.InputGroup(
                   placeholder="Step duration",
                   min=MIN_TIMESTEP,
                   max=MAX_TIMESTEP),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon("s", className="input-units")
     ],
     className="mb-3"
 )
 
-# Ground speed input disabled for the time being
+#TODO Disable ground speed input
 ground_speed_input = dbc.InputGroup(
     [
         dbc.InputGroupAddon("Ground Speed", className="input-label"),
@@ -137,22 +160,22 @@ ground_speed_input = dbc.InputGroup(
                   placeholder="Treadmill speed",
                   min=MIN_GROUNDSPEED,
                   max=MAX_GROUNDSPEED,
-                  disabled=True),
-        dbc.InputGroupAddon("units", addon_type="append")
+                  disabled=False),
+        dbc.InputGroupAddon("m/s", className="input-units")
     ],
     className="mb-3"
 )
 
-height_input = dbc.InputGroup(
+stepper_height_input = dbc.InputGroup(
     [
-        dbc.InputGroupAddon("Height", className="input-label"),
+       dbc.InputGroupAddon("Height", className="input-label"),
         dbc.Input(id="height-input",
                   bs_size="md",
                   type="number",
-                  placeholder="Stepper height",
+                  placeholder="Stepper Height",
                   min=MIN_HEIGHT,
                   max=MAX_HEIGHT),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon(f"m", className="input-units")
     ],
     className="mb-3"
 )
@@ -166,7 +189,7 @@ surface_area_input = dbc.InputGroup(
                   placeholder="Surface area",
                   min=MIN_SA,
                   max=MAX_SA),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon(f"m\N{SUPERSCRIPT TWO}", className="input-units")
     ],
     className="mb-3"
 )
@@ -180,7 +203,7 @@ fra_input = dbc.InputGroup(
                   placeholder="Frontal ref. area",
                   min=MIN_FRA,
                   max=MAX_FRA),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon(f"m\N{SUPERSCRIPT TWO}", className="input-units")
     ],
     className="mb-3"
 )
@@ -195,12 +218,11 @@ aoa_input = dbc.InputGroup(
                   min=MIN_AOA,
                   max=MAX_AOA,
                   step=5),
-        dbc.InputGroupAddon("units", addon_type="append")
+        dbc.InputGroupAddon("°", className="input-units")
     ],
     className="mb-3"
 )
 
-# TODO Center vertically
 temp_input = dbc.InputGroup(
     [
         dbc.InputGroupAddon("TEMP", addon_type="prepend", id="current-temp"),
@@ -222,22 +244,23 @@ temp_input = dbc.InputGroup(
 inverter_config_card = dbc.Card([
     dbc.CardHeader("INVERTER CONFIG"),
     dbc.CardBody([
+            test_name_input,
             air_speed_input,
+            ground_speed_input, 
             increments_input,
             timestep_input,
-            ground_speed_input   
     ])
-])
+], className="custom-card")
 
 stepper_config_card = dbc.Card([
     dbc.CardHeader("STEPPER CONFIG"),
     dbc.CardBody([
-          height_input,
-          surface_area_input,
-          fra_input,
-          aoa_input  
+        stepper_height_input,
+        surface_area_input,
+        fra_input,
+        aoa_input,    
     ])
-])
+], className="custom-card")
 
 environmental_config_card = dbc.Card([
     dbc.CardBody([
@@ -258,29 +281,9 @@ environmental_config_card = dbc.Card([
             temp_input
         ], style={"justify-content":"center"})
     ])
-], className="custom-card")
-
-update_profile_card = dbc.Card([
-    update_profile_btn
-], 
-body=True)
-
-init_stepper_card = dbc.Card([
-    init_stepper_btn
-], 
-body=True)
-
-start_card = dbc.Card([
-    start_btn
 ], 
 body=True,
-style={"height":"150px"})
-
-estop_card = dbc.Card([
-    estop_btn
-], 
-body=True,
-style={"height":"150px"})
+className="custom-card")
 
 system_communication_card = dbc.Card([
     dbc.CardHeader("SYSTEM COMMUNICATION"),
@@ -327,12 +330,74 @@ system_communication_card = dbc.Card([
     ])
 ], className="custom-card")
 
+state_indicator_card = dbc.Card([
+                daq.Indicator(
+                    id="state-1",
+                    label="STEPPERS CONFIGURED",
+                    labelPosition="bottom",
+                    value=False, # Default false for indicators
+                    color="#808080",
+                    height=30,
+                    className="pad-top indicator-label"
+                ),
+                     
+                daq.Indicator(
+                    id="state-2",
+                    label="STEPPERS INITIALIZED",
+                    labelPosition="bottom",
+                    value=False, # Default false for indicators
+                    color="#808080",
+                    height=30,
+                    className="pad-top indicator-label"
+                ),
+                
+                daq.Indicator(
+                    id="state-3",
+                    label="STEPPERS LOCKED",
+                    labelPosition="bottom",
+                    value=False, # Default false for indicators
+                    color="#808080",
+                    height=30,
+                    className="pad-top indicator-label"
+                ),
+                                
+                daq.Indicator(
+                    id="state-4",
+                    label="INVERTERS CONFIGURED",
+                    labelPosition="bottom",
+                    value=False, # Default false for indicators
+                    color="#808080",
+                    height=30,
+                    className="pad-top indicator-label"
+                ),
+                                                
+                daq.Indicator(
+                    id="state-5",
+                    label="READY",
+                    labelPosition="bottom",
+                    value=False, # Default false for indicators
+                    color="#808080",
+                    height=30,
+                    className="pad-top indicator-label"
+                ),  
+                
+                daq.Indicator(
+                    id="state-6",
+                    label="TEST ACTIVE",
+                    labelPosition="bottom",
+                    value=False, # Default false for indicators
+                    color="#808080",
+                    height=30,
+                    className="pad-top indicator-label"
+                ),   
+            ],body=True, className="custom-card", style={"text-align":"center"})
+    
 ### DISPLAY CARDS ###
 kin_viscosity_card = dbc.Card(
             dbc.CardBody([
                 html.P("Kinematic Viscosity", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="kin-viscosity-value"),
-                html.P("cSt", className="numerical-display-units", style={"display":"inline-block"})
+                html.P(f"m\N{SUPERSCRIPT TWO}/s*10\u207B\u2076", className="numerical-display-units", style={"display":"inline-block"})
             ])
         )
 
@@ -368,7 +433,7 @@ dynamic_viscosity_card = dbc.Card(
             dbc.CardBody([
                 html.P("Dynamic Viscosity", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="dynamic-viscosity-value"),
-                html.P("cP", className="numerical-display-units", style={"display":"inline-block"})
+                html.P("Pa.s", className="numerical-display-units", style={"display":"inline-block"})
             ])
         )
 
@@ -397,7 +462,7 @@ exp_dist1_card = dbc.Card(
             dbc.CardBody([
                 html.P("Expected Distance 1", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="exp-dist1-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -405,7 +470,7 @@ act_dist1_card = dbc.Card(
             dbc.CardBody([
                 html.P("Actual Distance 1", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="act-dist1-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -413,7 +478,7 @@ exp_dist2_card = dbc.Card(
             dbc.CardBody([
                 html.P("Expected Distance 2", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="exp-dist2-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -421,7 +486,7 @@ act_dist2_card = dbc.Card(
             dbc.CardBody([
                 html.P("Actual Distance 2", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="act-dist2-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -429,7 +494,7 @@ exp_dist3_card = dbc.Card(
             dbc.CardBody([
                 html.P("Expected Distance 3", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="exp-dist3-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -437,7 +502,7 @@ act_dist3_card = dbc.Card(
             dbc.CardBody([
                 html.P("Actual Distance 3", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="act-dist3-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -445,7 +510,7 @@ exp_dist4_card = dbc.Card(
             dbc.CardBody([
                 html.P("Expected Distance 4", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="exp-dist4-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -453,7 +518,7 @@ act_dist4_card = dbc.Card(
             dbc.CardBody([
                 html.P("Actual Distance 4", className="numerical-display-title"),
                 html.P("0", className="numerical-display-value", style={"display":"inline-block"}, id="act-dist4-value"),
-                html.P("mm", className="numerical-display-units", style={"display":"inline-block"}),
+                html.P("m", className="numerical-display-units", style={"display":"inline-block"}),
             ])
         )
 
@@ -574,59 +639,24 @@ distance_values_collapse = html.Div([
 # GUI Control Column 
 control_gui_column = html.Div([
     
-    # System Communication Row
-    dbc.Row([
-        dbc.Col([
-            system_communication_card
-        ]),
-        dbc.Col([
-            environmental_config_card 
-       ]) 
-    ],
-    className="pad-top pad-bot pad-left pad-right"),
-        
-    # Inverter and Stepper Config Row
+    # Stepper config Row
     dbc.Row([
        dbc.Col([
-         stepper_config_card  
+            stepper_config_card  
        ]),
        
        dbc.Col([
-           inverter_config_card
-       ])
+            dbc.Card([
+                init_stepper_btn,    
+            ], body=True, className="half-height-card"),
+        
+            dbc.Card([
+                lock_stepper_btn,    
+            ], body=True, className="half-height-card")
+            
+        ],)
     ],
-    className="pad-bot pad-left pad-right"),
-    
-    # Update Profile / Initialize Stepper Button Row
-    dbc.Row([
-        dbc.Col([
-            update_profile_card
-        ]),
-        dbc.Col([
-            init_stepper_card
-        ])
-    ],
-    className="pad-left pad-right pad-bot"),
-    
-    # Start and ESTOP Button Row
-    dbc.Row([
-        dbc.Col([
-            start_card
-        ]),
-        dbc.Col([
-            estop_card
-        ])
-    ],
-    className="pad-left pad-right pad-bot"),
-    
-
-    # Calculated Values Collapse
-    dbc.Row([
-        dbc.Col([
-            calculated_values_collapse
-        ])
-    ],
-    className="pad-left pad-right pad-bot"),
+    className="pad-bot pad-left"),
     
     # Distance Sensor Readings Collapse
     dbc.Row([
@@ -634,16 +664,78 @@ control_gui_column = html.Div([
             distance_values_collapse
         ])
     ],
-    className="pad-left pad-right pad-bot")
+    className="pad-left  pad-bot"),
+
+    # Inverter config row
+    dbc.Row([
+        dbc.Col([
+            inverter_config_card
+        ]),
+        
+        dbc.Col([
+            dbc.Card([
+                start_btn
+            ],
+            className="half-height-card" ,
+            body=True),
+            
+            dbc.Card([
+                estop_btn
+            ], 
+            body=True,
+            className="half-height-card")            
+        ]) 
+    ],  
+    className="pad-bot pad-left"),
+    
+    # Calculated Values Collapse
+    dbc.Row([
+        dbc.Col([
+            calculated_values_collapse
+        ])
+    ],
+    className="pad-left pad-bot"),
+    
 ])
 
 control_gui = html.Div([
+    
+    # System Comunication Row
     dbc.Row([
-        # CONTROLS
+        dbc.Col([
+            system_communication_card
+        ], width=5),
+        
+        dbc.Col([
+            environmental_config_card    
+       ], width=5)
+    ],
+    className="pad-top pad-bot pad-left"),
+    
+    dbc.Row([
+        # Control Column
         dbc.Col([
             control_gui_column
-        ]),
-    ])    
+        ],
+        width=10),
+        
+        dbc.Col([
+            state_indicator_card
+        ], className="pad-right pad-bot"),
+    ]),
+
+    # Output Dumps
+    html.Div(id="update-profile-dump")   ,
+    
+    # State Divs
+    html.Div(id="1-InitialState"),
+    html.Div(id="2-StepperInitReadyState"),
+    html.Div(id="3-StepperInitState"),
+    html.Div(id="4-StepperLockState"),
+    html.Div(id="5-InverterConfigState"),
+    html.Div(id="6-PrimedState"),
+    html.Div(id="7-ActiveTestState"),
+     
 ])
 
 manual = dcc.Markdown(

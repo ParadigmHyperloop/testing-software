@@ -40,6 +40,11 @@
     width: 100%;
 }
 
+.half-height-card{
+    height: 50%;
+    width: 100%;
+}
+
 .inline-block-child {
     display: inline-block;
   }
@@ -81,7 +86,7 @@ p.numerical-display-value {
 
 p.numerical-display-units {
     font-family: 'Open Sans', sans-serif;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .card-title {
@@ -93,6 +98,14 @@ p.numerical-display-units {
 .input-label {
     width: 37%;
     /*font-family: 'Open Sans', sans-serif;*/
+}
+
+.input-units {
+    width: 14.5%;
+}
+
+.indicator-label{
+    font-size: 14px;
 }
 
 
