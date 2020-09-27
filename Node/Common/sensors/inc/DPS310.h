@@ -35,19 +35,28 @@ enum Coefficient_Reg : uint8_t
     C30 = 0x20
 };
 
+enum Configuration_Reg : uint8_t
+{
+    
+};
+
 // Pressure sensors use the high speed clock by default
 constexpr unsigned HIGH_SPEED_MODE = 3400000;
 
-/**********************************************
+/**********************************************\
  *  I2C Interface for DPS310 Pressure Sensor  *
- **********************************************/
+\**********************************************/
 class DPS310
 {
 public:
+    static const unsigned s_defaultAddress = 77;
+
     DPS310();
     DPS310(const uint8_t);
     byte_t writeRegister(const Register, const uint8_t);
-    int32_t DPS310::readCalibrationCoefficient(const Coefficient_Reg);
+    int32_t readCalibrationCoefficient(const Coefficient_Reg);
+    byte_t configureTemp(byte_t, byte_t);
+    byte_t configurePressure(byte_t, byte_t);
 
 private:
     uint8_t m_address;

@@ -1,7 +1,7 @@
 #include "DPS310.h"
 
 DPS310::DPS310()
-    : m_address(77)
+    : m_address(s_defaultAddress)
 {}
 
 DPS310::DPS310(const uint8_t address)
@@ -72,5 +72,53 @@ int32_t DPS310::readCalibrationCoefficient(const Coefficient_Reg reg)
             low_byte = Wire.read();
             result = ((high_byte & 0x0f) << 16) | (middle_byte << 8) | low_byte;
         }
+        case C11:
+        {
+            Wire.beginTransmission(m_address);
+            Wire.write(C11);
+            Wire.requestFrom(m_address, 2);
+            high_byte = Wire.read();
+            low_byte = Wire.read();
+            result = (high_byte << 8) | low_byte;
+        }
+        case C20:
+        {
+            Wire.beginTransmission(m_address);
+            Wire.write(C20);
+            Wire.requestFrom(m_address, 2);
+            high_byte = Wire.read();
+            low_byte = Wire.read();
+            result = (high_byte << 8) | low_byte;
+        }
+        case C21:
+        {
+            Wire.beginTransmission(m_address);
+            Wire.write(C21);
+            Wire.requestFrom(m_address, 2);
+            high_byte = Wire.read();
+            low_byte = Wire.read();
+            result = (high_byte << 8) | low_byte;
+        }
+        case C30:
+        {
+            Wire.beginTransmission(m_address);
+            Wire.write(C30);
+            Wire.requestFrom(m_address, 2);
+            high_byte = Wire.read();
+            low_byte = Wire.read();
+            result = (high_byte << 8) | low_byte;
+        }
     }
+    
+    return result;
+}
+
+byte_t DPS310::configureTemp(byte_t tempRate, byte_t tempPrecision)
+{
+    return writeRegister(TMP_CFG, (tempRate & 0xf0) | (tempPrecision & 0x0f));
+}
+
+byte_t DPS310::configurePressure(byte_t pressureRate, byte_t pressurePrecision)
+{
+    return writeRegister(PRS_CFG, (pressureRate & 0xf0) | (pressurePrecision & 0x0f));
 }
