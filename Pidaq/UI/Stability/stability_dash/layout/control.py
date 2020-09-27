@@ -24,7 +24,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.InputGroup([
-                dbc.InputGroupAddon("RUNTIME", addon_type="prepend"),
+                dbc.InputGroupAddon("RUNTIME", style={"width":"180px"}),
                 dbc.Input(id="runtime"),
             ])
         ], 
@@ -37,7 +37,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.InputGroup([
-                dbc.InputGroupAddon("TIMESTEP", addon_type="prepend"),
+                dbc.InputGroupAddon("TIMESTEP", style={"width":"180px"}),
                 dbc.Input(id="timestep"),
             ])
         ],
@@ -50,7 +50,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.InputGroup([
-                dbc.InputGroupAddon("DISPLACEMENT STEP", addon_type="prepend"),
+                dbc.InputGroupAddon("DISPLACEMENT STEP", style={"width":"180px"}),
                 dbc.Input(id="displacement-step"),
             ])
         ],
@@ -63,7 +63,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.InputGroup([
-                dbc.InputGroupAddon("VELOCITY STEP", addon_type="prepend"),
+                dbc.InputGroupAddon("VELOCITY STEP", style={"width":"180px"}),
                 dbc.Input(id="velocity-step"),
             ])
         ],
@@ -76,7 +76,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.InputGroup([
-                dbc.InputGroupAddon("ACCELERATION STEP", addon_type="prepend"),
+                dbc.InputGroupAddon("ACCELERATION STEP", style={"width":"180px"}),
                 dbc.Input(id="acceleration-step"),
             ])
         ],
@@ -89,7 +89,7 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.InputGroup([
-                dbc.InputGroupAddon("PROFILE NAME", addon_type="prepend"),
+                dbc.InputGroupAddon("PROFILE NAME", style={"width":"180px"}),
                 dbc.Input(id="profile-name"),
             ])
         ],
@@ -102,14 +102,13 @@ dbc.Row([
     dbc.Col([
         dbc.Card([
             dbc.ButtonGroup([
-                dbc.Button("SAVE PROFILE", id="save-profile", style={"height":"100%","width":"100%"}),
-                dbc.Button("DELETE PROFILE", id="delete-profile", style={"height":"100%","width":"100%"}),
+                dbc.Button("SAVE PROFILE", id="save-profile", style={"width":"100%"}),
+                dbc.Button("DELETE PROFILE", id="delete-profile", style={"width":"100%"}),
                 dcc.Dropdown(
                     id = "load-profile",
-                    options = [
-                    ],
+                    options = [],
                     placeholder="LOAD PROFILE",
-                    style={'width': '100%'})
+                    style={"width":"100%"})
             ])
         ],
         body=True)  
