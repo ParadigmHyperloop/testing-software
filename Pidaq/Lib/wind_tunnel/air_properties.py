@@ -27,7 +27,7 @@ class LinearInterpolation:
 
     def __init__(self, path):
         """
-        Reads a CSV file to define two functions for each of density and dynamic
+        Reads a CSV file to define two functions for density and dynamic
         viscosity that can be used with temperature.  The CSV should have same
         structure as current one in Drive, where the units are in the second row.
         
@@ -63,13 +63,13 @@ class LinearInterpolation:
 
             # if a unit is not found, terminate the script
             if tempCol == -1: 
-                self.logger.error("Could not find \"°C\" in any column header.")
+                self.logger.error('Could not find "°C" in any column header.')
                 sys.exit()
             if densityCol == -1: 
-                self.logger.error("Could not find \"kg/m3\" in any column header.")
+                self.logger.error('Could not find "kg/m3" in any column header.')
                 sys.exit()
             if viscosityCol == -1:
-                self.logger.error("Could not find \"Pa*S\" in any column header.")
+                self.logger.error('Could not find "Pa*S" in any column header.')
                 sys.exit()
 
             tempList = []
@@ -109,3 +109,4 @@ class LinearInterpolation:
             self.logger.warning("Temperature out of bounds, returning 0. " + str(e))
             value = 0
         return value
+        
