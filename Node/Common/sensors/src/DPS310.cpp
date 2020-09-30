@@ -574,38 +574,6 @@ int16_t Dps310::readcoeffs(void)
 	return DPS__SUCCEEDED;
 }
 
-int16_t Dps310::configTemp(uint8_t tempMr, uint8_t tempOsr)
-{
-	int16_t ret = Dps310::configTemp(tempMr, tempOsr);
-
-	writeByteBitfield(m_tempSensor, registers[TEMP_SENSOR]);
-	//set TEMP SHIFT ENABLE if oversampling rate higher than eight(2^3)
-	if (tempOsr > DPS310__OSR_SE)
-	{
-		ret = writeByteBitfield(1U, registers[TEMP_SE]);
-	}
-	else
-	{
-		ret = writeByteBitfield(0U, registers[TEMP_SE]);
-	}
-	return ret;
-}
-
-int16_t Dps310::configPressure(uint8_t prsMr, uint8_t prsOsr)
-{
-	int16_t ret = Dps310::configPressure(prsMr, prsOsr);
-	//set PM SHIFT ENABLE if oversampling rate higher than eight(2^3)
-	if (prsOsr > DPS310__OSR_SE)
-	{
-		ret = writeByteBitfield(1U, registers[PRS_SE]);
-	}
-	else
-	{
-		ret = writeByteBitfield(0U, registers[PRS_SE]);
-	}
-	return ret;
-}
-
 int16_t Dps310::writeByte(uint8_t regAddress, uint8_t data)
 {
 	return writeByte(regAddress, data, 0U);

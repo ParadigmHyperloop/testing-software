@@ -9,6 +9,9 @@ class TwoWire;
 class Dps310
 {
 public:
+	Dps310();
+
+	~Dps310();
 	/**
 	 * I2C begin function with standard address
 	 */
@@ -310,6 +313,8 @@ private:
 	 * 			1 if result is a pressure raw value
 	 */
 	int16_t getFIFOvalue(int32_t *value);
+
+	int16_t Dps310::getContResults(float *tempBuffer, uint8_t &tempCount, float *prsBuffer, uint8_t &prsCount);
 
 	/**
 	 * Gets the results from continuous measurements and writes them to given arrays
