@@ -314,7 +314,7 @@ private:
 	 */
 	int16_t getFIFOvalue(int32_t *value);
 
-	int16_t Dps310::getContResults(float *tempBuffer, uint8_t &tempCount, float *prsBuffer, uint8_t &prsCount);
+	int16_t getContResults(float *tempBuffer, uint8_t &tempCount, float *prsBuffer, uint8_t &prsCount);
 
 	/**
 	 * Gets the results from continuous measurements and writes them to given arrays
