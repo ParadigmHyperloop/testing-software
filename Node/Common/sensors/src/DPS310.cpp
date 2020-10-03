@@ -33,11 +33,64 @@ uint8_t Dps310::getRevisionId(void)
 }
 
 int16_t Dps310::getContResults(float *tempBuffer,
+								 uint8_t &tempCount,
+								 float *prsBuffer,
+								 uint8_t &prsCount,
+								 RegMask_t fifo_empty_reg)
+{
+	if (m_initFail)
+	{
+		return DPS__FAIL_INIT_FAILED;
+	}
+	//abort if device is not in background mode
+	if (!(m_opMode & 0x04))
+	{
+		return DPS__FAIL_TOOBUSY;
+	}
+
+	if (!tempBuffer || !prsBuffer)
+	{
+		return DPS__FAIL_UNKNOWN;
+	}
+	tempCount = 0U;
+	prsCount = 0U;
+
+	//while FIFO is not empty
+	while (readByteBitfield(fifo_empty_reg) == 0)
+	{
+		int32_t raw_result;
+		float result;
+		//read next result from FIFO
+		int16_t type = getFIFOvalue(&raw_result);
+		switch (type)
+		{
+		case 0: //temperature
+			if (tempCount < DPS__FIFO_SIZE)
+			{
+				result = calcTemp(raw_result);
+				tempBuffer[tempCount++] = result;
+			}
+			break;
+		case 1: //pressure
+			if (prsCount < DPS__FIFO_SIZE)
+			{
+				result = calcPressure(raw_result);
+				prsBuffer[prsCount++] = result;
+			}
+			break;
+		case -1: //read failed
+			break;
+		}
+	}
+	return DPS__SUCCEEDED;
+}
+
+int16_t Dps310::getContResults(float *tempBuffer,
 							   uint8_t &tempCount,
 							   float *prsBuffer,
 							   uint8_t &prsCount)
 {
-	return Dps310::getContResults(tempBuffer, tempCount, prsBuffer, prsCount, registers[FIFO_EMPTY]);
+	return getContResults(tempBuffer, tempCount, prsBuffer, prsCount, registers[FIFO_EMPTY]);
 }
 
 int16_t Dps310::getSingleResult(float &result)

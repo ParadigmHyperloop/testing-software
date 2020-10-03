@@ -188,15 +188,6 @@ public:
 	 */
 	int16_t correctTemp(void);
 
-  /**
-   * @brief Set the source of interrupt (FIFO full, measurement values ready)
-   * 
-   * @param intr_source Interrupt source as defined by Interrupt_source_310_e
-   * @param polarity 
-   * @return status code 
-   */
-  int16_t setInterruptSources(uint8_t intr_source, uint8_t polarity = 1);
-
 private:
 	//scaling factor table
 	static const int32_t scaling_facts[DPS__NUM_OF_SCAL_FACTS];
