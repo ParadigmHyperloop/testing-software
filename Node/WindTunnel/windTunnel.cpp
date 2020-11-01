@@ -50,8 +50,10 @@ void CANMessage::updateMessageData()
     }
     else // Pressure Reading
     {
+        // Have to pack 2 32-bit floats into and array of 8 unsigned ints
+        // Using memcpy circumvents the typing, and allows this to be possible
         memcpy(frame.data, &(m_pReadings[1]->getResult()), sizeof(float));
-        memcpy(frame.data + 4, &(m_pReadings[1]->getResult()), sizeof(float));
+        memcpy(frame.data + 4, &(m_pReadings[0]->getResult()), sizeof(float));
     }
 }
 
