@@ -94,7 +94,7 @@ class LinearInterpolation:
         If temperature is out of bounds, return 0.        
         """
         try:
-            value= self.densityFunc(inputTemp)
+            value = self.densityFunc(inputTemp)
         except ValueError as e:
            self.logger.warning("Temperature out of bounds, returning 0. " + str(e))
            value = 0
@@ -105,7 +105,7 @@ class LinearInterpolation:
         If temperature is out of bounds, return 0.
         """
         try:
-            value= self.viscosityFunc(inputTemp)
+            value = self.viscosityFunc(inputTemp)
         except ValueError as e:
             self.logger.warning("Temperature out of bounds, returning 0. " + str(e))
             value = 0
