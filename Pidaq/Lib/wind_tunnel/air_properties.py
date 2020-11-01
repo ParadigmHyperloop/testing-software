@@ -40,7 +40,7 @@ class LinearInterpolation:
             open(path) # Open the CSV file
         except IOError as err:
             self.logger.error(err)
-            sys.exit()
+            
         with open(path) as file:
             csv_reader= csv.reader(file, delimiter =',')
             next(csv_reader) # Skip the first row
@@ -61,16 +61,15 @@ class LinearInterpolation:
                     viscosityCol = count
                 count += 1
 
-            # if a unit is not found, terminate the script
+            # if a unit was not found, raise an error
             if tempCol == -1: 
-                self.logger.error('Could not find "°C" in any column header.')
-                sys.exit()
+                raise ValueError('Temperature unit "°C" was not found.')
+                
             if densityCol == -1: 
-                self.logger.error('Could not find "kg/m3" in any column header.')
-                sys.exit()
+                raise ValueError('Density unit "kg/m3" was not found.')
+                
             if viscosityCol == -1:
-                self.logger.error('Could not find "Pa*S" in any column header.')
-                sys.exit()
+                raise ValueError('Dynamic viscosity unit "Pa*S" was not found.')
 
             tempList = []
             densityList = []
