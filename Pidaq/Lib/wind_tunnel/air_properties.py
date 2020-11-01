@@ -47,19 +47,17 @@ class LinearInterpolation:
             tempCol, densityCol, viscosityCol = -1,-1,-1
             row = next(csv_reader) # Read the second row that contains the units
         
-            count = 0 # For tracking the column index
-            for cell in row: # This loop determines the column index for 
+            for index, cell in enumerate(row): # This loop determines the column index for 
                     # temperature, density, and dynamic viscosity based on units
 
                 if cell.find('°C') != -1:
-                    tempCol = count
+                    tempCol = index
 
                 if cell.find('[kg/m3]') != -1:
-                    densityCol = count
+                    densityCol = index
 
                 if cell.find('[Pa*S]') != -1:
-                    viscosityCol = count
-                count += 1
+                    viscosityCol = index
 
             # if a unit was not found, raise an error
             if tempCol == -1: 
