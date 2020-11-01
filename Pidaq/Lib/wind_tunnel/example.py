@@ -16,10 +16,10 @@ if __name__ == "__main__":
             logger.warning("Path does not exist. \nPlease enter a valid path: ")
 
     interObject = LinearInterpolation(filePath)
-    value = input("Enter temperature value, or write \"exit\" to end: ")
+    value = input('Enter temperature value, or write "exit" to end: ')
     while(value != "exit"):
         x = interObject.interpolateDensity(value)
         y = interObject.interpolateViscosity(value) 
-        print(x) 
-        print(y)
-        value = input("Enter next temperature value, or write \"exit\" to end: ")
+        print("Density: ", x) 
+        print("Dynamic Viscosity: ", y)
+        value = input('Enter next temperature value, or write "exit" to end: ')
