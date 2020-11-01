@@ -80,12 +80,16 @@ class LinearInterpolation:
                 viscosityList.append(float(row[viscosityCol]))
             
             # Define the interpolation function for density
-            self.densityFunc = interpolate.interp1d(tempList, densityList,
-                                                    bounds_error = True, assume_sorted = True)
+            self.densityFunc = interpolate.interp1d(tempList,
+                                                    densityList,
+                                                    bounds_error = True,
+                                                    assume_sorted = True)
             
             # Define the interpolation function for viscosity
-            self.viscosityFunc = interpolate.interp1d(tempList, viscosityList, 
-                                                        bounds_error = True, assume_sorted = True)
+            self.viscosityFunc = interpolate.interp1d(tempList,
+                                                      viscosityList, 
+                                                      bounds_error = True,
+                                                      assume_sorted = True)
 
     def interpolateDensity(self, inputTemp):
         """Return interpolated value of density based on temperature.
