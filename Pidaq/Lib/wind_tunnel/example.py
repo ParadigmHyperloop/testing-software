@@ -3,9 +3,9 @@ import os
 import sys
 from air_properties import LinearInterpolation
 
-logger = logging.getLogger()
 
 if __name__ == "__main__":
+    logger = logging.getLogger()
     while 1:
         filePath = input("CSV File Path, no quotations: ")
         
