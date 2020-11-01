@@ -25,7 +25,7 @@ class LinearInterpolation:
         interpolateViscosity
     """
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         """
         Reads a CSV file to define two functions for density and dynamic
         viscosity that can be used with temperature.  The CSV should have same
@@ -89,7 +89,7 @@ class LinearInterpolation:
                                                       bounds_error = True,
                                                       assume_sorted = True)
 
-    def interpolateDensity(self, inputTemp):
+    def interpolateDensity(self, inputTemp: float) -> float:
         """Return interpolated value of density based on temperature.
         If temperature is out of bounds, return 0.        
         """
@@ -100,7 +100,7 @@ class LinearInterpolation:
            value = 0
         return value
     
-    def interpolateViscosity(self, inputTemp):
+    def interpolateViscosity(self, inputTemp: float) -> float:
         """Return interpolated value of dynamic viscosity based on temperature.
         If temperature is out of bounds, return 0.
         """
