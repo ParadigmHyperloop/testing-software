@@ -17,7 +17,7 @@
 #ifndef _Adafruit_MotorShield_h_
 #define _Adafruit_MotorShield_h_
 
-#include "utility/Adafruit_MS_PWMServoDriver.h"
+#include "../../drivers/inc/Adafruit_MS_PWMServoDriver.h"
 #include <Wire.h>
 #include <inttypes.h>
 
