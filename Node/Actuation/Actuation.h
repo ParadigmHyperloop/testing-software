@@ -23,11 +23,21 @@ private:
         eStepResponse = 22
     };
 
+    struct StepperCommand
+    {
+        uint16_t nSteps;
+        uint8_t u8Direction;
+        uint8_t u8Style;
+    };
+
     void InitStepper(uint16_t, uint8_t);
     void sendInitStepperResponse(uint16_t, uint8_t);
 
     void setStepperSpeed(uint16_t, uint8_t);
     void sendStepperSpeedResponse(uint16_t, uint8_t);
+
+    void stepperCommand(StepperCommand, uint8_t);
+    void stepperResponse(StepperCommand, uint8_t);
 
     TwoWire* m_pI2C;
     MCP2515 m_can;

@@ -31,6 +31,12 @@ bool ActuationManager::receiveCommand()
         }
         case (eStepCommand):
         {
+            StepperCommand command = {
+                (frame.data[0] << 8) | frame.data[1],
+                frame.data[2],
+                frame.data[3]
+            };
+            stepperCommand(command, frame.data[4]);
             break;
         }
     }
@@ -80,6 +86,36 @@ void ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uint8_t u8Add
 {
     uint8_t au8Data[] = { (uint8_t)((u16Speed & 0xFF00) >> 8), (uint8_t)(u16Speed & 0x00FF), u8Address };
     can_frame frame = { eSpeedResponse, 8, au8Data };
+
+    MCP2515::ERROR status = m_can.sendMessage(&frame);
+    if (status != MCP2515::ERROR_OK)
+    {
+        // TODO error handling
+    }
+}
+
+void ActuationManager::stepperCommand(StepperCommand command, uint8_t u8Address)
+{
+    if (m_apSteppers[u8Address - 1] == nullptr)
+    {
+        // TODO error handling
+        return;
+    }
+    m_apSteppers[u8Address - 1]->step(command.nSteps, command.u8Direction, command.u8Style);
+
+    stepperResponse(command, u8Address);
+}
+
+void ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address)
+{
+    uint8_t au8Data[] = {
+        (uint8_t)((command.nSteps & 0xFF00) >> 8),
+        (uint8_t)(command.nSteps & 0x00FF),
+        command.u8Direction,
+        command.u8Style,
+        u8Address
+    };
+    can_frame frame = { eStepResponse, 8, au8Data };
 
     MCP2515::ERROR status = m_can.sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
