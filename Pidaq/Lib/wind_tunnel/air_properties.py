@@ -38,12 +38,8 @@ class LinearInterpolation:
             ValueError - A unit (hence the column for a property) was not found
         """
         self.logger = logging.getLogger()
-
-        try:
-            open(path) # Open the CSV file
-        except IOError as err:
-            self.logger.error(err)
-            
+        
+        self.init(path) # Check if the path is valid, return 0 if not
         with open(path) as file:
             csv_reader = csv.reader(file, delimiter =',')
             next(csv_reader) # Skip the first row
@@ -91,6 +87,13 @@ class LinearInterpolation:
                                                       viscosityList, 
                                                       bounds_error = True,
                                                       assume_sorted = True)
+
+    def init(self, path: str):
+                try:
+                    open(path) # Open the CSV file
+                except FileNotFoundError as err:
+                    self.logger.error(err)
+                    return 0
 
     def interpolateDensity(self, inputTemp: float) -> float:
         """Return interpolated value of density based on temperature.
