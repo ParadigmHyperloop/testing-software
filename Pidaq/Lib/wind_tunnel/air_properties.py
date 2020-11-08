@@ -37,63 +37,65 @@ class LinearInterpolation:
         Raises:
             ValueError - A unit (hence the column for a property) was not found
         """
-        self.logger = logging.getLogger()
+        self.init(path)
         
-        self.init(path) # Check if the path is valid, return 0 if not
-        with open(path) as file:
-            csv_reader = csv.reader(file, delimiter =',')
-            next(csv_reader) # Skip the first row
-            tempCol, densityCol, viscosityCol = -1,-1,-1
-            row = next(csv_reader) # Read the second row that contains the units
-        
-            for index, cell in enumerate(row): # This loop determines the column index for 
-                    # temperature, density, and dynamic viscosity based on units
-
-                if cell.find('°C') != -1:
-                    tempCol = index
-
-                if cell.find('[kg/m3]') != -1:
-                    densityCol = index
-
-                if cell.find('[Pa*S]') != -1:
-                    viscosityCol = index
-
-            # if a unit was not found, raise an error
-            if tempCol == -1: 
-                raise ValueError('Temperature unit "°C" was not found.')
-                
-            if densityCol == -1: 
-                raise ValueError('Density unit "kg/m3" was not found.')
-                
-            if viscosityCol == -1:
-                raise ValueError('Dynamic viscosity unit "Pa*S" was not found.')
-
-            tempList = []
-            densityList = []
-            viscosityList = []
-            for row in csv_reader: # Populate each list with the relevant values casted to float
-                tempList.append(float(row[tempCol]))
-                densityList.append(float(row[densityCol]))
-                viscosityList.append(float(row[viscosityCol]))
-            
-            # Define the interpolation function for density
-            self.densityFunc = interpolate.interp1d(tempList,
-                                                    densityList,
-                                                    bounds_error = True,
-                                                    assume_sorted = True)
-            
-            # Define the interpolation function for viscosity
-            self.viscosityFunc = interpolate.interp1d(tempList,
-                                                      viscosityList, 
-                                                      bounds_error = True,
-                                                      assume_sorted = True)
 
     def init(self, path: str):
-                try:
-                    open(path) # Open the CSV file
-                except FileNotFoundError as err:
-                    self.logger.error(err)
-                    return 0
+            self.logger = logging.getLogger()
+
+            try:
+                open(path)
+            except FileNotFoundError as err:
+                self.logger.error(err)
+                return 0
+
+            with open(path) as file:
+                csv_reader = csv.reader(file, delimiter =',')
+                next(csv_reader) # Skip the first row
+                tempCol, densityCol, viscosityCol = -1,-1,-1
+                row = next(csv_reader) # Read the second row that contains the units
+
+                # This loop determines the column indices based on units
+                for index, cell in enumerate(row): 
+
+                    if cell.find('°C') != -1:
+                        tempCol = index
+
+                    if cell.find('[kg/m3]') != -1:
+                        densityCol = index
+
+                    if cell.find('[Pa*S]') != -1:
+                        viscosityCol = index
+
+                # If a unit was not found, raise an error
+                if tempCol == -1: 
+                    raise ValueError('Temperature unit "°C" was not found.')
+                    
+                if densityCol == -1: 
+                    raise ValueError('Density unit "kg/m3" was not found.')
+                    
+                if viscosityCol == -1:
+                    raise ValueError('Dynamic viscosity unit "Pa*S" was not found.')
+
+                tempList = []
+                densityList = []
+                viscosityList = []
+                for row in csv_reader: # Populate each list with the relevant values casted to float
+                    tempList.append(float(row[tempCol]))
+                    densityList.append(float(row[densityCol]))
+                    viscosityList.append(float(row[viscosityCol]))
+                
+                # Define the interpolation function for density
+                self.densityFunc = interpolate.interp1d(tempList,
+                                                        densityList,
+                                                        bounds_error = True,
+                                                        assume_sorted = True)
+                
+                # Define the interpolation function for viscosity
+                self.viscosityFunc = interpolate.interp1d(tempList,
+                                                        viscosityList, 
+                                                        bounds_error = True,
+                                                        assume_sorted = True)
 
     def interpolateDensity(self, inputTemp: float) -> float:
         """Return interpolated value of density based on temperature.
