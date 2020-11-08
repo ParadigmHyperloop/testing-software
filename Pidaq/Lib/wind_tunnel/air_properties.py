@@ -52,8 +52,8 @@ class LinearInterpolation:
             with open(path) as file:
                 csv_reader = csv.reader(file, delimiter =',')
                 next(csv_reader) # Skip the first row
-                tempCol, densityCol, viscosityCol = -1,-1,-1
                 row = next(csv_reader) # Read the second row that contains the units
+                tempCol, densityCol, viscosityCol = -1,-1,-1
 
                 # This loop determines the column indices based on units
                 for index, cell in enumerate(row): 
