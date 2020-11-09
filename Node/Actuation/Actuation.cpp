@@ -60,7 +60,10 @@ bool ActuationManager::InitStepper(uint16_t u16Step, uint8_t u8Address)
 bool ActuationManager::sendInitStepperResponse(uint16_t u16Step, uint8_t u8Address)
 {
     uint8_t au8Data[] = { (uint8_t)((u16Step & 0xFF00) >> 8), (uint8_t)(u16Step & 0x00FF), u8Address };
-    can_frame frame = { eInitResponse, 8, au8Data };
+    uint8_t au8IdBuf[4];
+    m_can.prepareId(au8IdBuf, false, eInitResponse);
+
+    can_frame frame = { &au8IdBuf, 8, au8Data };
 
     MCP2515::ERROR status = m_can.sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
@@ -85,7 +88,10 @@ bool ActuationManager::setStepperSpeed(uint16_t u16Speed, uint8_t u8Address)
 bool ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uint8_t u8Address)
 {
     uint8_t au8Data[] = { (uint8_t)((u16Speed & 0xFF00) >> 8), (uint8_t)(u16Speed & 0x00FF), u8Address };
-    can_frame frame = { eSpeedResponse, 8, au8Data };
+    uint8_t au8IdBuf[4];
+    m_can.prepareId(au8IdBuf, false, eSpeedResponse);
+
+    can_frame frame = { &au8IdBuf, 8, au8Data };
 
     MCP2515::ERROR status = m_can.sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
@@ -116,7 +122,10 @@ bool ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address
         command.u8Style,
         u8Address
     };
-    can_frame frame = { eStepResponse, 8, au8Data };
+    uint8_t au8IdBuf[4];
+    m_can.prepareId(au8IdBuf, false, eStepResponse);
+
+    can_frame frame = { &au8IdBuf, 8, au8Data };
 
     MCP2515::ERROR status = m_can.sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
@@ -129,8 +138,11 @@ bool ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address
 
 bool ActuationManager::sendHeartbeat()
 {
+    uint8_t au8IdBuf[4];
+    m_can.prepareId(au8IdBuf, false, eHeartbeat);
     can_frame frame = {0};
-    frame.can_id = eHeartbeat;
+
+    frame.can_id = &au8IdBuf;
 
     MCP2515::ERROR status = m_can.sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)

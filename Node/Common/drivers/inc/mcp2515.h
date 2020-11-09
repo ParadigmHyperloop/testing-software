@@ -453,7 +453,6 @@ class MCP2515
         void setRegisters(const REGISTER reg, const uint8_t values[], const uint8_t n);
         void modifyRegister(const REGISTER reg, const uint8_t mask, const uint8_t data);
 
-        void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
     
     public:
         MCP2515(const uint8_t _CS);
@@ -484,6 +483,7 @@ class MCP2515
         void clearRXnOVR(void);
         void clearMERR();
         void clearERRIF();
+        void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
 };
 
 #endif
