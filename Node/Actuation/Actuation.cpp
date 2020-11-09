@@ -1,14 +1,14 @@
 #include "Actuation.h"
 
-ActuationManager::ActuationManager(TwoWire* pI2C, const uint8_t u8Cs)
-    : m_pI2C(pI2C), m_can(u8Cs), m_motorShield()
+ActuationManager::ActuationManager(TwoWire* pI2C, MCP2515* can)
+    : m_pI2C(pI2C), m_can(can), m_motorShield()
 {}
 
 bool ActuationManager::receiveCommand()
 {
     bool bStatus;
     can_frame frame = {0};
-    MCP2515::ERROR response = m_can.readMessage(&frame);
+    MCP2515::ERROR response = m_can->readMessage(&frame);
     if (response != MCP2515::ERROR_OK)
     {
         return false;
@@ -61,11 +61,11 @@ bool ActuationManager::sendInitStepperResponse(uint16_t u16Step, uint8_t u8Addre
 {
     uint8_t au8Data[] = { (uint8_t)((u16Step & 0xFF00) >> 8), (uint8_t)(u16Step & 0x00FF), u8Address };
     uint8_t au8IdBuf[4];
-    m_can.prepareId(au8IdBuf, false, eInitResponse);
+    m_can->prepareId(au8IdBuf, false, eInitResponse);
 
     can_frame frame = { &au8IdBuf, 8, au8Data };
 
-    MCP2515::ERROR status = m_can.sendMessage(&frame);
+    MCP2515::ERROR status = m_can->sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
     {
         return false;
@@ -89,11 +89,11 @@ bool ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uint8_t u8Add
 {
     uint8_t au8Data[] = { (uint8_t)((u16Speed & 0xFF00) >> 8), (uint8_t)(u16Speed & 0x00FF), u8Address };
     uint8_t au8IdBuf[4];
-    m_can.prepareId(au8IdBuf, false, eSpeedResponse);
+    m_can->prepareId(au8IdBuf, false, eSpeedResponse);
 
     can_frame frame = { &au8IdBuf, 8, au8Data };
 
-    MCP2515::ERROR status = m_can.sendMessage(&frame);
+    MCP2515::ERROR status = m_can->sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
     {
         return false;
@@ -123,11 +123,11 @@ bool ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address
         u8Address
     };
     uint8_t au8IdBuf[4];
-    m_can.prepareId(au8IdBuf, false, eStepResponse);
+    m_can->prepareId(au8IdBuf, false, eStepResponse);
 
     can_frame frame = { &au8IdBuf, 8, au8Data };
 
-    MCP2515::ERROR status = m_can.sendMessage(&frame);
+    MCP2515::ERROR status = m_can->sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
     {
         return false;
@@ -139,12 +139,12 @@ bool ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address
 bool ActuationManager::sendHeartbeat()
 {
     uint8_t au8IdBuf[4];
-    m_can.prepareId(au8IdBuf, false, eHeartbeat);
+    m_can->prepareId(au8IdBuf, false, eHeartbeat);
     can_frame frame = {0};
 
     frame.can_id = &au8IdBuf;
 
-    MCP2515::ERROR status = m_can.sendMessage(&frame);
+    MCP2515::ERROR status = m_can->sendMessage(&frame);
     if (status != MCP2515::ERROR_OK)
     {
         return false;
@@ -155,7 +155,8 @@ bool ActuationManager::sendHeartbeat()
 
 int main(void)
 {
-    ActuationManager manager{&Wire, 15};
+    MCP2515 can{15};
+    ActuationManager manager{&Wire, &can};
     return 0;
 }
 

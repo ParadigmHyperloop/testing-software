@@ -8,7 +8,7 @@
 class ActuationManager
 {
 public:
-    ActuationManager(TwoWire*, const uint8_t);
+    ActuationManager(TwoWire*, MCP2515*);
 
     bool receiveCommand();
 
@@ -45,7 +45,7 @@ private:
     bool sendResponse();
 
     TwoWire* m_pI2C;
-    MCP2515 m_can;
+    MCP2515* m_can;
     Adafruit_MotorShield m_motorShield;
     Adafruit_StepperMotor* m_apSteppers[2];
 };
