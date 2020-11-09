@@ -3,8 +3,6 @@
 #include <Adafruit_MotorShield.h>
 #include <mcp2515.h>
 
-// TODO class wrapping watchdog timer and heartbeat can message
-
 class ActuationManager
 {
 public:
@@ -41,8 +39,6 @@ private:
     bool stepperResponse(StepperCommand, uint8_t);
 
     bool sendHeartbeat();
-
-    bool sendResponse();
 
     TwoWire* m_pI2C;
     MCP2515* m_can;
