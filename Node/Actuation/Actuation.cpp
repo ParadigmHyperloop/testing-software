@@ -4,47 +4,45 @@ ActuationManager::ActuationManager(TwoWire* pI2C, MCP2515* can)
     : m_pI2C(pI2C), m_can(can), m_motorShield()
 {}
 
-bool ActuationManager::receiveCommand()
+MCP2515::ERROR ActuationManager::receiveCommand(can_frame* frame)
 {
-    bool bStatus;
-    can_frame frame = {0};
-    MCP2515::ERROR response = m_can->readMessage(&frame);
-    if (response != MCP2515::ERROR_OK)
-    {
-        return false;
-    }
-    switch (frame.can_id)
+    return m_can->readMessage(&frame);
+}
+
+MCP2515::ERROR handleCommand(can_frame* frame)
+{
+    switch (frame->can_id)
     {
         case (eInitCommand):
         {
-            uint16_t u16Data = (frame.data[0] << 8) | frame.data[1];
-            uint8_t u8Address = frame.data[2];
-            bStatus = InitStepper(u16Data, u8Address);
+            uint16_t u16Data = (frame->data[0] << 8) | frame->data[1];
+            uint8_t u8Address = frame->data[2];
+            status = InitStepper(u16Data, u8Address);
             break;
         }
         case (eSpeedCommand):
         {
-            uint16_t u16Data = (frame.data[0] << 8) | frame.data[1];
-            uint8_t u8Address = frame.data[2];
-            bStatus = setStepperSpeed(u16Data, u8Address);
+            uint16_t u16Data = (frame->data[0] << 8) | frame->data[1];
+            uint8_t u8Address = frame->data[2];
+            status = setStepperSpeed(u16Data, u8Address);
             break;
         }
         case (eStepCommand):
         {
             StepperCommand command = {
-                (frame.data[0] << 8) | frame.data[1],
-                frame.data[2],
-                frame.data[3]
+                (frame->data[0] << 8) | frame->data[1],
+                frame->data[2],
+                frame->data[3]
             };
-            bStatus = stepperCommand(command, frame.data[4]);
+            status = stepperCommand(command, frame->data[4]);
             break;
         }
     }
 
-    return bStatus;
+    return status;
 }
 
-bool ActuationManager::InitStepper(uint16_t u16Step, uint8_t u8Address)
+MCP2515::ERROR ActuationManager::InitStepper(uint16_t u16Step, uint8_t u8Address)
 {
     if (u8Address != 1 || u8Address != 2)
     {
@@ -57,7 +55,7 @@ bool ActuationManager::InitStepper(uint16_t u16Step, uint8_t u8Address)
     return sendInitStepperResponse(u16Step, u8Address);
 }
 
-bool ActuationManager::sendInitStepperResponse(uint16_t u16Step, uint8_t u8Address)
+MCP2515::ERROR ActuationManager::sendInitStepperResponse(uint16_t u16Step, uint8_t u8Address)
 {
     uint8_t au8Data[] = { (uint8_t)((u16Step & 0xFF00) >> 8), (uint8_t)(u16Step & 0x00FF), u8Address };
     uint8_t au8IdBuf[4];
@@ -65,27 +63,21 @@ bool ActuationManager::sendInitStepperResponse(uint16_t u16Step, uint8_t u8Addre
 
     can_frame frame = { &au8IdBuf, 8, au8Data };
 
-    MCP2515::ERROR status = m_can->sendMessage(&frame);
-    if (status != MCP2515::ERROR_OK)
-    {
-        return false;
-    }
-    
-    return true;
+    return m_can->sendMessage(&frame);
 }
 
-bool ActuationManager::setStepperSpeed(uint16_t u16Speed, uint8_t u8Address)
+MCP2515::ERROR ActuationManager::setStepperSpeed(uint16_t u16Speed, uint8_t u8Address)
 {
     if (m_apSteppers[u8Address - 1] == nullptr)
     {
-        return false;
+        return MCP2515::ERROR_FAIL;
     }
     m_apSteppers[u8Address - 1]->setSpeed(u16Speed);
 
     return sendStepperSpeedResponse(u16Speed, u8Address);
 }
 
-bool ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uint8_t u8Address)
+MCP2515::ERROR ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uint8_t u8Address)
 {
     uint8_t au8Data[] = { (uint8_t)((u16Speed & 0xFF00) >> 8), (uint8_t)(u16Speed & 0x00FF), u8Address };
     uint8_t au8IdBuf[4];
@@ -93,27 +85,21 @@ bool ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uint8_t u8Add
 
     can_frame frame = { &au8IdBuf, 8, au8Data };
 
-    MCP2515::ERROR status = m_can->sendMessage(&frame);
-    if (status != MCP2515::ERROR_OK)
-    {
-        return false;
-    }
-
-    return true;
+    return m_can->sendMessage(&frame);
 }
 
-bool ActuationManager::stepperCommand(StepperCommand command, uint8_t u8Address)
+MCP2515::ERROR ActuationManager::stepperCommand(StepperCommand command, uint8_t u8Address)
 {
     if (m_apSteppers[u8Address - 1] == nullptr)
     {
-        return false;
+        return MCP2515::ERROR_FAIL;
     }
     m_apSteppers[u8Address - 1]->step(command.nSteps, command.u8Direction, command.u8Style);
 
     return stepperResponse(command, u8Address);
 }
 
-bool ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address)
+MCP2515::ERROR ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address)
 {
     uint8_t au8Data[] = {
         (uint8_t)((command.nSteps & 0xFF00) >> 8),
@@ -127,16 +113,10 @@ bool ActuationManager::stepperResponse(StepperCommand command, uint8_t u8Address
 
     can_frame frame = { &au8IdBuf, 8, au8Data };
 
-    MCP2515::ERROR status = m_can->sendMessage(&frame);
-    if (status != MCP2515::ERROR_OK)
-    {
-        return false;
-    }
-
-    return true;
+    return m_can->sendMessage(&frame);
 }
 
-bool ActuationManager::sendHeartbeat()
+MCP2515::ERROR ActuationManager::sendHeartbeat()
 {
     uint8_t au8IdBuf[4];
     m_can->prepareId(au8IdBuf, false, eHeartbeat);
@@ -144,13 +124,7 @@ bool ActuationManager::sendHeartbeat()
 
     frame.can_id = &au8IdBuf;
 
-    MCP2515::ERROR status = m_can->sendMessage(&frame);
-    if (status != MCP2515::ERROR_OK)
-    {
-        return false;
-    }
-
-    return true;
+    return m_can->sendMessage(&frame);
 }
 
 int main(void)

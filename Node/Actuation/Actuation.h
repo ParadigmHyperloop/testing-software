@@ -8,7 +8,8 @@ class ActuationManager
 public:
     ActuationManager(TwoWire*, MCP2515*);
 
-    bool receiveCommand();
+    MCP2515::ERROR receiveCommand();
+    MCP2515::ERROR handleCommand(can_frame*);
 
 private:
     enum ECommandResponse : uint8_t
@@ -29,16 +30,16 @@ private:
         uint8_t u8Style;
     };
 
-    bool InitStepper(uint16_t, uint8_t);
-    bool sendInitStepperResponse(uint16_t, uint8_t);
+    MCP2515::ERROR InitStepper(uint16_t, uint8_t);
+    MCP2515::ERROR sendInitStepperResponse(uint16_t, uint8_t);
 
-    bool setStepperSpeed(uint16_t, uint8_t);
-    bool sendStepperSpeedResponse(uint16_t, uint8_t);
+    MCP2515::ERROR setStepperSpeed(uint16_t, uint8_t);
+    MCP2515::ERROR sendStepperSpeedResponse(uint16_t, uint8_t);
 
-    bool stepperCommand(StepperCommand, uint8_t);
-    bool stepperResponse(StepperCommand, uint8_t);
+    MCP2515::ERROR stepperCommand(StepperCommand, uint8_t);
+    MCP2515::ERROR stepperResponse(StepperCommand, uint8_t);
 
-    bool sendHeartbeat();
+    MCP2515::ERROR sendHeartbeat();
 
     TwoWire* m_pI2C;
     MCP2515* m_can;
