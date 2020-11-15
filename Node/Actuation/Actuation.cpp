@@ -6,11 +6,12 @@ ActuationManager::ActuationManager(TwoWire* pI2C, MCP2515* can)
 
 MCP2515::ERROR ActuationManager::receiveCommand(can_frame* frame)
 {
-    return m_can->readMessage(&frame);
+    return m_can->readMessage(frame);
 }
 
-MCP2515::ERROR handleCommand(can_frame* frame)
+MCP2515::ERROR ActuationManager::handleCommand(can_frame* frame)
 {
+    MCP2515::ERROR status;
     switch (frame->can_id)
     {
         case (eInitCommand):
@@ -30,7 +31,7 @@ MCP2515::ERROR handleCommand(can_frame* frame)
         case (eStepCommand):
         {
             StepperCommand command = {
-                (frame->data[0] << 8) | frame->data[1],
+                static_cast<uint16_t>((frame->data[0] << 8) | frame->data[1]),
                 frame->data[2],
                 frame->data[3]
             };
@@ -46,7 +47,7 @@ MCP2515::ERROR ActuationManager::InitStepper(uint16_t u16Step, uint8_t u8Address
 {
     if (u8Address != 1 || u8Address != 2)
     {
-        return false;
+        return MCP2515::ERROR_FAIL;
     }
     if (m_apSteppers[u8Address - 1] == nullptr)
     {
@@ -61,7 +62,8 @@ MCP2515::ERROR ActuationManager::sendInitStepperResponse(uint16_t u16Step, uint8
     uint8_t au8IdBuf[4];
     m_can->prepareId(au8IdBuf, false, eInitResponse);
 
-    can_frame frame = { &au8IdBuf, 8, au8Data };
+    canid_t* pIdBuf = (canid_t*)au8IdBuf;
+    can_frame frame = { *pIdBuf, 8, *au8Data };
 
     return m_can->sendMessage(&frame);
 }
@@ -82,8 +84,9 @@ MCP2515::ERROR ActuationManager::sendStepperSpeedResponse(uint16_t u16Speed, uin
     uint8_t au8Data[] = { (uint8_t)((u16Speed & 0xFF00) >> 8), (uint8_t)(u16Speed & 0x00FF), u8Address };
     uint8_t au8IdBuf[4];
     m_can->prepareId(au8IdBuf, false, eSpeedResponse);
-
-    can_frame frame = { &au8IdBuf, 8, au8Data };
+    
+    canid_t* pIdBuf = (canid_t*)au8IdBuf;
+    can_frame frame = { *pIdBuf, 8, *au8Data };
 
     return m_can->sendMessage(&frame);
 }
@@ -111,7 +114,8 @@ MCP2515::ERROR ActuationManager::stepperResponse(StepperCommand command, uint8_t
     uint8_t au8IdBuf[4];
     m_can->prepareId(au8IdBuf, false, eStepResponse);
 
-    can_frame frame = { &au8IdBuf, 8, au8Data };
+    canid_t* pIdBuf = (canid_t*)au8IdBuf;
+    can_frame frame = { *pIdBuf, 8, *au8Data };
 
     return m_can->sendMessage(&frame);
 }
@@ -122,7 +126,8 @@ MCP2515::ERROR ActuationManager::sendHeartbeat()
     m_can->prepareId(au8IdBuf, false, eHeartbeat);
     can_frame frame = {0};
 
-    frame.can_id = &au8IdBuf;
+    canid_t* pIdBuf = (canid_t*)au8IdBuf;
+    frame.can_id = *pIdBuf;
 
     return m_can->sendMessage(&frame);
 }

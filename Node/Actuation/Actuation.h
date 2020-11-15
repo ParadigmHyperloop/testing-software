@@ -8,7 +8,7 @@ class ActuationManager
 public:
     ActuationManager(TwoWire*, MCP2515*);
 
-    MCP2515::ERROR receiveCommand();
+    MCP2515::ERROR receiveCommand(can_frame*);
     MCP2515::ERROR handleCommand(can_frame*);
 
 private:
