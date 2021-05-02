@@ -3,3 +3,4 @@
 !important .vscode/tasks.json
 __pycache__
 profiles.json
+.DS_Store
