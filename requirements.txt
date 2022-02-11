@@ -10,6 +10,6 @@ dash-table==4.6.1
 Flask==1.1.1
 Flask-SocketIO==4.2.1
 influxdb==5.2.3
-protobuf==3.11.3
+protobuf==3.15.0
 pylint==2.4.4
 pandas==1.0.3
